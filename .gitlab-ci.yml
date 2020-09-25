@@ -1,0 +1,46 @@
+stages:
+  - build
+  - test
+
+variables:
+  FEATURE_IMAGE_NAME: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
+  DEPLOY_IMAGE_NAME: $CI_REGISTRY_IMAGE
+
+Build environment:
+  stage: build
+  image: docker:19.03.12
+  services:
+    - name: docker:dind
+  variables:
+    DOCKER_HOST: tcp://localhost:2375
+    DOCKER_DRIVER: overlay2
+    DOCKER_TLS_CERTDIR: ""
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $FEATURE_IMAGE_NAME:runtime || true
+    - |
+      docker build \
+      --cache-from $FEATURE_IMAGE_NAME:runtime \
+      -t $FEATURE_IMAGE_NAME:runtime \
+      --target runtime \
+      .
+    - docker push $FEATURE_IMAGE_NAME:runtime
+  only:
+    changes:
+      - Dockerfile
+      - .gitlab-ci.yml
+      - requirements.txt
+
+Dryrun Robottests:
+  stage: test
+  image: $FEATURE_IMAGE_NAME:runtime
+  script:
+    - robot -b console -d output -x xunit.xml --dryrun tests/robot/*.robot
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - output
+    reports:
+      junit: output/xunit.xml
+    when: always
+
