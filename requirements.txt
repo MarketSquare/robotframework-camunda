@@ -1,0 +1,4 @@
+robotframework>=3.2,<3.3
+camunda-external-task-client-python3
+requets
+frozendict

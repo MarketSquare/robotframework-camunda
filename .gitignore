@@ -1,0 +1,7 @@
+venv/
+output/
+logs/
+log/
+temp/
+tmp/
+.idea/
