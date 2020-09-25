@@ -18,12 +18,20 @@ class ExternalTask:
 
     @keyword("Set Camunda URL")
     def set_camunda_url(self, url: str):
+        """
+        Sets url for camunda eninge. Only necessary when URL cannot be set during initialization of this library or
+        you want to switch camunda url for some reason.
+        """
         if not url:
             raise ValueError('Cannot set camunda engine url: no url given.')
         self.CAMUNDA_ENGINE_URL = url
 
     @keyword("Fetch and Lock workloads")
     def fetch_and_lock(self, topic: str) -> Dict:
+        """
+        Locks and fetches workloads from camunda on a given topic. Returns a list of varaible dictionary.
+        Each dictionary representing 1 workload.
+        """
         external_task: ExternalTask = self._get_task_client(topic, automatically_create_client=True)
         work_items: List[Dict] = external_task.fetch_and_lock([topic])
         if work_items:
