@@ -45,8 +45,7 @@ class ExternalTask:
             external_task_id = work_items[0].get('id')
 
         if self.RECENT_TASK_ID and self.RECENT_TASK_ID != external_task_id:
-            logger.warn(f'Fetched from "{external_task_id}different task than before. '
-                        f'Before:\t{self.RECENT_TASK_ID}')
+            logger.warn(f'Fetched from "{external_task_id}" which is different task than before:\t{self.RECENT_TASK_ID}')
         self.RECENT_TASK_ID = external_task_id
 
         if not work_items:
@@ -59,9 +58,11 @@ class ExternalTask:
         return self.RECENT_TASK_ID
 
     @keyword("Complete task")
-    def complete(self, topic, task_id= RECENT_TASK_ID, result_set: Dict[str,Any] = None):
+    def complete(self, topic, task_id: str = None, result_set: Dict[str, Any] = None):
         if not topic:
             raise ValueError('Unable complete task, because no topic given')
+        if not task_id:
+            task_id = self.RECENT_TASK_ID
         external_task = self._create_task_client(topic)
         external_task.complete(task_id, global_variables=result_set)
 
