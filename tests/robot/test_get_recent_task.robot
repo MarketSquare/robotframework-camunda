@@ -1,9 +1,12 @@
 *** Settings ***
 Library    ../../Camunda/ExternalTask/ExternalTask.py
 
+*** Variables ***
+${CAMUNDA_HOST}    http://localhost:8080
+
 *** Test Cases ***
 Never write external task id when no workitem is fetched
-    [Setup]    set camunda url    http://localhost:8080/engine-rest
+    [Setup]    set camunda url    ${CAMUNDA_HOST}/engine-rest
     # GIVEN
     ${not_existing_topic}    Set Variable    asdfawesadas
     ${work_items}    fetch and lock workloads    topic=${not_existing_topic}

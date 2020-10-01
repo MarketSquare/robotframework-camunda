@@ -44,3 +44,18 @@ Dryrun Robottests:
       junit: output/xunit.xml
     when: always
 
+Integrationtests:
+  stage: test
+  image: $FEATURE_IMAGE_NAME:runtime
+  services:
+    - name: camunda/camunda-bpm-platform:7.13.0
+      alias: camunda
+  script:
+    - robot -b console -d output -x xunit.xml -v CAMUNDA_HOST:http://camunda:8080 tests/robot/test*.robot
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - output
+    reports:
+      junit: output/xunit.xml
+    when: always
