@@ -1,9 +1,12 @@
 *** Settings ***
 Library    ../../Camunda/ExternalTask/ExternalTask.py
 
+*** Variables ***
+${CAMUNDA_HOST}    http://localhost:8080
+
 *** Test Cases ***
 Test 'fetch and lock' for non existing topic
-    [Setup]    set camunda url    http://localhost:8080/engine-rest
+    [Setup]    set camunda url    ${CAMUNDA_HOST}/engine-rest
     # GIVEN
     ${non_existing_topic}    Set Variable    asdqeweasdwe
 
