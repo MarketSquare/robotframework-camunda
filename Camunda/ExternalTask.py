@@ -4,7 +4,7 @@ from typing import List, Dict, Any
 from camunda.client.external_task_client import ExternalTaskClient
 
 
-@library(scope='GLOBAL', version='0.0.1')
+@library(scope='GLOBAL')
 class ExternalTask:
 
     EMPTY_STRING = ""
