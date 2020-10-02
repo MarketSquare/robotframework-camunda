@@ -1,5 +1,5 @@
 *** Settings ***
-Library    ../../../Camunda/Deployment/Deployment.py    ${CAMUNDA_HOST}
+Library    Camunda.Deployment    ${CAMUNDA_HOST}
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080

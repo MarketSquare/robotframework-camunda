@@ -1,5 +1,5 @@
 *** Settings ***
-Library    ../../Camunda/ExternalTask/ExternalTask.py
+Library    Camunda.ExternalTask
 Library    Collections
 
 *** Test Cases ***
