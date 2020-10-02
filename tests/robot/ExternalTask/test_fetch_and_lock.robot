@@ -1,5 +1,5 @@
 *** Settings ***
-Library    ../../../Camunda/ExternalTask/ExternalTask.py
+Library    Camunda.ExternalTask
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080

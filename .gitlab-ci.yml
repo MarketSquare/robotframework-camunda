@@ -1,6 +1,7 @@
 stages:
   - build
   - test
+  - deploy
 
 variables:
   FEATURE_IMAGE_NAME: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
@@ -34,6 +35,8 @@ Build environment:
 Dryrun Robottests:
   stage: test
   image: $FEATURE_IMAGE_NAME:runtime
+  before_script:
+    - pip install .
   script:
     - robot -b console -d output -x xunit.xml --dryrun tests/robot/**/*.robot
   artifacts:
@@ -50,6 +53,8 @@ Integrationtests:
   services:
     - name: camunda/camunda-bpm-platform:7.13.0
       alias: camunda
+  before_script:
+    - pip install .
   script:
     - robot -b console -d output -x xunit.xml -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/test*.robot
   artifacts:
@@ -59,3 +64,18 @@ Integrationtests:
     reports:
       junit: output/xunit.xml
     when: always
+
+package and deploy:
+  stage: deploy
+  image: $FEATURE_IMAGE_NAME:runtime
+  script:
+    # installiere setuptools und wheel, um damit python packages zu bauen
+    # installiere twine, um damit packages in ein pypi repository hochzuladen
+    - python -m pip install --upgrade setuptools wheel twine
+    # erstelle für dieses projekt packages. die packages werden in ein unterverzeichnis 'dist' gespeichert
+    - python setup.py sdist bdist_wheel
+    # lade alles aus dem verzeichnis 'dist' zu nexus hoch
+    - python -m twine upload --repository-url https://nexus.dpag.io:8443/nexus/repository/pypi-dpa/ -u $NEXUS_USER -p $NEXUS_PASSWORD dist/*
+  only:
+    # deployt wird nur vom master aus
+    - master
