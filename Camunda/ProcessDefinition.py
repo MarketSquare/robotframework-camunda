@@ -6,7 +6,7 @@ import json
 
 
 @library(scope='GLOBAL')
-class Execution:
+class ProcessDefinition:
 
     CAMUNDA_HOST = None
 
@@ -44,3 +44,5 @@ class Execution:
 
         logger.debug(f"Response {response.status_code}:\t{response.content}")
         response.raise_for_status()
+
+        return json.loads(response.content)

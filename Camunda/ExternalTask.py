@@ -32,7 +32,7 @@ class ExternalTask:
         Locks and fetches workloads from camunda on a given topic. Returns a list of varaible dictionary.
         Each dictionary representing 1 workload.
         """
-        external_task: ExternalTask = self._get_task_client(topic, automatically_create_client=True)
+        external_task: ExternalTaskClient = self._get_task_client(topic, automatically_create_client=True)
         work_items: List[Dict] = external_task.fetch_and_lock([topic])
         if work_items:
             logger.debug(f'Recived {len(work_items)} work_items from camunda engine for topic:\t{topic}')
@@ -86,7 +86,7 @@ class ExternalTask:
                 raise ValueError(f'No client available for topic "{topic}". Either you misspelled the topic or you missed'
                                  f' creating a client before.')
 
-            new_task_client: ExternalTask = self._create_task_client(topic)
+            new_task_client: ExternalTaskClient = self._create_task_client(topic)
             self.KNOWN_TOPICS[topic] = {'client': new_task_client}
 
         return self.KNOWN_TOPICS[topic]['client']
