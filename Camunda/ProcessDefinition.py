@@ -1,6 +1,6 @@
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
-from typing import List
+from typing import Dict
 import requests
 import json
 
@@ -24,7 +24,7 @@ class ProcessDefinition:
         self.CAMUNDA_HOST = url
 
     @keyword("Start process")
-    def start_process(self, process_key: str, variables: List = None):
+    def start_process(self, process_key: str, variables: Dict = None):
         endpoint = f'{self.CAMUNDA_HOST}/engine-rest/process-definition/key/{process_key}/start'
 
         header = {
