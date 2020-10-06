@@ -14,7 +14,7 @@ class ExternalTask:
 
     def __init__(self, camunda_engine_url: str = None):
         if camunda_engine_url:
-            self.CAMUNDA_ENGINE_URL = camunda_engine_url
+            self.set_camunda_url(camunda_engine_url)
 
     @keyword("Set Camunda URL")
     def set_camunda_url(self, url: str):
@@ -24,7 +24,7 @@ class ExternalTask:
         """
         if not url:
             raise ValueError('Cannot set camunda engine url: no url given.')
-        self.CAMUNDA_ENGINE_URL = url
+        self.CAMUNDA_ENGINE_URL = f'{url}/engine-rest'
 
     @keyword("Fetch and Lock workloads")
     def fetch_and_lock(self, topic: str) -> Dict:
