@@ -6,7 +6,7 @@ name = "Deutsche Post Adress GmbH & Co. KG"
 
 setup(
     name="robotframework-camunda",
-    version="0.1.0",
+    version="0.2.0",
     description="Keywords for camunda rest api",
     long_description="Keywords for camunda rest api, leading open source workflow engine.",
     author=name,
