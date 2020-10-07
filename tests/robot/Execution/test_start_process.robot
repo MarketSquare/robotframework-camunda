@@ -52,4 +52,4 @@ Test starting process with variables
 Init Camunda Host
     Camunda.ProcessDefinition.set camunda url    ${CAMUNDA_HOST}
     Camunda.ProcessInstance.set camunda url    ${CAMUNDA_HOST}
-    Camunda.ExternalTask.set camunda url    ${CAMUNDA_HOST}/engine-rest
+    Camunda.ExternalTask.set camunda url    ${CAMUNDA_HOST}

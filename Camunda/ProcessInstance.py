@@ -1,6 +1,7 @@
 from robot.api.deco import keyword, library
 from robot.api.logger import librarylogger as logger
 import requests
+import json
 
 
 @library(scope='GLOBAL')
@@ -24,13 +25,22 @@ class ProcessInstance:
     def delete_process_instance(self, process_instance_id):
         endpoint = f'{self.CAMUNDA_HOST}/engine-rest/process-instance/{process_instance_id}'
 
-        header = {
-            'Content-type': 'application/json'
-        }
-
         logger.debug(f"Requesting deletion of process instance:\t{process_instance_id}")
 
         response = requests.delete(endpoint, timeout=(3.05, 15))
 
         logger.debug(f"Response {response.status_code}")
         response.raise_for_status()
+
+    @keyword("Get all active process instances")
+    def get_all_process_instances(self, process_definition_key):
+        endpoint = f'{self.CAMUNDA_HOST}/engine-rest/process-instance?processDefinitionKey={process_definition_key}&active=true'
+
+        logger.debug(f"Requesting all active instances of process:\t{process_definition_key}")
+
+        response = requests.get(endpoint, timeout=(3.05, 15))
+
+        logger.debug(f"Response {response.status_code}")
+        response.raise_for_status()
+        return json.loads(response.content)
+
