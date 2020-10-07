@@ -10,7 +10,7 @@ class ExternalTask:
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
     CAMUNDA_ENGINE_URL: str = None
-    RECENT_TASK_ID: str = EMPTY_STRING
+    RECENT_PROCESS_INSTANCE: str = EMPTY_STRING
 
     def __init__(self, camunda_engine_url: str = None):
         if camunda_engine_url:
@@ -35,36 +35,35 @@ class ExternalTask:
         external_task: ExternalTaskClient = self._get_task_client(topic, automatically_create_client=True)
         work_items: List[Dict] = external_task.fetch_and_lock([topic])
         if work_items:
-            logger.debug(f'Recived {len(work_items)} work_items from camunda engine for topic:\t{topic}')
+            logger.debug(f'Received {len(work_items)} work_items from camunda engine for topic:\t{topic}')
         else:
             logger.debug(f'Received no work items from camunda engine for topic:\t{topic}')
 
         if not work_items:
-            external_task_id = self.EMPTY_STRING
-        else:
-            external_task_id = work_items[0].get('id')
-
-        if self.RECENT_TASK_ID and self.RECENT_TASK_ID != external_task_id:
-            logger.warn(f'Fetched from "{external_task_id}" which is different task than before:\t{self.RECENT_TASK_ID}')
-        self.RECENT_TASK_ID = external_task_id
-
-        if not work_items:
             return work_items
-        else:
-            return [item.get('variables') for item in work_items]
+
+        process_instance = work_items[0].get('id')
+
+        if self.RECENT_PROCESS_INSTANCE and self.RECENT_PROCESS_INSTANCE != process_instance:
+            logger.warn(f'Fetched from "{process_instance}", but previous instance was not finished:\t'
+                        f'{self.RECENT_PROCESS_INSTANCE}')
+        self.RECENT_PROCESS_INSTANCE = process_instance
+
+        return [item.get('variables') for item in work_items]
 
     @keyword("Get recent task id")
     def get_recent_task_id(self):
-        return self.RECENT_TASK_ID
+        return self.RECENT_PROCESS_INSTANCE
 
     @keyword("Complete task")
-    def complete(self, topic, task_id: str = None, result_set: Dict[str, Any] = None):
+    def complete(self, topic, process_instance: str = None, result_set: Dict[str, Any] = None):
         if not topic:
             raise ValueError('Unable complete task, because no topic given')
-        if not task_id:
-            task_id = self.RECENT_TASK_ID
-        external_task = self._create_task_client(topic)
-        external_task.complete(task_id, global_variables=result_set)
+        if not process_instance:
+            process_instance = self.RECENT_PROCESS_INSTANCE
+        external_task = self._get_task_client(topic)
+        external_task.complete(process_instance, global_variables=result_set)
+        self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
 
 
 
