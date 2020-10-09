@@ -25,6 +25,9 @@ class ProcessDefinition:
 
     @keyword("Start process")
     def start_process(self, process_key: str, variables: Dict = None):
+        """
+        Starts a new process instance from a process definition with given key.
+        """
         endpoint = f'{self.CAMUNDA_HOST}/engine-rest/process-definition/key/{process_key}/start'
 
         header = {

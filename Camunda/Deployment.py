@@ -24,16 +24,19 @@ class Deployment:
         self.CAMUNDA_HOST = url
 
     @keyword(name='Deploy model from file')
-    def deploy_bpmn(self, bpmn_file: str):
-        if not bpmn_file:
+    def deploy_bpmn(self, path_bpmn_file: str):
+        """
+        Uploads a camunda model to camunda.
+        """
+        if not path_bpmn_file:
             raise ValueError('Failed deploying model, because no file provided.')
 
-        filename = os.path.basename(bpmn_file)
+        filename = os.path.basename(path_bpmn_file)
 
         camunda_deployment_info_part = {
             'deployment-name': filename,
         }
-        model_part = {'data': (os.path.basename(bpmn_file), open(bpmn_file, 'r'))}
+        model_part = {'data': (os.path.basename(path_bpmn_file), open(path_bpmn_file, 'r'))}
         response = requests.post(f'{self.CAMUNDA_HOST}/engine-rest/deployment/create', data=camunda_deployment_info_part, files=model_part)
         logger.info(f'Response from camunda:\t{response.status_code}')
         response.raise_for_status()

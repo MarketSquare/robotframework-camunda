@@ -29,8 +29,10 @@ class ExternalTask:
     @keyword("Fetch and Lock workloads")
     def fetch_and_lock(self, topic: str) -> Dict:
         """
-        Locks and fetches workloads from camunda on a given topic. Returns a list of varaible dictionary.
+        Locks and fetches workloads from camunda on a given topic. Returns a list of variable dictionary.
         Each dictionary representing 1 workload.
+
+        If camunda provides a new work item, the work_items process instance id is cached.
         """
         external_task: ExternalTaskClient = self._get_task_client(topic, automatically_create_client=True)
         work_items: List[Dict] = external_task.fetch_and_lock([topic])
@@ -51,12 +53,19 @@ class ExternalTask:
 
         return [item.get('variables') for item in work_items]
 
-    @keyword("Get recent task id")
-    def get_recent_task_id(self):
+    @keyword("Get process instance id")
+    def get_process_instance_id(self):
+        """
+        Returns cached process instance id from previously called `fetch and lock workloads`
+        """
         return self.RECENT_PROCESS_INSTANCE
 
     @keyword("Complete task")
     def complete(self, topic, process_instance: str = None, result_set: Dict[str, Any] = None):
+        """
+        Completes a topic for a process instance. If no process isntance id is provided, the most recent cached
+        process instance id is used.
+        """
         if not topic:
             raise ValueError('Unable complete task, because no topic given')
         if not process_instance:

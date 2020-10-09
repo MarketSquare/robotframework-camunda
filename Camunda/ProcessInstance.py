@@ -23,6 +23,9 @@ class ProcessInstance:
 
     @keyword("Delete process instance")
     def delete_process_instance(self, process_instance_id):
+        """
+        USE WITH CARE: Deletes a process instance by id. All data in this process instance will be lost.
+        """
         endpoint = f'{self.CAMUNDA_HOST}/engine-rest/process-instance/{process_instance_id}'
 
         logger.debug(f"Requesting deletion of process instance:\t{process_instance_id}")
@@ -34,6 +37,9 @@ class ProcessInstance:
 
     @keyword("Get all active process instances")
     def get_all_process_instances(self, process_definition_key):
+        """
+        Returns a list of process instances that are active for a certain process definition identified by key.
+        """
         endpoint = f'{self.CAMUNDA_HOST}/engine-rest/process-instance?processDefinitionKey={process_definition_key}&active=true'
 
         logger.debug(f"Requesting all active instances of process:\t{process_definition_key}")
