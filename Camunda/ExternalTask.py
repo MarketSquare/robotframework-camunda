@@ -53,7 +53,7 @@ class ExternalTask:
 
         return [item.get('variables') for item in work_items]
 
-    @keyword("Get process instance id")
+    @keyword("Get recent process instance")
     def get_process_instance_id(self):
         """
         Returns cached process instance id from previously called `fetch and lock workloads`

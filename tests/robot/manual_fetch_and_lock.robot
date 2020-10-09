@@ -14,7 +14,7 @@ Test 'fetch and lock' for non existing topic
     # THEN
     Should Not Be Empty    ${work_items}
 
-    ${recent_task}    get recent task id
+    ${recent_task}    Get recent process instance
     log    Recent task:\t${recent_task}
 
     ${my_result}    Create Dictionary    lastname=Stahl
