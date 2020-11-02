@@ -13,9 +13,9 @@ Build environment:
   services:
     - name: docker:dind
   variables:
-    DOCKER_HOST: tcp://localhost:2375
+#    DOCKER_HOST: tcp://localhost:2375
     DOCKER_DRIVER: overlay2
-    DOCKER_TLS_CERTDIR: ""
+#    DOCKER_TLS_CERTDIR: ""
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $FEATURE_IMAGE_NAME:runtime || true
@@ -64,18 +64,3 @@ Integrationtests:
     reports:
       junit: output/xunit.xml
     when: always
-
-package and deploy:
-  stage: deploy
-  image: $FEATURE_IMAGE_NAME:runtime
-  script:
-    # installiere setuptools und wheel, um damit python packages zu bauen
-    # installiere twine, um damit packages in ein pypi repository hochzuladen
-    - python -m pip install --upgrade setuptools wheel twine
-    # erstelle für dieses projekt packages. die packages werden in ein unterverzeichnis 'dist' gespeichert
-    - python setup.py sdist bdist_wheel
-    # lade alles aus dem verzeichnis 'dist' zu nexus hoch
-    - python -m twine upload --repository-url https://nexus.dpag.io:8443/nexus/repository/pypi-dpa/ -u $NEXUS_USER -p $NEXUS_PASSWORD dist/*
-  only:
-    # deployt wird nur vom master aus
-    - master
