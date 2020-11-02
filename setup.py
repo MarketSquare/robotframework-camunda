@@ -1,15 +1,22 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
+import os
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 name = "Deutsche Post Adress GmbH & Co. KG"
 
 setup(
     name="robotframework-camunda",
     version="0.3.2",
-    description="Keywords for camunda rest api",
-    long_description="Keywords for camunda rest api, leading open source workflow engine.",
+    description="Keywords for camunda rest api, leading open source workflow engine.",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     author=name,
+    author_email="markus.stahl@postadress.de",
+    url=os.environ['CI_PROJECT_URL'],
     packages=find_packages(),
     classifiers=[
         "Intended Audience :: Developers",
