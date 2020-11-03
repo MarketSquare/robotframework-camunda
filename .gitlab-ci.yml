@@ -65,7 +65,7 @@ Integrationtests:
       junit: output/xunit.xml
     when: always
 
-package and deploy:
+.package and deploy on testpypi:
   stage: deploy
   image: $FEATURE_IMAGE_NAME:runtime
   script:
@@ -76,6 +76,21 @@ package and deploy:
     - python setup.py sdist bdist_wheel
     # lade alles aus dem verzeichnis 'dist' zu nexus hoch
     - TWINE_PASSWORD=${TEST_PYPI_DEPLOYTOKEN} TWINE_USERNAME=__token__ python -m twine upload --repository testpypi dist/*
+  only:
+    # deployt wird nur vom master aus
+    - master
+
+package and deploy on pypi:
+  stage: deploy
+  image: $FEATURE_IMAGE_NAME:runtime
+  script:
+    # installiere setuptools und wheel, um damit python packages zu bauen
+    # installiere twine, um damit packages in ein pypi repository hochzuladen
+    - python -m pip install --upgrade setuptools wheel twine
+    # erstelle für dieses projekt packages. die packages werden in ein unterverzeichnis 'dist' gespeichert
+    - python setup.py sdist bdist_wheel
+    # lade alles aus dem verzeichnis 'dist' zu nexus hoch
+    - TWINE_PASSWORD=${PYPI_DEPLOYMENT_TOKEN} TWINE_USERNAME=__token__ python -m twine upload --repository pypi dist/*
   only:
     # deployt wird nur vom master aus
     - master
