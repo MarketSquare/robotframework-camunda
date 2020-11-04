@@ -4,7 +4,7 @@ import requests
 import json
 
 
-@library(scope='GLOBAL')
+@library(scope='GLOBAL', version='0.3.4')
 class ProcessInstance:
     CAMUNDA_HOST = None
 

@@ -3,6 +3,8 @@ stages:
   - test
   - deploy
 
+image: $FEATURE_IMAGE_NAME:runtime
+
 variables:
   FEATURE_IMAGE_NAME: $CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG
   DEPLOY_IMAGE_NAME: $CI_REGISTRY_IMAGE
@@ -13,9 +15,7 @@ Build environment:
   services:
     - name: docker:dind
   variables:
-#    DOCKER_HOST: tcp://localhost:2375
     DOCKER_DRIVER: overlay2
-#    DOCKER_TLS_CERTDIR: ""
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker pull $FEATURE_IMAGE_NAME:runtime || true
@@ -34,7 +34,6 @@ Build environment:
 
 Dryrun Robottests:
   stage: test
-  image: $FEATURE_IMAGE_NAME:runtime
   before_script:
     - pip install .
   script:
@@ -49,7 +48,6 @@ Dryrun Robottests:
 
 Integrationtests:
   stage: test
-  image: $FEATURE_IMAGE_NAME:runtime
   services:
     - name: camunda/camunda-bpm-platform:7.13.0
       alias: camunda
@@ -67,14 +65,9 @@ Integrationtests:
 
 .package and deploy on testpypi:
   stage: deploy
-  image: $FEATURE_IMAGE_NAME:runtime
   script:
-    # installiere setuptools und wheel, um damit python packages zu bauen
-    # installiere twine, um damit packages in ein pypi repository hochzuladen
     - python -m pip install --upgrade setuptools wheel twine
-    # erstelle für dieses projekt packages. die packages werden in ein unterverzeichnis 'dist' gespeichert
     - python setup.py sdist bdist_wheel
-    # lade alles aus dem verzeichnis 'dist' zu nexus hoch
     - TWINE_PASSWORD=${TEST_PYPI_DEPLOYTOKEN} TWINE_USERNAME=__token__ python -m twine upload --repository testpypi dist/*
   only:
     # deployt wird nur vom master aus
@@ -82,15 +75,21 @@ Integrationtests:
 
 package and deploy on pypi:
   stage: deploy
-  image: $FEATURE_IMAGE_NAME:runtime
   script:
-    # installiere setuptools und wheel, um damit python packages zu bauen
-    # installiere twine, um damit packages in ein pypi repository hochzuladen
     - python -m pip install --upgrade setuptools wheel twine
-    # erstelle für dieses projekt packages. die packages werden in ein unterverzeichnis 'dist' gespeichert
     - python setup.py sdist bdist_wheel
-    # lade alles aus dem verzeichnis 'dist' zu nexus hoch
     - TWINE_PASSWORD=${PYPI_DEPLOYMENT_TOKEN} TWINE_USERNAME=__token__ python -m twine upload --repository pypi dist/*
-  only:
-    # deployt wird nur vom master aus
-    - master
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
+pages:
+  stage: deploy
+  before_script:
+    - pip install .
+  script:
+    - python libdoc/generate_libdoc.py
+  artifacts:
+    paths:
+      - public
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "master"'

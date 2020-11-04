@@ -10,7 +10,7 @@ name = "Deutsche Post Adress GmbH & Co. KG"
 
 setup(
     name="robotframework-camunda",
-    version="0.3.4",
+    version="0.3.5",
     description="Keywords for camunda rest api, leading open source workflow engine.",
     long_description=long_description,
     long_description_content_type="text/markdown",
