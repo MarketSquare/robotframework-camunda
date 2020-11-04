@@ -10,7 +10,7 @@ name = "Deutsche Post Adress GmbH & Co. KG"
 
 setup(
     name="robotframework-camunda",
-    version="0.3.3",
+    version="0.3.4",
     description="Keywords for camunda rest api, leading open source workflow engine.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -25,7 +25,7 @@ setup(
         "Topic :: Software Development",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
-        "Development Status :: 3 - Alpha",
+        "Development Status :: 4 - Beta",
         "Framework :: Robot Framework",
     ],
     license="Apache License, Version 2.0",
