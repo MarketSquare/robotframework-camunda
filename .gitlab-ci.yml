@@ -70,8 +70,7 @@ Integrationtests:
     - python setup.py sdist bdist_wheel
     - TWINE_PASSWORD=${TEST_PYPI_DEPLOYTOKEN} TWINE_USERNAME=__token__ python -m twine upload --repository testpypi dist/*
   only:
-    # deployt wird nur vom master aus
-    - master
+    - tags
 
 package and deploy on pypi:
   stage: deploy
@@ -79,8 +78,8 @@ package and deploy on pypi:
     - python -m pip install --upgrade setuptools wheel twine
     - python setup.py sdist bdist_wheel
     - TWINE_PASSWORD=${PYPI_DEPLOYMENT_TOKEN} TWINE_USERNAME=__token__ python -m twine upload --repository pypi dist/*
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+  only:
+    - tags
 
 pages:
   stage: deploy
@@ -91,5 +90,5 @@ pages:
   artifacts:
     paths:
       - public
-  rules:
-    - if: '$CI_COMMIT_BRANCH == "master"'
+  only:
+    - tags
