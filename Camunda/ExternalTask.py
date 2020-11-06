@@ -39,7 +39,7 @@ class ExternalTask:
 
         If camunda provides a new work item, the work_items process instance id is cached.
         """
-        with openapi_client.ApiClient() as api_client:
+        with openapi_client.ApiClient(self.CAMUNDA_CONFIGURATION) as api_client:
             # Create an instance of the API class
             api_instance = openapi_client.ExternalTaskApi(api_client)
             fetch_external_tasks_dto = {"topics": [{"topicName": topic}]}
