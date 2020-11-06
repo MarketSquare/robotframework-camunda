@@ -28,7 +28,7 @@ class ExternalTask:
             raise ValueError('Cannot set camunda engine url: no url given.')
         self.CAMUNDA_ENGINE_URL = f'{url}/engine-rest'
         self.CAMUNDA_CONFIGURATION = openapi_client.Configuration(
-            host=f"{url}/engine-rest"
+            host=self.CAMUNDA_ENGINE_URL
         )
 
     @keyword("Fetch and Lock workloads")
