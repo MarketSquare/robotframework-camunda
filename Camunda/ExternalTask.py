@@ -2,7 +2,8 @@ from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
 from typing import List, Dict, Any
 from camunda.client.external_task_client import ExternalTaskClient
-
+import openapi_client
+from openapi_client import ApiException
 
 @library(scope='GLOBAL', version='0.3.4')
 class ExternalTask:
@@ -34,8 +35,18 @@ class ExternalTask:
 
         If camunda provides a new work item, the work_items process instance id is cached.
         """
-        external_task: ExternalTaskClient = self._get_task_client(topic, automatically_create_client=True)
-        work_items: List[Dict] = external_task.fetch_and_lock([topic])
+        with openapi_client.ApiClient() as api_client:
+            # Create an instance of the API class
+            api_instance = openapi_client.ExternalTaskApi(api_client)
+            fetch_external_tasks_dto = {"topics": [{"topicName": topic}]}
+
+            try:
+                api_response = api_instance.fetch_and_lock(fetch_external_tasks_dto=fetch_external_tasks_dto)
+                logger.info(api_response)
+            except ApiException as e:
+                print("Exception when calling ExternalTaskApi->fetch_and_lock: %s\n" % e)
+
+        work_items: List[Dict] = api_response
         if work_items:
             logger.debug(f'Received {len(work_items)} work_items from camunda engine for topic:\t{topic}')
         else:
