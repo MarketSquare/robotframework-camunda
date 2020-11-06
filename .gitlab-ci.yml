@@ -35,6 +35,7 @@ Build environment:
 Dryrun Robottests:
   stage: test
   before_script:
+    - pip install --extra-index-url https://__token__:${OPENAPI_CLIENT_REGISTRY_TOKEN}@gitlab.com/api/v4/projects/22240013/packages/pypi/simple openapi-client -U --force
     - pip install .
   script:
     - robot -b console -d output -x xunit.xml --dryrun tests/robot/**/*.robot
