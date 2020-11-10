@@ -39,7 +39,7 @@ Test deployment of models
 ### Starting a process instance
 ```robot
 *** Settings ***
-Library    Camunda.ProcessInstance    ${CAMUNDA_HOST}
+Library    Camunda.ProcessDefinition    ${CAMUNDA_HOST}
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
