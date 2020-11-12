@@ -10,13 +10,13 @@ name = "Deutsche Post Adress GmbH & Co. KG"
 
 setup(
     name="robotframework-camunda",
-    version="0.3.5",
+    version="0.4.0",
     description="Keywords for camunda rest api, leading open source workflow engine.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     author=name,
     author_email="markus.stahl@postadress.de",
-    url=os.environ['CI_PROJECT_URL'],
+    url=os.environ.get('CI_PROJECT_URL'),
     packages=find_packages(),
     classifiers=[
         "Intended Audience :: Developers",
