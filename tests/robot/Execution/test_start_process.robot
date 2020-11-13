@@ -1,7 +1,7 @@
 *** Settings ***
-Library    Camunda.ProcessDefinition
-Library    Camunda.ProcessInstance
-Library    Camunda.ExternalTask
+Library    CamundaLibrary.ProcessDefinition
+Library    CamundaLibrary.ProcessInstance
+Library    CamundaLibrary.ExternalTask
 Library    Collections
 
 
@@ -50,6 +50,6 @@ Test starting process with variables
 
 *** Keywords ***
 Init Camunda Host
-    Camunda.ProcessDefinition.set camunda url    ${CAMUNDA_HOST}
-    Camunda.ProcessInstance.set camunda url    ${CAMUNDA_HOST}
-    Camunda.ExternalTask.set camunda url    ${CAMUNDA_HOST}
+    CamundaLibrary.ProcessDefinition.set camunda url    ${CAMUNDA_HOST}
+    CamundaLibrary.ProcessInstance.set camunda url    ${CAMUNDA_HOST}
+    CamundaLibrary.ExternalTask.set camunda url    ${CAMUNDA_HOST}

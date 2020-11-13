@@ -1,5 +1,5 @@
 *** Settings ***
-Library    Camunda.ExternalTask
+Library    CamundaLibrary.ExternalTask
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
