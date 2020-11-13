@@ -6,3 +6,6 @@ temp/
 tmp/
 .idea/
 public/
+
+*.log
+*.zip

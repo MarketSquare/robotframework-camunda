@@ -34,13 +34,12 @@ Test starting process with variables
     start process    ${process_definition_key}   ${variables}
 
     # AND
-    ${workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
 
     # THEN
-    Should Not be empty    ${workload}
+    Should Not be empty    ${first_workload}
 
     # AND
-    ${first_workload}    Set Variable    ${workload}[0]
     dictionary should contain key    ${first_workload}    ${variable1_key}
     Should Not be empty    ${first_workload}[${variable1_key}]
     dictionary should contain key    ${first_workload}[${variable1_key}]    value

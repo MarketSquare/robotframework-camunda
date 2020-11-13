@@ -2,11 +2,15 @@ from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
 from typing import List, Dict, Any
 from camunda.client.external_task_client import ExternalTaskClient
+from camunda.variables.variables import Variables
 import openapi_client
-from openapi_client import ApiException
+import time
+from openapi_client import ApiException, LockedExternalTaskDto, VariableValueDto
 
 @library(scope='GLOBAL', version='0.3.4')
 class ExternalTask:
+
+    WORKER_ID = f'robotframework-camundalibrary-{time.time()}'
 
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
@@ -43,15 +47,24 @@ class ExternalTask:
         with openapi_client.ApiClient(self.CAMUNDA_CONFIGURATION) as api_client:
             # Create an instance of the API class
             api_instance = openapi_client.ExternalTaskApi(api_client)
-            fetch_external_tasks_dto = {"topics": [{"topicName": topic}]}
+            fetch_external_tasks_dto = {
+                "workerId": self.WORKER_ID,
+                "maxTasks": 1,
+                "topics": [
+                    {
+                        "topicName": topic,
+                        "lockDuration": 600000,
+                    }
+                ]
+            }
 
             try:
                 api_response = api_instance.fetch_and_lock(fetch_external_tasks_dto=fetch_external_tasks_dto)
                 logger.info(api_response)
             except ApiException as e:
-                print("Exception when calling ExternalTaskApi->fetch_and_lock: %s\n" % e)
+                logger.error("Exception when calling ExternalTaskApi->fetch_and_lock: %s\n" % e)
 
-        work_items: List[Dict] = api_response
+        work_items: List[LockedExternalTaskDto] = api_response
         if work_items:
             logger.debug(f'Received {len(work_items)} work_items from camunda engine for topic:\t{topic}')
         else:
@@ -60,14 +73,15 @@ class ExternalTask:
         if not work_items:
             return work_items
 
-        process_instance = work_items[0].get('id')
+        process_instance = work_items[0].id
 
         if self.RECENT_PROCESS_INSTANCE and self.RECENT_PROCESS_INSTANCE != process_instance:
             logger.warn(f'Fetched from "{process_instance}", but previous instance was not finished:\t'
                         f'{self.RECENT_PROCESS_INSTANCE}')
         self.RECENT_PROCESS_INSTANCE = process_instance
 
-        return [item.get('variables') for item in work_items]
+        variables: Dict[str, VariableValueDto] = work_items[0].variables
+        return {key: value.to_dict() for (key, value) in variables.items()}
 
     @keyword("Get recent process instance")
     def get_process_instance_id(self):
@@ -114,4 +128,18 @@ class ExternalTask:
             self.KNOWN_TOPICS[topic] = {'client': new_task_client}
 
         return self.KNOWN_TOPICS[topic]['client']
+
+    @staticmethod
+    def convert_openapi_variables_to_dict(open_api_variables: Dict[str, VariableValueDto]) -> Dict:
+        """
+        Converts the variables to a simple dictionary
+        :return: dict
+            {"var1": {"value": 1}, "var2": {"value": True}}
+            ->
+            {"var1": 1, "var2": True}
+        """
+        result = {}
+        for k, v in open_api_variables.items():
+            result[k] = v.value
+        return result
 
