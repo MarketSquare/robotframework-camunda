@@ -17,6 +17,7 @@ class ExternalTask:
     CAMUNDA_ENGINE_URL: str = None
     RECENT_PROCESS_INSTANCE: str = EMPTY_STRING
     CAMUNDA_CONFIGURATION: Dict = None
+    TASK_ID = ""
 
     def __init__(self, camunda_engine_url: str = None):
         if camunda_engine_url:
@@ -44,7 +45,7 @@ class ExternalTask:
         If camunda provides a new work item, the work_items process instance id is cached.
         """
         api_response = []
-        with openapi_client.ApiClient(self.CAMUNDA_CONFIGURATION) as api_client:
+        with self._get_task_client(topic, automatically_create_client=True) as api_client:
             # Create an instance of the API class
             api_instance = openapi_client.ExternalTaskApi(api_client)
             fetch_external_tasks_dto = {
@@ -73,12 +74,8 @@ class ExternalTask:
         if not work_items:
             return work_items
 
-        process_instance = work_items[0].id
-
-        if self.RECENT_PROCESS_INSTANCE and self.RECENT_PROCESS_INSTANCE != process_instance:
-            logger.warn(f'Fetched from "{process_instance}", but previous instance was not finished:\t'
-                        f'{self.RECENT_PROCESS_INSTANCE}')
-        self.RECENT_PROCESS_INSTANCE = process_instance
+        self.TASK_ID = work_items[0].id
+        self.RECENT_PROCESS_INSTANCE = work_items[0].process_instance_id
 
         variables: Dict[str, VariableValueDto] = work_items[0].variables
         return {key: value.to_dict() for (key, value) in variables.items()}
@@ -98,24 +95,26 @@ class ExternalTask:
         """
         if not topic:
             raise ValueError('Unable complete task, because no topic given')
-        if not process_instance:
-            process_instance = self.RECENT_PROCESS_INSTANCE
-        external_task = self._get_task_client(topic)
-        external_task.complete(process_instance, global_variables=result_set)
-        self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
+        with self._get_task_client(topic) as api_client:
+            api_instance = openapi_client.ExternalTaskApi(api_client)
+            complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID, variables=result_set)
+            try:
+                api_instance.complete_external_task_resource(self.TASK_ID, complete_external_task_dto=complete_task_dto)
+                self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
+                self.TASK_ID=self.EMPTY_STRING
+            except ApiException as e:
+                logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
 
-
-
-    def _create_task_client(self, topic: str) -> ExternalTaskClient:
+    def _create_task_client(self, topic: str) -> openapi_client.ApiClient:
         if not self.CAMUNDA_ENGINE_URL:
             raise ValueError('No URL to camunda set. Please initialize Library with url or use keyword '
                              '"Set Camunda URL" first.')
 
         if not topic:
             raise ValueError('No topic set')
-        return ExternalTaskClient(topic, self.CAMUNDA_ENGINE_URL)
+        return openapi_client.ApiClient(self.CAMUNDA_CONFIGURATION)
 
-    def _get_task_client(self, topic, automatically_create_client = False) -> ExternalTaskClient:
+    def _get_task_client(self, topic, automatically_create_client = False) -> openapi_client.ApiClient:
         if not topic:
             raise ValueError('Unable to retrieve client, because no topic given.')
 
@@ -124,7 +123,7 @@ class ExternalTask:
                 raise ValueError(f'No client available for topic "{topic}". Either you misspelled the topic or you missed'
                                  f' creating a client before.')
 
-            new_task_client: ExternalTaskClient = self._create_task_client(topic)
+            new_task_client: openapi_client.ApiClient = self._create_task_client(topic)
             self.KNOWN_TOPICS[topic] = {'client': new_task_client}
 
         return self.KNOWN_TOPICS[topic]['client']
