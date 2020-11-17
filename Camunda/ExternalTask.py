@@ -1,9 +1,7 @@
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
 from typing import List, Dict, Any
-from camunda.client.external_task_client import ExternalTaskClient
-from camunda.variables.variables import Variables
-import openapi_client
+import generic_camunda_client as openapi_client
 import time
 from openapi_client import ApiException, LockedExternalTaskDto, VariableValueDto
 
