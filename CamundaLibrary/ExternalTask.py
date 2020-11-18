@@ -3,7 +3,8 @@ from robot.api.logger import librarylogger as logger
 from typing import List, Dict, Any
 import generic_camunda_client as openapi_client
 import time
-from openapi_client import ApiException, LockedExternalTaskDto, VariableValueDto
+from generic_camunda_client import ApiException, LockedExternalTaskDto, VariableValueDto
+
 
 @library(scope='GLOBAL', version='0.3.4')
 class ExternalTask:
