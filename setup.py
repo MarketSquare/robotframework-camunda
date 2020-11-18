@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 from setuptools import setup, find_packages
+import re
 import os
 
 with open("README.md", "r") as fh:
@@ -8,9 +9,15 @@ with open("README.md", "r") as fh:
 
 name = "Deutsche Post Adress GmbH & Co. KG"
 
+version_regex = r"^v(?P<version>\d*\.\d*\.\d*$)"
+version = os.environ.get('CI_COMMIT_TAG', '0-CI_COMMIT_REF_NAME')
+full_version_match = re.fullmatch(version_regex, version)
+if full_version_match:
+    version = full_version_match.group('version')
+
 setup(
     name="robotframework-camunda",
-    version="0.4.0",
+    version=version,
     description="Keywords for camunda rest api, leading open source workflow engine.",
     long_description=long_description,
     long_description_content_type="text/markdown",
