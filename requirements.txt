@@ -1,4 +1,4 @@
 robotframework>=3.2,<3.3
-camunda-external-task-client-python3>=3.0,<3.1
 requests>=2.24,<2.25
+generic-camunda-client
 frozendict>=1.2,<1.3

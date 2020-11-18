@@ -1,16 +1,22 @@
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
 from typing import List, Dict, Any
-from camunda.client.external_task_client import ExternalTaskClient
+import generic_camunda_client as openapi_client
+import time
+from generic_camunda_client import ApiException, LockedExternalTaskDto, VariableValueDto
 
 
 @library(scope='GLOBAL', version='0.3.4')
 class ExternalTask:
 
+    WORKER_ID = f'robotframework-camundalibrary-{time.time()}'
+
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
     CAMUNDA_ENGINE_URL: str = None
     RECENT_PROCESS_INSTANCE: str = EMPTY_STRING
+    CAMUNDA_CONFIGURATION: Dict = None
+    TASK_ID = ""
 
     def __init__(self, camunda_engine_url: str = None):
         if camunda_engine_url:
@@ -25,6 +31,9 @@ class ExternalTask:
         if not url:
             raise ValueError('Cannot set camunda engine url: no url given.')
         self.CAMUNDA_ENGINE_URL = f'{url}/engine-rest'
+        self.CAMUNDA_CONFIGURATION = openapi_client.Configuration(
+            host=self.CAMUNDA_ENGINE_URL
+        )
 
     @keyword("Fetch and Lock workloads")
     def fetch_and_lock(self, topic: str) -> Dict:
@@ -34,8 +43,28 @@ class ExternalTask:
 
         If camunda provides a new work item, the work_items process instance id is cached.
         """
-        external_task: ExternalTaskClient = self._get_task_client(topic, automatically_create_client=True)
-        work_items: List[Dict] = external_task.fetch_and_lock([topic])
+        api_response = []
+        with self._get_task_client(topic, automatically_create_client=True) as api_client:
+            # Create an instance of the API class
+            api_instance = openapi_client.ExternalTaskApi(api_client)
+            fetch_external_tasks_dto = {
+                "workerId": self.WORKER_ID,
+                "maxTasks": 1,
+                "topics": [
+                    {
+                        "topicName": topic,
+                        "lockDuration": 600000,
+                    }
+                ]
+            }
+
+            try:
+                api_response = api_instance.fetch_and_lock(fetch_external_tasks_dto=fetch_external_tasks_dto)
+                logger.info(api_response)
+            except ApiException as e:
+                logger.error("Exception when calling ExternalTaskApi->fetch_and_lock: %s\n" % e)
+
+        work_items: List[LockedExternalTaskDto] = api_response
         if work_items:
             logger.debug(f'Received {len(work_items)} work_items from camunda engine for topic:\t{topic}')
         else:
@@ -44,14 +73,11 @@ class ExternalTask:
         if not work_items:
             return work_items
 
-        process_instance = work_items[0].get('id')
+        self.TASK_ID = work_items[0].id
+        self.RECENT_PROCESS_INSTANCE = work_items[0].process_instance_id
 
-        if self.RECENT_PROCESS_INSTANCE and self.RECENT_PROCESS_INSTANCE != process_instance:
-            logger.warn(f'Fetched from "{process_instance}", but previous instance was not finished:\t'
-                        f'{self.RECENT_PROCESS_INSTANCE}')
-        self.RECENT_PROCESS_INSTANCE = process_instance
-
-        return [item.get('variables') for item in work_items]
+        variables: Dict[str, VariableValueDto] = work_items[0].variables
+        return {key: value.to_dict() for (key, value) in variables.items()}
 
     @keyword("Get recent process instance")
     def get_process_instance_id(self):
@@ -68,24 +94,26 @@ class ExternalTask:
         """
         if not topic:
             raise ValueError('Unable complete task, because no topic given')
-        if not process_instance:
-            process_instance = self.RECENT_PROCESS_INSTANCE
-        external_task = self._get_task_client(topic)
-        external_task.complete(process_instance, global_variables=result_set)
-        self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
+        with self._get_task_client(topic) as api_client:
+            api_instance = openapi_client.ExternalTaskApi(api_client)
+            complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID, variables=result_set)
+            try:
+                api_instance.complete_external_task_resource(self.TASK_ID, complete_external_task_dto=complete_task_dto)
+                self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
+                self.TASK_ID=self.EMPTY_STRING
+            except ApiException as e:
+                logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
 
-
-
-    def _create_task_client(self, topic: str) -> ExternalTaskClient:
+    def _create_task_client(self, topic: str) -> openapi_client.ApiClient:
         if not self.CAMUNDA_ENGINE_URL:
             raise ValueError('No URL to camunda set. Please initialize Library with url or use keyword '
                              '"Set Camunda URL" first.')
 
         if not topic:
             raise ValueError('No topic set')
-        return ExternalTaskClient(topic, self.CAMUNDA_ENGINE_URL)
+        return openapi_client.ApiClient(self.CAMUNDA_CONFIGURATION)
 
-    def _get_task_client(self, topic, automatically_create_client = False) -> ExternalTaskClient:
+    def _get_task_client(self, topic, automatically_create_client = False) -> openapi_client.ApiClient:
         if not topic:
             raise ValueError('Unable to retrieve client, because no topic given.')
 
@@ -94,8 +122,22 @@ class ExternalTask:
                 raise ValueError(f'No client available for topic "{topic}". Either you misspelled the topic or you missed'
                                  f' creating a client before.')
 
-            new_task_client: ExternalTaskClient = self._create_task_client(topic)
+            new_task_client: openapi_client.ApiClient = self._create_task_client(topic)
             self.KNOWN_TOPICS[topic] = {'client': new_task_client}
 
         return self.KNOWN_TOPICS[topic]['client']
+
+    @staticmethod
+    def convert_openapi_variables_to_dict(open_api_variables: Dict[str, VariableValueDto]) -> Dict:
+        """
+        Converts the variables to a simple dictionary
+        :return: dict
+            {"var1": {"value": 1}, "var2": {"value": True}}
+            ->
+            {"var1": 1, "var2": True}
+        """
+        result = {}
+        for k, v in open_api_variables.items():
+            result[k] = v.value
+        return result
 
