@@ -18,6 +18,9 @@ def generate_libdoc():
             filename, fileextenstion = os.path.splitext(entry.name)
             if '__init__' != filename and '.py' == fileextenstion:
                 libdoc(f'{module_name}.{filename}',
+                       outfile=f'public/latest/keywords/{filename.lower()}/index.html',
+                       version=version)
+                libdoc(f'{module_name}.{filename}',
                        outfile=f'public/{version}/keywords/{filename.lower()}/index.html',
                        version=version)
 

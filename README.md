@@ -8,10 +8,10 @@ invited to contribute pull requests.**
 
 ## Documentation
 Keyword documentation exists for sub-libraries:
-- [Deployment](https://postadress.gitlab.io/robotframework/robotframework-camunda/keywords/deployment/)
-- [ProcessInstance](https://postadress.gitlab.io/robotframework/robotframework-camunda/keywords/processinstance/)
-- [ProcessDefinition](https://postadress.gitlab.io/robotframework/robotframework-camunda/keywords/processdefinition/)
-- [ExternalTask](https://postadress.gitlab.io/robotframework/robotframework-camunda/keywords/externaltask/)
+- [Deployment](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/deployment/)
+- [ProcessInstance](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/processinstance/)
+- [ProcessDefinition](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/processdefinition/)
+- [ExternalTask](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/externaltask/)
 
 ## Installation
 The library is published on [pypi.org](https://pypi.org/project/robotframework-camunda/) and can be installed with pip:
