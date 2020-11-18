@@ -1,5 +1,5 @@
 *** Settings ***
-Library    Camunda.ExternalTask
+Library    CamundaLibrary.ExternalTask
 Library    Collections
 
 *** Test Cases ***

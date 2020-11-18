@@ -26,7 +26,7 @@ instance of camunda running.
 ### Deploy process definition
 ```robot
 *** Settings ***
-Library    Camunda.Deployment    ${CAMUNDA_HOST}
+Library    CamundaLibrary.Deployment    ${CAMUNDA_HOST}
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
@@ -39,7 +39,7 @@ Test deployment of models
 ### Starting a process instance
 ```robot
 *** Settings ***
-Library    Camunda.ProcessInstance    ${CAMUNDA_HOST}
+Library    CamundaLibrary.ProcessDefinition    ${CAMUNDA_HOST}
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
@@ -56,12 +56,12 @@ Test starting process
 ### Execute Task
 "Executing task" bascially means, you execute a robot task that *fetches* a workload from camunda, processes it and 
 returns its workload back to camunda during *completion*. Main keywords involved are:
-1. `Camunda.ExternalTask.Fetch and lock workloads`
-1. `Camunda.ExternalTask.Complete Task`
+1. `CamundaLibrary.ExternalTask.Fetch and lock workloads`
+1. `CamundaLibrary.ExternalTask.Complete Task`
 
 ```robot
 *** Settings ***
-Library    Camunda.ExternalTask    ${CAMUNDA_HOST}
+Library    CamundaLibrary.ExternalTask    ${CAMUNDA_HOST}
 Library    Collections
 
 *** Variables ***
