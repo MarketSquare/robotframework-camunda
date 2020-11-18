@@ -2,7 +2,7 @@ from robot.libdoc import libdoc
 import os
 
 def generate_libdoc():
-    with os.scandir('./Camunda') as dirs:
+    with os.scandir('./CamundaLibrary') as dirs:
         for entry in dirs:
             filename, fileextenstion = os.path.splitext(entry.name)
             if '__init__' != filename and '.py' == fileextenstion:
