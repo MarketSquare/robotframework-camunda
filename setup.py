@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 name = "Deutsche Post Adress GmbH & Co. KG"
 
 version_regex = r"^v(?P<version>\d*\.\d*\.\d*$)"
-version = os.environ.get('CI_COMMIT_TAG', '0-CI_COMMIT_REF_NAME')
+version = os.environ.get('CI_COMMIT_TAG', f'0-{os.environ.get("CI_COMMIT_REF_NAME","dev")}')
 full_version_match = re.fullmatch(version_regex, version)
 if full_version_match:
     version = full_version_match.group('version')
