@@ -43,7 +43,7 @@ class Deployment:
             'deployment-name': filename,
         }
         model_part = {'data': (os.path.basename(path_bpmn_file), open(path_bpmn_file, 'r'))}
-        response = requests.post(f'{self._shared_resources}/deployment/create', data=camunda_deployment_info_part, files=model_part)
+        response = requests.post(f'{self._shared_resources.camunda_url}/deployment/create', data=camunda_deployment_info_part, files=model_part)
         logger.info(f'Response from camunda:\t{response.status_code}')
         response.raise_for_status()
 

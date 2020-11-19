@@ -34,7 +34,7 @@ class ProcessDefinition:
         """
         Starts a new process instance from a process definition with given key.
         """
-        endpoint = f'{self._shared_resources}/process-definition/key/{process_key}/start'
+        endpoint = f'{self._shared_resources.camunda_url}/process-definition/key/{process_key}/start'
 
         header = {
             'Content-type': 'application/json'
