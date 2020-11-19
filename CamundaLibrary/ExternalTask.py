@@ -11,7 +11,7 @@ import generic_camunda_client as openapi_client
 from generic_camunda_client import ApiException, LockedExternalTaskDto, VariableValueDto
 
 # local imports
-from CamundaLibrary import CamundaResources
+from CamundaLibrary.CamundaResources import CamundaResources
 
 
 @library(scope='GLOBAL', version='0.3.4')

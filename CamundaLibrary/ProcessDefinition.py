@@ -8,7 +8,7 @@ import requests
 import json
 
 # local imports
-from CamundaLibrary import CamundaResources
+from CamundaLibrary.CamundaResources import CamundaResources
 
 
 @library

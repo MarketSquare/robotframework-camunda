@@ -8,7 +8,7 @@ import os
 import json
 
 # local imports
-from CamundaLibrary import CamundaResources
+from CamundaLibrary.CamundaResources import CamundaResources
 
 
 @library(scope='GLOBAL', version='0.3.4')
