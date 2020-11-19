@@ -1,9 +1,17 @@
+# robot imports
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
+
+# general python import
 from typing import List, Dict, Any
-import generic_camunda_client as openapi_client
 import time
+
+# camunda client imports
+import generic_camunda_client as openapi_client
 from generic_camunda_client import ApiException, LockedExternalTaskDto, VariableValueDto
+
+# local imports
+from CamundaLibrary import CamundaResources
 
 
 @library(scope='GLOBAL', version='0.3.4')
@@ -13,12 +21,12 @@ class ExternalTask:
 
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
-    CAMUNDA_ENGINE_URL: str = None
     RECENT_PROCESS_INSTANCE: str = EMPTY_STRING
     CAMUNDA_CONFIGURATION: Dict = None
     TASK_ID = ""
 
     def __init__(self, camunda_engine_url: str = None):
+        self._shared_resources = CamundaResources()
         if camunda_engine_url:
             self.set_camunda_url(camunda_engine_url)
 
@@ -30,9 +38,9 @@ class ExternalTask:
         """
         if not url:
             raise ValueError('Cannot set camunda engine url: no url given.')
-        self.CAMUNDA_ENGINE_URL = f'{url}/engine-rest'
+        self._shared_resources.camunda_url = f'{url}/engine-rest'
         self.CAMUNDA_CONFIGURATION = openapi_client.Configuration(
-            host=self.CAMUNDA_ENGINE_URL
+            host=self._shared_resources.camunda_url
         )
 
     @keyword("Fetch and Lock workloads")
@@ -105,7 +113,7 @@ class ExternalTask:
                 logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
 
     def _create_task_client(self, topic: str) -> openapi_client.ApiClient:
-        if not self.CAMUNDA_ENGINE_URL:
+        if not self._shared_resources.camunda_url:
             raise ValueError('No URL to camunda set. Please initialize Library with url or use keyword '
                              '"Set Camunda URL" first.')
 
