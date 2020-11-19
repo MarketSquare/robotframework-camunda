@@ -1,5 +1,5 @@
 *** Settings ***
-Library    CamundaLibrary.ProcessDefinition
+Library    CamundaLibrary.ProcessDefinition    ${CAMUNDA_HOST}
 Library    CamundaLibrary.ProcessInstance
 Library    CamundaLibrary.ExternalTask
 Library    Collections
@@ -10,7 +10,6 @@ ${CAMUNDA_HOST}    http://localhost:8080
 
 *** Test Cases ***
 Test starting process
-    [Setup]    Init Camunda Host
     #GIVEN
     ${process_definition_key}    Set Variable    demo_for_robot
 
@@ -20,7 +19,6 @@ Test starting process
     [Teardown]    delete process instance    ${process_instance}[id]
 
 Test starting process with variables
-    [Setup]    Init Camunda Host
     #GIVEN
     ${process_definition_key}    Set Variable    demo_for_robot
     ${existing_topic}    Set Variable    process_demo_element
@@ -46,9 +44,3 @@ Test starting process with variables
     Should Not be empty    ${first_workload}[${variable1_key}][value]
     Should Be Equal    ${variable1_value}    ${first_workload}[${variable1_key}][value]
     [Teardown]    complete task   ${existing_topic}
-
-*** Keywords ***
-Init Camunda Host
-    CamundaLibrary.ProcessDefinition.set camunda url    ${CAMUNDA_HOST}
-    CamundaLibrary.ProcessInstance.set camunda url    ${CAMUNDA_HOST}
-    CamundaLibrary.ExternalTask.set camunda url    ${CAMUNDA_HOST}
