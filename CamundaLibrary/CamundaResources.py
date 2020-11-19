@@ -14,10 +14,10 @@ class CamundaResources:
         return cls._instance
 
     @property
-    def camunda_url(self):
+    def camunda_url(self) -> str:
         return self._camunda_url
 
     @camunda_url.setter
-    def camunda_url(self, value):
+    def camunda_url(self, value: str):
         self._camunda_url = value
 
