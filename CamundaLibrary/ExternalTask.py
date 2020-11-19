@@ -22,7 +22,6 @@ class ExternalTask:
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
     RECENT_PROCESS_INSTANCE: str = EMPTY_STRING
-    CAMUNDA_CONFIGURATION: Dict = None
     TASK_ID = ""
 
     def __init__(self, camunda_engine_url: str = None):
@@ -39,9 +38,6 @@ class ExternalTask:
         if not url:
             raise ValueError('Cannot set camunda engine url: no url given.')
         self._shared_resources.camunda_url = f'{url}/engine-rest'
-        self.CAMUNDA_CONFIGURATION = openapi_client.Configuration(
-            host=self._shared_resources.camunda_url
-        )
 
     @keyword("Fetch and Lock workloads")
     def fetch_and_lock(self, topic: str) -> Dict:
@@ -119,7 +115,7 @@ class ExternalTask:
 
         if not topic:
             raise ValueError('No topic set')
-        return openapi_client.ApiClient(self.CAMUNDA_CONFIGURATION)
+        return openapi_client.ApiClient(self._shared_resources.client_configuration)
 
     def _get_task_client(self, topic, automatically_create_client = False) -> openapi_client.ApiClient:
         if not topic:
