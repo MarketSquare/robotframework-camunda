@@ -1,17 +1,23 @@
+# robot imports
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
+
+# python imports
 from typing import Dict
 import requests
 import json
 
+# local imports
+from CamundaLibrary.CamundaResources import CamundaResources
 
-@library(scope='GLOBAL', version='0.3.4')
+
+@library
 class ProcessDefinition:
 
-    CAMUNDA_HOST = None
-
-    def __init__(self, camunda_host: str = ''):
-        self.CAMUNDA_HOST = camunda_host
+    def __init__(self, camunda_engine_url: str = None):
+        self._shared_resources = CamundaResources()
+        if camunda_engine_url:
+            self.set_camunda_url(camunda_engine_url)
 
     @keyword("Set Camunda URL")
     def set_camunda_url(self, url: str):
@@ -21,14 +27,14 @@ class ProcessDefinition:
         """
         if not url:
             raise ValueError('Cannot set camunda engine url: no url given.')
-        self.CAMUNDA_HOST = url
+        self._shared_resources.camunda_url = f'{url}/engine-rest'
 
     @keyword("Start process")
     def start_process(self, process_key: str, variables: Dict = None):
         """
         Starts a new process instance from a process definition with given key.
         """
-        endpoint = f'{self.CAMUNDA_HOST}/engine-rest/process-definition/key/{process_key}/start'
+        endpoint = f'{self._shared_resources.camunda_url}/process-definition/key/{process_key}/start'
 
         header = {
             'Content-type': 'application/json'

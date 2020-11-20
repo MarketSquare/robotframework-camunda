@@ -1,15 +1,22 @@
+# robot imports
 from robot.api.deco import keyword, library
 from robot.api.logger import librarylogger as logger
+
+# python imports
 import requests
 import json
+
+# local imports
+from CamundaLibrary.CamundaResources import CamundaResources
 
 
 @library(scope='GLOBAL', version='0.3.4')
 class ProcessInstance:
-    CAMUNDA_HOST = None
 
-    def __init__(self, camunda_host: str = ''):
-        self.CAMUNDA_HOST = camunda_host
+    def __init__(self, camunda_engine_url: str = None):
+        self._shared_resources = CamundaResources()
+        if camunda_engine_url:
+            self.set_camunda_url(camunda_engine_url)
 
     @keyword("Set Camunda URL")
     def set_camunda_url(self, url: str):
@@ -19,14 +26,14 @@ class ProcessInstance:
         """
         if not url:
             raise ValueError('Cannot set camunda engine url: no url given.')
-        self.CAMUNDA_HOST = url
+        self._shared_resources.camunda_url = f'{url}/engine-rest'
 
     @keyword("Delete process instance")
     def delete_process_instance(self, process_instance_id):
         """
         USE WITH CARE: Deletes a process instance by id. All data in this process instance will be lost.
         """
-        endpoint = f'{self.CAMUNDA_HOST}/engine-rest/process-instance/{process_instance_id}'
+        endpoint = f'{self._shared_resources.camunda_url}/process-instance/{process_instance_id}'
 
         logger.debug(f"Requesting deletion of process instance:\t{process_instance_id}")
 
@@ -40,7 +47,7 @@ class ProcessInstance:
         """
         Returns a list of process instances that are active for a certain process definition identified by key.
         """
-        endpoint = f'{self.CAMUNDA_HOST}/engine-rest/process-instance?processDefinitionKey={process_definition_key}&active=true'
+        endpoint = f'{self._shared_resources.camunda_url}/process-instance?processDefinitionKey={process_definition_key}&active=true'
 
         logger.debug(f"Requesting all active instances of process:\t{process_definition_key}")
 

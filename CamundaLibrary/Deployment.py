@@ -1,17 +1,23 @@
+# robot imports
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
+
+# python imports
 import requests
 import os
 import json
+
+# local imports
+from CamundaLibrary.CamundaResources import CamundaResources
 
 
 @library(scope='GLOBAL', version='0.3.4')
 class Deployment:
 
-    CAMUNDA_HOST = None
-
-    def __init__(self, camunda_host: str = ''):
-        self.CAMUNDA_HOST = camunda_host
+    def __init__(self, camunda_engine_url: str = None):
+        self._shared_resources = CamundaResources()
+        if camunda_engine_url:
+            self.set_camunda_url(camunda_engine_url)
 
     @keyword("Set Camunda URL")
     def set_camunda_url(self, url: str):
@@ -21,7 +27,7 @@ class Deployment:
         """
         if not url:
             raise ValueError('Cannot set camunda engine url: no url given.')
-        self.CAMUNDA_HOST = url
+        self._shared_resources.camunda_url = f'{url}/engine-rest'
 
     @keyword(name='Deploy model from file')
     def deploy_bpmn(self, path_bpmn_file: str):
@@ -37,7 +43,7 @@ class Deployment:
             'deployment-name': filename,
         }
         model_part = {'data': (os.path.basename(path_bpmn_file), open(path_bpmn_file, 'r'))}
-        response = requests.post(f'{self.CAMUNDA_HOST}/engine-rest/deployment/create', data=camunda_deployment_info_part, files=model_part)
+        response = requests.post(f'{self._shared_resources.camunda_url}/deployment/create', data=camunda_deployment_info_part, files=model_part)
         logger.info(f'Response from camunda:\t{response.status_code}')
         response.raise_for_status()
 
