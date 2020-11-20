@@ -16,6 +16,7 @@ class CamundaResources:
             # Put any initialization here.
         return cls._instance
 
+    # cammunda_url parameter is only required as long not every keyword uses generic-camunda-client
     @property
     def camunda_url(self) -> str:
         return self.client_configuration.host
