@@ -36,6 +36,6 @@ setup(
         "Framework :: Robot Framework",
     ],
     license="Apache License, Version 2.0",
-    install_requires=["robotframework", "requests", "frozendict", 'camunda-external-task-client-python3>=3.0,<3.1'],
+    install_requires=["robotframework", "requests", "frozendict", 'generic-camunda-client'],
     include_package_data=True,
 )
