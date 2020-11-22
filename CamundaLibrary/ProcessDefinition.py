@@ -3,13 +3,11 @@ from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
 
 # generic camunda client
-from generic_camunda_client import ApiException, ProcessDefinitionApi, ProcessInstanceWithVariablesDto
+from generic_camunda_client import ApiException, ProcessDefinitionApi, ProcessInstanceWithVariablesDto, StartProcessInstanceDto
 import generic_camunda_client
 
 # python imports
 from typing import Dict
-import requests
-import json
 
 # local imports
 from CamundaLibrary.CamundaResources import CamundaResources
@@ -40,11 +38,12 @@ class ProcessDefinition:
         """
         with self._shared_resources.api_client as api_client:
             api_instance: ProcessDefinitionApi = generic_camunda_client.ProcessDefinitionApi(api_client)
+            start_process_instance_dto: StartProcessInstanceDto = {'variables': variables}
 
             try:
                 response: ProcessInstanceWithVariablesDto = api_instance.start_process_instance_by_key(
                     key=process_key,
-                    variables={'variables': variables}
+                    start_process_instance_dto=start_process_instance_dto
                 )
             except ApiException as e:
                 logger.error(f'Failed to start process {process_key}:\n{e}')
