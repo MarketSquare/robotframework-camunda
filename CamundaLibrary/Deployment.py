@@ -57,5 +57,5 @@ class Deployment:
                 logger.error(f'Failed to upload {filename}:\n{e}')
                 raise e
 
-        return response
+        return response.to_dict()
 
