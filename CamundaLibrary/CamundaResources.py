@@ -49,7 +49,7 @@ class CamundaResources:
             raise ValueError('No URL to camunda set. Please initialize Library with url or use keyword '
                              '"Set Camunda URL" first.')
 
-        return ApiClient(self._shared_resources.client_configuration)
+        return ApiClient(self._client_configuration)
 
     def _get_task_client(self) -> ApiClient:
         if not self._api_client:
