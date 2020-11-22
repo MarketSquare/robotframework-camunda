@@ -13,7 +13,7 @@ from typing import Dict
 from CamundaLibrary.CamundaResources import CamundaResources
 
 
-@library
+@library(scope='GLOBAL')
 class ProcessDefinition:
 
     def __init__(self, camunda_engine_url: str = None):

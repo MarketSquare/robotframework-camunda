@@ -13,7 +13,7 @@ from typing import List
 from CamundaLibrary.CamundaResources import CamundaResources
 
 
-@library(scope='GLOBAL', version='0.3.4')
+@library(scope='GLOBAL')
 class ProcessInstance:
 
     def __init__(self, camunda_engine_url: str = None):

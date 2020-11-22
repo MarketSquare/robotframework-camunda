@@ -14,7 +14,7 @@ from generic_camunda_client import ApiException, LockedExternalTaskDto, Variable
 from CamundaLibrary.CamundaResources import CamundaResources
 
 
-@library(scope='GLOBAL', version='0.3.4')
+@library(scope='GLOBAL')
 class ExternalTask:
 
     WORKER_ID = f'robotframework-camundalibrary-{time.time()}'
