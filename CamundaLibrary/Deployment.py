@@ -55,6 +55,7 @@ class Deployment:
                 logger.info(f'Response from camunda:\t{response}')
             except ApiException as e:
                 logger.error(f'Failed to upload {filename}:\n{e}')
+                raise e
 
-        return json.loads(response)
+        return json.loads(f'{response}')
 
