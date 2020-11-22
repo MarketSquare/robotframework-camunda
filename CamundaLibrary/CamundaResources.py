@@ -1,4 +1,4 @@
-from generic_camunda_client import Configuration
+from generic_camunda_client import Configuration, ApiClient
 
 
 class CamundaResources:
@@ -8,6 +8,8 @@ class CamundaResources:
     _instance = None
 
     _client_configuration: Configuration = None
+
+    _api_client: ApiClient = None
 
     def __new__(cls):
         if cls._instance is None:
@@ -35,3 +37,24 @@ class CamundaResources:
     @client_configuration.setter
     def client_configuration(self, value):
         self._client_configuration = value
+        if self._api_client:
+            self._get_task_client()
+
+    @property
+    def api_client(self) -> ApiClient:
+        return self._get_task_client()
+
+    def _create_task_client(self) -> ApiClient:
+        if not self._shared_resources.camunda_url:
+            raise ValueError('No URL to camunda set. Please initialize Library with url or use keyword '
+                             '"Set Camunda URL" first.')
+
+        return ApiClient(self._shared_resources.client_configuration)
+
+    def _get_task_client(self) -> ApiClient:
+        if not self._api_client:
+
+            self._api_client = self._create_task_client()
+
+        return self._api_client
+
