@@ -2,10 +2,12 @@
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
 
+# generic camunda client
+from generic_camunda_client import ApiException, ProcessDefinitionApi, ProcessInstanceWithVariablesDto, StartProcessInstanceDto
+import generic_camunda_client
+
 # python imports
 from typing import Dict
-import requests
-import json
 
 # local imports
 from CamundaLibrary.CamundaResources import CamundaResources
@@ -34,24 +36,17 @@ class ProcessDefinition:
         """
         Starts a new process instance from a process definition with given key.
         """
-        endpoint = f'{self._shared_resources.camunda_url}/process-definition/key/{process_key}/start'
+        with self._shared_resources.api_client as api_client:
+            api_instance: ProcessDefinitionApi = generic_camunda_client.ProcessDefinitionApi(api_client)
+            start_process_instance_dto: StartProcessInstanceDto = {'variables': variables}
 
-        header = {
-            'Content-type': 'application/json'
-        }
+            try:
+                response: ProcessInstanceWithVariablesDto = api_instance.start_process_instance_by_key(
+                    key=process_key,
+                    start_process_instance_dto=start_process_instance_dto
+                )
+            except ApiException as e:
+                logger.error(f'Failed to start process {process_key}:\n{e}')
+                raise e
 
-        json_body = { }
-
-        if variables:
-            json_body["variables"]=variables
-
-        logger.info(f"Request:\t{json_body}")
-
-        response = requests.post(endpoint,
-                            data=json.dumps(json_body),
-                            headers=header, timeout=(3.05, 15))
-
-        logger.debug(f"Response {response.status_code}:\t{response.content}")
-        response.raise_for_status()
-
-        return json.loads(response.content)
+        return response.to_dict()

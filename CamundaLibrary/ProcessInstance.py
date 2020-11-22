@@ -2,9 +2,12 @@
 from robot.api.deco import keyword, library
 from robot.api.logger import librarylogger as logger
 
+# generic camunda client
+from generic_camunda_client import ApiException, ProcessInstanceApi, ProcessInstanceDto
+import generic_camunda_client
+
 # python imports
-import requests
-import json
+from typing import List
 
 # local imports
 from CamundaLibrary.CamundaResources import CamundaResources
@@ -33,27 +36,31 @@ class ProcessInstance:
         """
         USE WITH CARE: Deletes a process instance by id. All data in this process instance will be lost.
         """
-        endpoint = f'{self._shared_resources.camunda_url}/process-instance/{process_instance_id}'
+        with self._shared_resources.api_client as api_client:
+            api_instance = generic_camunda_client.ProcessInstanceApi(api_client)
 
-        logger.debug(f"Requesting deletion of process instance:\t{process_instance_id}")
-
-        response = requests.delete(endpoint, timeout=(3.05, 15))
-
-        logger.debug(f"Response {response.status_code}")
-        response.raise_for_status()
+            try:
+                api_instance.delete_process_instance(id=process_instance_id)
+            except ApiException as e:
+                logger.error(f'Failed to delete process instance {process_instance_id}:\n{e}')
+                raise e
 
     @keyword("Get all active process instances")
     def get_all_process_instances(self, process_definition_key):
         """
         Returns a list of process instances that are active for a certain process definition identified by key.
         """
-        endpoint = f'{self._shared_resources.camunda_url}/process-instance?processDefinitionKey={process_definition_key}&active=true'
+        with self._shared_resources.api_client as api_client:
+            api_instance: ProcessInstanceApi = generic_camunda_client.ProcessInstanceApi(api_client)
 
-        logger.debug(f"Requesting all active instances of process:\t{process_definition_key}")
+            try:
+                response: List[ProcessInstanceDto] = api_instance.get_process_instances(
+                    process_definition_key=process_definition_key,
+                    active=True
+                )
+            except ApiException as e:
+                logger.error(f'Failed to get process instances of process {process_definition_key}:\n{e}')
+                raise e
 
-        response = requests.get(endpoint, timeout=(3.05, 15))
-
-        logger.debug(f"Response {response.status_code}")
-        response.raise_for_status()
-        return json.loads(response.content)
+        return [process_instance.to_dict() for process_instance in response]
 

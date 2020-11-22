@@ -7,6 +7,9 @@ import requests
 import os
 import json
 
+from generic_camunda_client import ApiException, DeploymentWithDefinitionsDto
+import generic_camunda_client
+
 # local imports
 from CamundaLibrary.CamundaResources import CamundaResources
 
@@ -39,13 +42,20 @@ class Deployment:
 
         filename = os.path.basename(path_bpmn_file)
 
-        camunda_deployment_info_part = {
-            'deployment-name': filename,
-        }
-        model_part = {'data': (os.path.basename(path_bpmn_file), open(path_bpmn_file, 'r'))}
-        response = requests.post(f'{self._shared_resources.camunda_url}/deployment/create', data=camunda_deployment_info_part, files=model_part)
-        logger.info(f'Response from camunda:\t{response.status_code}')
-        response.raise_for_status()
+        with self._shared_resources.api_client as api_client:
+            api_instance = generic_camunda_client.DeploymentApi(api_client)
+            data = path_bpmn_file
+            deployment_name = filename
 
-        return json.loads(response.content)
+            try:
+                response: DeploymentWithDefinitionsDto = api_instance.create_deployment(deploy_changed_only=True,
+                                                          enable_duplicate_filtering=True,
+                                                          deployment_name=deployment_name,
+                                                          data=data)
+                logger.info(f'Response from camunda:\t{response}')
+            except ApiException as e:
+                logger.error(f'Failed to upload {filename}:\n{e}')
+                raise e
+
+        return response.to_dict()
 

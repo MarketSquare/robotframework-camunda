@@ -48,7 +48,7 @@ class ExternalTask:
         If camunda provides a new work item, the work_items process instance id is cached.
         """
         api_response = []
-        with self._get_task_client(topic, automatically_create_client=True) as api_client:
+        with self._shared_resources.api_client as api_client:
             # Create an instance of the API class
             api_instance = openapi_client.ExternalTaskApi(api_client)
             fetch_external_tasks_dto = {
@@ -98,7 +98,7 @@ class ExternalTask:
         """
         if not topic:
             raise ValueError('Unable complete task, because no topic given')
-        with self._get_task_client(topic) as api_client:
+        with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.ExternalTaskApi(api_client)
             complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID, variables=result_set)
             try:
@@ -107,29 +107,6 @@ class ExternalTask:
                 self.TASK_ID=self.EMPTY_STRING
             except ApiException as e:
                 logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
-
-    def _create_task_client(self, topic: str) -> openapi_client.ApiClient:
-        if not self._shared_resources.camunda_url:
-            raise ValueError('No URL to camunda set. Please initialize Library with url or use keyword '
-                             '"Set Camunda URL" first.')
-
-        if not topic:
-            raise ValueError('No topic set')
-        return openapi_client.ApiClient(self._shared_resources.client_configuration)
-
-    def _get_task_client(self, topic, automatically_create_client = False) -> openapi_client.ApiClient:
-        if not topic:
-            raise ValueError('Unable to retrieve client, because no topic given.')
-
-        if not self.KNOWN_TOPICS.get(topic, None):
-            if not automatically_create_client:
-                raise ValueError(f'No client available for topic "{topic}". Either you misspelled the topic or you missed'
-                                 f' creating a client before.')
-
-            new_task_client: openapi_client.ApiClient = self._create_task_client(topic)
-            self.KNOWN_TOPICS[topic] = {'client': new_task_client}
-
-        return self.KNOWN_TOPICS[topic]['client']
 
     @staticmethod
     def convert_openapi_variables_to_dict(open_api_variables: Dict[str, VariableValueDto]) -> Dict:
