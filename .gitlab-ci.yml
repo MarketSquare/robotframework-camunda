@@ -6,7 +6,13 @@ stages:
 - build
 - test
 - deploy
+
 image: "$FEATURE_IMAGE_NAME:runtime"
+
+# scan for secret spoiling in project
+include:
+  - template: Secret-Detection.gitlab-ci.yml
+
 variables:
   FEATURE_IMAGE_NAME: "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG"
   DEPLOY_IMAGE_NAME: "$CI_REGISTRY_IMAGE"
@@ -91,6 +97,8 @@ pages:
     - public
   only:
   - tags
+
+ # do some code analysis 
 sast:
   stage: test
 include:
