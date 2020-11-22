@@ -7,7 +7,7 @@ import requests
 import os
 import json
 
-from generic_camunda_client import ApiException
+from generic_camunda_client import ApiException, DeploymentWithDefinitionsDto
 import generic_camunda_client
 
 # local imports
@@ -48,7 +48,7 @@ class Deployment:
             deployment_name = filename
 
             try:
-                response = api_instance.create_deployment(deploy_changed_only=True,
+                response: DeploymentWithDefinitionsDto = api_instance.create_deployment(deploy_changed_only=True,
                                                           enable_duplicate_filtering=True,
                                                           deployment_name=deployment_name,
                                                           data=data)
@@ -57,5 +57,5 @@ class Deployment:
                 logger.error(f'Failed to upload {filename}:\n{e}')
                 raise e
 
-        return json.loads(f'{response}')
+        return json.loads(response.to_str())
 
