@@ -1,11 +1,11 @@
 *** Settings ***
-Library    CamundaLibrary.ProcessInstance    ${CAMUNDA_URL}
+Library    CamundaLibrary.ProcessInstance    ${CAMUNDA_HOST}
 Library    CamundaLibrary.ProcessDefinition
 Library    CamundaLibrary.Deployment
 
 
 *** Variables ***
-${CAMUNDA_URL}    http://localhost:8080
+${CAMUNDA_HOST}    http://localhost:8080
 ${PROCESS_NAME}    demo_for_robot
 
 
