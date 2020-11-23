@@ -22,7 +22,7 @@ Get all instances
 
     # WHEN
     FOR    ${process_instance}    IN    @{process_instances_after}
-        delete process instance    ${process_instance}['id']
+        delete process instance    ${process_instance}[id]
     END
 
 *** Keywords ***
