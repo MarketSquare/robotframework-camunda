@@ -3,9 +3,7 @@ from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
 
 # python imports
-import requests
 import os
-import json
 
 from generic_camunda_client import ApiException, DeploymentWithDefinitionsDto
 import generic_camunda_client
