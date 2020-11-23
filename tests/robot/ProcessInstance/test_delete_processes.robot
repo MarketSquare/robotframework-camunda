@@ -3,16 +3,19 @@ Library    CamundaLibrary.ProcessInstance    ${CAMUNDA_URL}
 Library    CamundaLibrary.ProcessDefinition
 Library    CamundaLibrary.Deployment
 
+
 *** Variables ***
 ${CAMUNDA_URL}    http://localhost:8080
+${PROCESS_NAME}    demo_for_robot
+
 
 *** Test Cases ***
 Get all instances
     # Given
     Upload process
-    ${process_instances_before}    get all active process instances
-    start process    demo_for_robot
-    ${process_instances_after}    get all active process instances
+    ${process_instances_before}    get all active process instances    ${PROCESS_NAME}
+    start process    ${PROCESS_NAME}
+    ${process_instances_after}    get all active process instances    ${PROCESS_NAME}
 
     # EXPECT
     should be 1 more process    ${process_instances_before}    ${process_instances_after}
