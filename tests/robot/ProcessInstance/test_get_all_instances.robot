@@ -10,11 +10,11 @@ ${CAMUNDA_URL}    http://localhost:8080
 Get all instances
     # Given
     Upload process
-    ${process_instances_before}    get all process instances
+    ${process_instances_before}    get all active process instances
 
     # WHEN
     start process    demo_for_robot
-    ${process_instances_after}    get all process instances
+    ${process_instances_after}    get all active process instances
 
     # THEN
     should be 1 more process    ${process_instances_before}    ${process_instances_after}
