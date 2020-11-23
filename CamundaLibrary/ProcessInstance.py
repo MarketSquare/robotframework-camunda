@@ -56,7 +56,7 @@ class ProcessInstance:
             try:
                 response: List[ProcessInstanceDto] = api_instance.get_process_instances(
                     process_definition_key=process_definition_key,
-                    active=True
+                    active='true'
                 )
             except ApiException as e:
                 logger.error(f'Failed to get process instances of process {process_definition_key}:\n{e}')
