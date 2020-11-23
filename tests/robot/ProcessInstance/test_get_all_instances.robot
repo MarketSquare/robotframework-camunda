@@ -31,4 +31,4 @@ should be 1 more process
     [Arguments]    ${before}    ${after}
     ${count_before}    Evaluate    len($before)+1
     ${count_after}    Evaluate    len($after)
-    Should be equal as integer    ${count_before}    ${count_after}
+    Should be equal as integers    ${count_before}    ${count_after}
