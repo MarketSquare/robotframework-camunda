@@ -75,13 +75,13 @@ class ExternalTask:
             logger.debug(f'Received no work items from camunda engine for topic:\t{topic}')
 
         if not work_items:
-            return work_items
+            return {}
 
         self.TASK_ID = work_items[0].id
         self.RECENT_PROCESS_INSTANCE = work_items[0].process_instance_id
 
         variables: Dict[str, VariableValueDto] = work_items[0].variables
-        return {key: value.to_dict() for (key, value) in variables.items()}
+        return CamundaResources.convert_openapi_variables_to_dict(variables)
 
     @keyword("Get recent process instance")
     def get_process_instance_id(self):
@@ -91,34 +91,19 @@ class ExternalTask:
         return self.RECENT_PROCESS_INSTANCE
 
     @keyword("Complete task")
-    def complete(self, topic, process_instance: str = None, result_set: Dict[str, Any] = None):
+    def complete(self, result_set: Dict[str, Any] = None):
         """
         Completes a topic for a process instance. If no process isntance id is provided, the most recent cached
         process instance id is used.
         """
-        if not topic:
-            raise ValueError('Unable complete task, because no topic given')
         with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.ExternalTaskApi(api_client)
-            complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID, variables=result_set)
+            variables = CamundaResources.convert_dict_to_openapi_variables(result_set)
+            complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID, variables=variables)
             try:
+                logger.debug(f"Sending to Camunda for completing Task:\n{complete_task_dto}")
                 api_instance.complete_external_task_resource(self.TASK_ID, complete_external_task_dto=complete_task_dto)
                 self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
                 self.TASK_ID=self.EMPTY_STRING
             except ApiException as e:
                 logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
-
-    @staticmethod
-    def convert_openapi_variables_to_dict(open_api_variables: Dict[str, VariableValueDto]) -> Dict:
-        """
-        Converts the variables to a simple dictionary
-        :return: dict
-            {"var1": {"value": 1}, "var2": {"value": True}}
-            ->
-            {"var1": 1, "var2": True}
-        """
-        result = {}
-        for k, v in open_api_variables.items():
-            result[k] = v.value
-        return result
-
