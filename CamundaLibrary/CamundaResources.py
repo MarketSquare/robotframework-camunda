@@ -64,8 +64,9 @@ class CamundaResources:
             {"var1": 1, "var2": True}
         """
         result = {}
-        for k, v in open_api_variables.items():
-            result[k] = v.value
+        if open_api_variables:
+            for k, v in open_api_variables.items():
+                result[k] = v.value
         return result
 
     @staticmethod
@@ -78,8 +79,9 @@ class CamundaResources:
             {"var1": {"value": "1", "type": "String"}, "var2": {"value": "True", "type": "String"}}
         """
         result: Dict[str, VariableValueDto] = {}
-        for k,v in variabes.items():
-            result[k] = VariableValueDto(value=v, type="String")
+        if variabes:
+            for k,v in variabes.items():
+                result[k] = VariableValueDto(value=v, type="String")
         return result
 
 
