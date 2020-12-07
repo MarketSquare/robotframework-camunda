@@ -1,4 +1,5 @@
-from generic_camunda_client import Configuration, ApiClient
+from generic_camunda_client import Configuration, ApiClient, VariableValueDto
+from typing import Dict
 
 
 class CamundaResources:
@@ -52,5 +53,35 @@ class CamundaResources:
                              '"Set Camunda URL" first.')
 
         return ApiClient(self.client_configuration)
+
+    @staticmethod
+    def convert_openapi_variables_to_dict(open_api_variables: Dict[str, VariableValueDto]) -> Dict:
+        """
+        Converts the variables to a simple dictionary
+        :return: dict
+            {"var1": {"value": 1}, "var2": {"value": True}}
+            ->
+            {"var1": 1, "var2": True}
+        """
+        result = {}
+        if open_api_variables:
+            for k, v in open_api_variables.items():
+                result[k] = v.value
+        return result
+
+    @staticmethod
+    def convert_dict_to_openapi_variables(variabes: dict) -> Dict[str,VariableValueDto]:
+        """
+        Converts the variables to a simple dictionary
+        :return: dict
+            {"var1": 1, "var2": True}
+            ->
+            {"var1": {"value": "1", "type": "String"}, "var2": {"value": "True", "type": "String"}}
+        """
+        result: Dict[str, VariableValueDto] = {}
+        if variabes:
+            for k,v in variabes.items():
+                result[k] = VariableValueDto(value=v, type="String")
+        return result
 
 

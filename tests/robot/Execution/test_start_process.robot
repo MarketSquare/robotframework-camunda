@@ -24,9 +24,8 @@ Test starting process with variables
     ${existing_topic}    Set Variable    process_demo_element
 
     ${variable1_value}    Set Variable    test1
-    ${variable1_value_object}    Create Dictionary    value=${variable1_value}    type=String
     ${variable1_key}    Set Variable    my_value
-    ${variables}    Create Dictionary    ${variable1_key}=${variable1_value_object}
+    ${variables}    Create Dictionary    ${variable1_key}=${variable1_value}
 
     # WHEN
     start process    ${process_definition_key}   ${variables}
@@ -40,7 +39,5 @@ Test starting process with variables
     # AND
     dictionary should contain key    ${first_workload}    ${variable1_key}
     Should Not be empty    ${first_workload}[${variable1_key}]
-    dictionary should contain key    ${first_workload}[${variable1_key}]    value
-    Should Not be empty    ${first_workload}[${variable1_key}][value]
-    Should Be Equal    ${variable1_value}    ${first_workload}[${variable1_key}][value]
-    [Teardown]    complete task   ${existing_topic}
+    Should Be Equal    ${variable1_value}    ${first_workload}[${variable1_key}]
+    [Teardown]    complete task
