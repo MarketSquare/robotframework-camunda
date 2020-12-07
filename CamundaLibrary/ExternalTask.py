@@ -97,28 +97,34 @@ class ExternalTask:
 
         result_set must be a dictionary like: {'key' : 'value'}
         """
-        with self._shared_resources.api_client as api_client:
-            api_instance = openapi_client.ExternalTaskApi(api_client)
-            variables = CamundaResources.convert_dict_to_openapi_variables(result_set)
-            complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID, variables=variables)
-            try:
-                logger.debug(f"Sending to Camunda for completing Task:\n{complete_task_dto}")
-                api_instance.complete_external_task_resource(self.TASK_ID, complete_external_task_dto=complete_task_dto)
-                self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
-                self.TASK_ID=self.EMPTY_STRING
-            except ApiException as e:
-                logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
+        if not self.TASK_ID:
+            logger.warn('No task to complete. Maybe you did not fetch and lock a workitem before?')
+        else:
+            with self._shared_resources.api_client as api_client:
+                api_instance = openapi_client.ExternalTaskApi(api_client)
+                variables = CamundaResources.convert_dict_to_openapi_variables(result_set)
+                complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID, variables=variables)
+                try:
+                    logger.debug(f"Sending to Camunda for completing Task:\n{complete_task_dto}")
+                    api_instance.complete_external_task_resource(self.TASK_ID, complete_external_task_dto=complete_task_dto)
+                    self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
+                    self.TASK_ID=self.EMPTY_STRING
+                except ApiException as e:
+                    logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
 
     @keyword("Unlock")
     def unlock(self):
         """
         Unlocks recent task.
         """
-        with self._shared_resources.api_client as api_client:
-            api_instance = openapi_client.ExternalTaskApi(api_client)
-            try:
-                api_instance.unlock(self.TASK_ID)
-                self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
-                self.TASK_ID=self.EMPTY_STRING
-            except ApiException as e:
-                logger.error(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
+        if not self.TASK_ID:
+            logger.warn('No task to unlock. Maybe you did not fetch and lock a workitem before?')
+        else:
+            with self._shared_resources.api_client as api_client:
+                api_instance = openapi_client.ExternalTaskApi(api_client)
+                try:
+                    api_instance.unlock(self.TASK_ID)
+                    self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
+                    self.TASK_ID=self.EMPTY_STRING
+                except ApiException as e:
+                    logger.error(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
