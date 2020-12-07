@@ -108,6 +108,23 @@ class ExternalTask:
             except ApiException as e:
                 logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
 
+    @keyword("Unlock")
+    def unlock(self, topic, process_instance: str = None, result_set: Dict[str, Any] = None):
+        """
+        Completes a topic for a process instance. If no process isntance id is provided, the most recent cached
+        process instance id is used.
+        """
+        if not topic:
+            raise ValueError('Unable complete task, because no topic given')
+        with self._shared_resources.api_client as api_client:
+            api_instance = openapi_client.ExternalTaskApi(api_client)
+            try:
+                api_instance.unlock(self.TASK_ID)
+                self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
+                self.TASK_ID=self.EMPTY_STRING
+            except ApiException as e:
+                logger.error(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
+
     @staticmethod
     def convert_openapi_variables_to_dict(open_api_variables: Dict[str, VariableValueDto]) -> Dict:
         """
