@@ -93,8 +93,9 @@ class ExternalTask:
     @keyword("Complete task")
     def complete(self, result_set: Dict[str, Any] = None):
         """
-        Completes a topic for a process instance. If no process isntance id is provided, the most recent cached
-        process instance id is used.
+        Completes recent task.
+
+        result_set must be a dictionary like: {'key' : 'value'}
         """
         with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.ExternalTaskApi(api_client)
@@ -111,8 +112,7 @@ class ExternalTask:
     @keyword("Unlock")
     def unlock(self):
         """
-        Completes a topic for a process instance. If no process isntance id is provided, the most recent cached
-        process instance id is used.
+        Unlocks recent task.
         """
         with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.ExternalTaskApi(api_client)
@@ -122,5 +122,3 @@ class ExternalTask:
                 self.TASK_ID=self.EMPTY_STRING
             except ApiException as e:
                 logger.error(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
-
-

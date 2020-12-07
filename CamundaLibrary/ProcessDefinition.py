@@ -35,6 +35,8 @@ class ProcessDefinition:
     def start_process(self, process_key: str, variables: Dict = None):
         """
         Starts a new process instance from a process definition with given key.
+
+        variables must be a dictionary like: {'key' : 'value'}
         """
         with self._shared_resources.api_client as api_client:
             api_instance: ProcessDefinitionApi = generic_camunda_client.ProcessDefinitionApi(api_client)
