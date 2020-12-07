@@ -18,4 +18,4 @@ Test 'fetch and lock' for non existing topic
     log    Recent task:\t${recent_task}
 
     ${my_result}    Create Dictionary    lastname=Stahl
-    complete task   ${existing_topic}    ${recent_task}    ${my_result}
+    complete task   ${my_result}

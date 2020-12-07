@@ -40,4 +40,4 @@ Test starting process with variables
     dictionary should contain key    ${first_workload}    ${variable1_key}
     Should Not be empty    ${first_workload}[${variable1_key}]
     Should Be Equal    ${variable1_value}    ${first_workload}[${variable1_key}]
-    [Teardown]    complete task   ${existing_topic}
+    [Teardown]    complete task
