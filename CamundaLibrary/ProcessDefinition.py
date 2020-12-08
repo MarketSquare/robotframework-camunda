@@ -38,6 +38,9 @@ class ProcessDefinition:
 
         variables must be a dictionary like: {'key' : 'value'}
         """
+        if not process_key:
+            raise ValueError('Error starting process. No process key provided.')
+
         with self._shared_resources.api_client as api_client:
             api_instance: ProcessDefinitionApi = generic_camunda_client.ProcessDefinitionApi(api_client)
             openapi_variables = CamundaResources.convert_dict_to_openapi_variables(variables)
