@@ -10,7 +10,7 @@ with open("README.md", "r") as fh:
 name = "Deutsche Post Adress GmbH & Co. KG"
 
 version_regex = r"^v(?P<version>\d*\.\d*\.\d*$)"
-version = os.environ.get('CI_COMMIT_TAG', f'0.{os.environ.get("CI_COMMIT_REF_NAME","8.0a1")}')
+version = os.environ.get('CI_COMMIT_TAG', f'0.{os.environ.get("CI_COMMIT_REF_NAME","8.0a2")}')
 full_version_match = re.fullmatch(version_regex, version)
 if full_version_match:
     version = full_version_match.group('version')
@@ -36,6 +36,6 @@ setup(
         "Framework :: Robot Framework",
     ],
     license="Apache License, Version 2.0",
-    install_requires=["robotframework", "requests", "frozendict", 'generic-camunda-client'],
+    install_requires=["robotframework>=3.2", "requests", "frozendict", 'generic-camunda-client>=0.0.4'],
     include_package_data=True,
 )
