@@ -63,6 +63,8 @@ class CamundaResources:
             ->
             {"var1": 1, "var2": True}
         """
+        if not open_api_variables:
+            return {}
         return {k: v.value for (k, v) in open_api_variables.items()}
 
     @staticmethod
@@ -74,4 +76,6 @@ class CamundaResources:
             ->
             {"var1": {"value": "1", "type": "String"}, "var2": {"value": "True", "type": "String"}}
         """
+        if not variabes:
+            return {}
         return {k: VariableValueDto(value=v) for (k, v) in variabes.items()}
