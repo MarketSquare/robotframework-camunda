@@ -1,5 +1,6 @@
 from generic_camunda_client import Configuration, ApiClient, VariableValueDto
-from typing import Dict
+from typing import Dict, Any
+import json
 
 
 class CamundaResources:
@@ -65,7 +66,7 @@ class CamundaResources:
         """
         if not open_api_variables:
             return {}
-        return {k: v.value for (k, v) in open_api_variables.items()}
+        return {k: CamundaResources.convert_variable_dto(v) for (k, v) in open_api_variables.items()}
 
     @staticmethod
     def convert_dict_to_openapi_variables(variabes: dict) -> Dict[str,VariableValueDto]:
@@ -78,4 +79,15 @@ class CamundaResources:
         """
         if not variabes:
             return {}
-        return {k: VariableValueDto(value=v) for (k, v) in variabes.items()}
+        return {k: CamundaResources.convert_to_variable_dto(v) for (k, v) in variabes.items()}
+
+    @staticmethod
+    def convert_to_variable_dto(value: Any) -> VariableValueDto:
+        # seems useless now, but might become handy
+        return VariableValueDto(value=value)
+
+    @staticmethod
+    def convert_variable_dto(dto: VariableValueDto) -> Any:
+        # seems useless now, but might become handy
+        return dto.value
+

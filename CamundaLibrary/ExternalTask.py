@@ -8,7 +8,7 @@ import time
 
 # camunda client imports
 import generic_camunda_client as openapi_client
-from generic_camunda_client import ApiException, LockedExternalTaskDto, VariableValueDto
+from generic_camunda_client import ApiException, LockedExternalTaskDto, VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto
 
 # local imports
 from CamundaLibrary.CamundaResources import CamundaResources
@@ -51,16 +51,8 @@ class ExternalTask:
         with self._shared_resources.api_client as api_client:
             # Create an instance of the API class
             api_instance = openapi_client.ExternalTaskApi(api_client)
-            fetch_external_tasks_dto = {
-                "workerId": self.WORKER_ID,
-                "maxTasks": 1,
-                "topics": [
-                    {
-                        "topicName": topic,
-                        "lockDuration": 600000,
-                    }
-                ]
-            }
+            topic_dto=FetchExternalTaskTopicDto(topic_name=topic, lock_duration=60000, deserialize_values=True)
+            fetch_external_tasks_dto = FetchExternalTasksDto(worker_id=self.WORKER_ID, max_tasks=1, topics=[topic_dto])
 
             try:
                 api_response = api_instance.fetch_and_lock(fetch_external_tasks_dto=fetch_external_tasks_dto)
