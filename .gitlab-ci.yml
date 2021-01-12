@@ -16,87 +16,94 @@ include:
 variables:
   FEATURE_IMAGE_NAME: "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG"
   DEPLOY_IMAGE_NAME: "$CI_REGISTRY_IMAGE"
+
 Build environment:
   stage: build
   image: docker:19.03.12
   services:
-  - name: docker:dind
+    - name: docker:dind
   variables:
     DOCKER_DRIVER: overlay2
   script:
-  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-  - docker pull $DEPLOY_IMAGE_NAME/master:runtime || true
-  - docker pull $FEATURE_IMAGE_NAME:runtime || true
-  - |
-    docker build \
-    --cache-from $FEATURE_IMAGE_NAME:runtime \
-    -t $FEATURE_IMAGE_NAME:runtime \
-    --target runtime \
-    .
-  - docker push $FEATURE_IMAGE_NAME:runtime
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $DEPLOY_IMAGE_NAME/master:runtime || true
+    - docker pull $FEATURE_IMAGE_NAME:runtime || true
+    - |
+      docker build \
+      --cache-from $FEATURE_IMAGE_NAME:runtime \
+      -t $FEATURE_IMAGE_NAME:runtime \
+      --target runtime \
+      .
+    - docker push $FEATURE_IMAGE_NAME:runtime
   only:
     changes:
     - Dockerfile
     - ".gitlab-ci.yml"
     - requirements.txt
+
 Dryrun Robottests:
   stage: test
   before_script:
-  - pip install .
+    - pip install .
   script:
-  - robot -b console -d output -x xunit.xml --dryrun tests/robot/**/*.robot
+    - robot -b console -d output -x xunit.xml --dryrun tests/robot/**/*.robot
   artifacts:
     expire_in: 1 week
     paths:
-    - output
+      - output
     reports:
       junit: output/xunit.xml
     when: always
+
 Integrationtests:
   stage: test
   services:
-  - name: camunda/camunda-bpm-platform:7.13.0
-    alias: camunda
+    - name: camunda/camunda-bpm-platform:7.14.0
+      alias: camunda
   before_script:
-  - pip install .
+    - pip install .
   script:
-  - robot -b console -d output -x xunit.xml -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/test*.robot
+    - robot -b console -d output -x xunit.xml -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/test*.robot
   artifacts:
     expire_in: 1 week
     paths:
-    - output
+      - output
     reports:
       junit: output/xunit.xml
     when: always
+
+
 ".package and deploy on testpypi":
   stage: deploy
   script:
-  - python -m pip install --upgrade setuptools wheel twine
-  - python setup.py sdist bdist_wheel
-  - TWINE_PASSWORD=${TEST_PYPI_DEPLOYTOKEN} TWINE_USERNAME=__token__ python -m twine
-    upload --repository testpypi dist/*
+    - python -m pip install --upgrade setuptools wheel twine
+    - python setup.py sdist bdist_wheel
+    - TWINE_PASSWORD=${TEST_PYPI_DEPLOYTOKEN} TWINE_USERNAME=__token__ python -m twine
+      upload --repository testpypi dist/*
   only:
-  - tags
+    - tags
+
 package and deploy on pypi:
   stage: deploy
   script:
-  - python -m pip install --upgrade setuptools wheel twine
-  - python setup.py sdist bdist_wheel
-  - TWINE_PASSWORD=${PYPI_DEPLOYMENT_TOKEN} TWINE_USERNAME=__token__ python -m twine
-    upload --repository pypi dist/*
+    - python -m pip install --upgrade setuptools wheel twine
+    - python setup.py sdist bdist_wheel
+    - TWINE_PASSWORD=${PYPI_DEPLOYMENT_TOKEN} TWINE_USERNAME=__token__ python -m twine
+      upload --repository pypi dist/*
   only:
-  - tags
+    - tags
+
 pages:
   stage: deploy
   before_script:
-  - pip install .
+    - pip install .
   script:
-  - python libdoc/generate_libdoc.py
+    - python libdoc/generate_libdoc.py
   artifacts:
     paths:
-    - public
+      - public
   only:
-  - tags
+    - tags
 
  # do some code analysis 
 sast:
