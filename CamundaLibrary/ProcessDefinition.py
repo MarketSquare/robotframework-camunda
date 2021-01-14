@@ -44,7 +44,7 @@ class ProcessDefinition:
         with self._shared_resources.api_client as api_client:
             api_instance: ProcessDefinitionApi = generic_camunda_client.ProcessDefinitionApi(api_client)
             openapi_variables = CamundaResources.convert_dict_to_openapi_variables(variables)
-            start_process_instance_dto: StartProcessInstanceDto = {'variables': openapi_variables}
+            start_process_instance_dto: StartProcessInstanceDto = StartProcessInstanceDto(variables= openapi_variables)
 
             try:
                 response: ProcessInstanceWithVariablesDto = api_instance.start_process_instance_by_key(
@@ -54,5 +54,6 @@ class ProcessDefinition:
             except ApiException as e:
                 logger.error(f'Failed to start process {process_key}:\n{e}')
                 raise e
+        logger.info(f'Response:\n{response}')
 
         return response.to_dict()
