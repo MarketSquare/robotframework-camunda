@@ -1,6 +1,5 @@
 from generic_camunda_client import Configuration, ApiClient, VariableValueDto
 from typing import Dict, Any
-import json
 
 
 class CamundaResources:
@@ -83,11 +82,9 @@ class CamundaResources:
 
     @staticmethod
     def convert_to_variable_dto(value: Any) -> VariableValueDto:
-        # seems useless now, but might become handy
         return VariableValueDto(value=value)
 
     @staticmethod
     def convert_variable_dto(dto: VariableValueDto) -> Any:
-        # seems useless now, but might become handy
         return dto.value
 
