@@ -83,7 +83,7 @@ class ExternalTask:
         return self.RECENT_PROCESS_INSTANCE
 
     @keyword("Complete task")
-    def complete(self, result_set: Dict[str, Any] = None):
+    def complete(self, result_set: Dict[str, Any] = None, files: Dict = None):
         """
         Completes recent task.
 
@@ -95,6 +95,8 @@ class ExternalTask:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ExternalTaskApi(api_client)
                 variables = CamundaResources.convert_dict_to_openapi_variables(result_set)
+                openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(files)
+                variables.update(openapi_files)
                 complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID, variables=variables)
                 try:
                     logger.debug(f"Sending to Camunda for completing Task:\n{complete_task_dto}")
@@ -103,6 +105,22 @@ class ExternalTask:
                     self.TASK_ID=self.EMPTY_STRING
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
+
+    @keyword("Download file from variable")
+    def download_file_from_variable(self, variable_name: str) -> str:
+        if not self.RECENT_PROCESS_INSTANCE:
+            logger.warn('Could not download file for variable. Maybe you did not fetch and lock a workitem before?')
+        else:
+            with self._shared_resources.api_client as api_client:
+                api_instance = openapi_client.ProcessInstanceApi(api_client)
+
+                try:
+                    response = api_instance.get_process_instance_variable_binary(id=self.RECENT_PROCESS_INSTANCE, var_name=variable_name)
+                    logger.debug(response)
+                except ApiException as e:
+                    logger.error(f"Exception when calling ExternalTaskApi->get_process_instance_variable_binary: {e}\n")
+                return response
+
 
     @keyword("Unlock")
     def unlock(self):

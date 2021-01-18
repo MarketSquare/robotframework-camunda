@@ -41,12 +41,26 @@ Build environment:
     - ".gitlab-ci.yml"
     - requirements.txt
 
+Unittests:
+  stage: test
+  before_script:
+    - pip install -U unittest-xml-reporting
+  script:
+    - python CamundaLibrary/*.py -v
+  artifacts:
+    expire_in: 1 week
+    paths:
+      - logs
+    when: always
+    reports:
+      junit: logs/TEST*.xml
+
 Dryrun Robottests:
   stage: test
   before_script:
     - pip install .
   script:
-    - robot -b console -d output -x xunit.xml --dryrun tests/robot/**/*.robot
+    - robot -L DEBUG -b console -d output -x xunit.xml --dryrun tests/robot/**/*.robot
   artifacts:
     expire_in: 1 week
     paths:
@@ -63,7 +77,7 @@ Integrationtests:
   before_script:
     - pip install .
   script:
-    - robot -b console -d output -x xunit.xml -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/test*.robot
+    - robot -L DEBUG -b console -d output -x xunit.xml -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/test*.robot
   artifacts:
     expire_in: 1 week
     paths:

@@ -1,5 +1,7 @@
 from generic_camunda_client import Configuration, ApiClient, VariableValueDto
 from typing import Dict, Any
+import os
+import base64
 
 
 class CamundaResources:
@@ -74,11 +76,57 @@ class CamundaResources:
         :return: dict
             {"var1": 1, "var2": True}
             ->
-            {"var1": {"value": "1", "type": "String"}, "var2": {"value": "True", "type": "String"}}
+            {'var1': {'type': None, 'value': 1, 'value_info': None}, 'var2': {'type': None, 'value': True, 'value_info': None}}
+
+        Example:
+        >>> CamundaResources.convert_dict_to_openapi_variables({"var1": 1, "var2": True})
+        {'var1': {'type': None, 'value': 1, 'value_info': None}, 'var2': {'type': None, 'value': True, 'value_info': None}}
+
+        >>> CamundaResources.convert_dict_to_openapi_variables({})
+        {}
         """
         if not variabes:
             return {}
         return {k: CamundaResources.convert_to_variable_dto(v) for (k, v) in variabes.items()}
+
+    @staticmethod
+    def convert_file_dict_to_openapi_variables(files: Dict[str, str]) -> Dict[str, VariableValueDto]:
+        """
+        Example:
+        >>> CamundaResources.convert_file_dict_to_openapi_variables({'testfile': 'tests/resources/test.txt'})
+        {'testfile': {'type': 'File',
+         'value': 'VGhpcyBpcyBhIHRlc3QgZmlsZSBmb3IgYSBjYW11bmRhIHByb2Nlc3Mu',
+         'value_info': {'filename': 'test.txt', 'mimetype': 'text/plain'}}}
+
+        >>> CamundaResources.convert_file_dict_to_openapi_variables({})
+        {}
+        """
+        if not files:
+            return {}
+        return {k: CamundaResources.convert_file_to_dto(v) for (k, v) in files.items()}
+
+    @staticmethod
+    def convert_file_to_dto(path: str) -> VariableValueDto:
+        if not path:
+            raise FileNotFoundError('Cannot create DTO from file, because no file provided')
+
+        with open(path, 'r+b') as file:
+            file_content = base64.standard_b64encode(file.read()).decode('utf-8')
+
+        base = os.path.basename(path)
+        file_name, file_ext = os.path.splitext(base)
+
+        if file_ext.lower() in ['.jpg', '.jpeg', '.jpe']:
+            mimetype = 'image/jpeg'
+        elif file_ext.lower() in ['.png']:
+            mimetype = 'image/png'
+        elif file_ext.lower() in ['.pdf']:
+            mimetype = 'application/pdf'
+        elif file_ext.lower() in ['.txt']:
+            mimetype = 'text/plain'
+        else:
+            mimetype = 'application/octet-stream'
+        return VariableValueDto(value=file_content, type='File', value_info={'filename': base, 'mimetype': mimetype})
 
     @staticmethod
     def convert_to_variable_dto(value: Any) -> VariableValueDto:
@@ -86,5 +134,13 @@ class CamundaResources:
 
     @staticmethod
     def convert_variable_dto(dto: VariableValueDto) -> Any:
+        if dto.type == 'File':
+            return dto.to_dict()
         return dto.value
 
+if __name__ == '__main__':
+    import doctest
+    import xmlrunner
+
+    suite = doctest.DocTestSuite()
+    xmlrunner.XMLTestRunner(output='logs').run(suite)

@@ -32,7 +32,7 @@ class ProcessDefinition:
         self._shared_resources.camunda_url = f'{url}/engine-rest'
 
     @keyword("Start process")
-    def start_process(self, process_key: str, variables: Dict = None):
+    def start_process(self, process_key: str, variables: Dict = None, files: Dict = None):
         """
         Starts a new process instance from a process definition with given key.
 
@@ -44,6 +44,8 @@ class ProcessDefinition:
         with self._shared_resources.api_client as api_client:
             api_instance: ProcessDefinitionApi = generic_camunda_client.ProcessDefinitionApi(api_client)
             openapi_variables = CamundaResources.convert_dict_to_openapi_variables(variables)
+            openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(files)
+            openapi_variables.update(openapi_files)
             start_process_instance_dto: StartProcessInstanceDto = StartProcessInstanceDto(variables= openapi_variables)
 
             try:
