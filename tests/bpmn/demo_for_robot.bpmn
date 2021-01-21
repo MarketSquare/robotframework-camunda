@@ -4,20 +4,20 @@
     <bpmn:startEvent id="StartEvent_1">
       <bpmn:outgoing>Flow_0xskn85</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:sequenceFlow id="Flow_0xskn85" sourceRef="StartEvent_1" targetRef="Activity_16clc17" />
-    <bpmn:serviceTask id="Activity_16clc17" name="Process element" camunda:type="external" camunda:topic="process_demo_element">
+    <bpmn:sequenceFlow id="Flow_0xskn85" sourceRef="StartEvent_1" targetRef="Activity_service_1" />
+    <bpmn:serviceTask id="Activity_service_1" name="Process element" camunda:type="external" camunda:topic="process_demo_element">
       <bpmn:incoming>Flow_0xskn85</bpmn:incoming>
       <bpmn:outgoing>Flow_1m77rg0</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:sequenceFlow id="Flow_1m77rg0" sourceRef="Activity_16clc17" targetRef="Activity_1kznptr" />
-    <bpmn:userTask id="Activity_1kznptr" name="Do something manually">
+    <bpmn:sequenceFlow id="Flow_1m77rg0" sourceRef="Activity_service_1" targetRef="Activity_user_1" />
+    <bpmn:userTask id="Activity_user_1" name="Do something manually">
       <bpmn:incoming>Flow_1m77rg0</bpmn:incoming>
       <bpmn:outgoing>Flow_0thahmr</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:endEvent id="Event_06qztq3">
       <bpmn:incoming>Flow_0thahmr</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0thahmr" sourceRef="Activity_1kznptr" targetRef="Event_06qztq3" />
+    <bpmn:sequenceFlow id="Flow_0thahmr" sourceRef="Activity_user_1" targetRef="Event_06qztq3" />
   </bpmn:process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="demo_for_robot">
@@ -36,10 +36,10 @@
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="179" y="99" width="36" height="36" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0qv44sp_di" bpmnElement="Activity_16clc17">
+      <bpmndi:BPMNShape id="Activity_0qv44sp_di" bpmnElement="Activity_service_1">
         <dc:Bounds x="270" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1cxrwut_di" bpmnElement="Activity_1kznptr">
+      <bpmndi:BPMNShape id="Activity_1cxrwut_di" bpmnElement="Activity_user_1">
         <dc:Bounds x="430" y="77" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_06qztq3_di" bpmnElement="Event_06qztq3">
