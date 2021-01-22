@@ -38,11 +38,14 @@ class ProcessDefinition:
         Starts a new process instance from a process definition with given key.
 
         variables: _optional_ dictionary like: {'variable name' : 'value'}
+
         files: _optional_ dictionary like: {'variable name' : path}. will be attached to variables in Camunda
+
         before_activity_id: _optional_ id of activity at which the process starts before. *CANNOT BE USED TOGETHER WITH _after_activity_id_*
+
         after_activity_id: _optional_ id of activity at which the process starts after. *CANNOT BE USED TOGETHER WITH _before_activity_id_*
 
-        Returns response from Camunda
+        Returns response from Camunda as dictionary
 
         == Examples ==
         | `start process`      | apply for job promotion    | _variables_= { 'employee' : 'John Doe', 'permission_for_application_granted' : True}   | _files_ = { 'cv' : 'documents/my_life.md'}  | _after_activity_id_ = 'Activity_ask_boss_for_persmission'   |
