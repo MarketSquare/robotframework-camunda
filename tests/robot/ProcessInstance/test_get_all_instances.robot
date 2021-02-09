@@ -1,7 +1,5 @@
 *** Settings ***
-Library    CamundaLibrary.ProcessInstance    ${CAMUNDA_HOST}
-Library    CamundaLibrary.ProcessDefinition
-Library    CamundaLibrary.Deployment
+Library    CamundaLibrary    ${CAMUNDA_HOST}
 
 
 *** Variables ***

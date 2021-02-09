@@ -1,5 +1,5 @@
 *** Settings ***
-Library    CamundaLibrary.Deployment    ${CAMUNDA_HOST}
+Library    CamundaLibrary   ${CAMUNDA_HOST}
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
@@ -20,3 +20,4 @@ Test error when deploying to incorrect url
     # THEN
     Should Be Equal    FAIL    ${pass_message}
     Should contain    ${error}    ConnectionError
+    [Teardown]    set camunda url     ${CAMUNDA_HOST}

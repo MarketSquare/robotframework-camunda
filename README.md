@@ -1,18 +1,13 @@
 # Robot Framework Camunda
 
 This library provides keywords for accessing camunda workflow engine. Complete REST API reference of camunda 
-can be found [here](https://docs.camunda.org/manual/7.5/reference/rest/).
+can be found [here](https://docs.camunda.org/manual/7.14/reference/rest/).
 
 **Library is in an early stage. Please review [issue board](https://gitlab.com/postadress/robotframework/robotframework-camunda/-/issues) for known issues or report one yourself. You are 
 invited to contribute pull requests.**
 
 ## Documentation
-Keyword documentation exists for sub-libraries:
-- [Deployment](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/deployment/)
-- [ProcessInstance](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/processinstance/)
-- [ProcessDefinition](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/processdefinition/)
-- [ExternalTask](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/externaltask/)
-
+Keyword documentation is provided [here](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/camundalibrary/)
 ## Installation
 The library is published on [pypi.org](https://pypi.org/project/robotframework-camunda/) and can be installed with pip:
 ```
@@ -26,7 +21,7 @@ instance of camunda running.
 ### Deploy process definition
 ```robot
 *** Settings ***
-Library    CamundaLibrary.Deployment    ${CAMUNDA_HOST}
+Library    CamundaLibrary    ${CAMUNDA_HOST}
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
@@ -39,7 +34,7 @@ Test deployment of models
 ### Starting a process instance
 ```robot
 *** Settings ***
-Library    CamundaLibrary.ProcessDefinition    ${CAMUNDA_HOST}
+Library    CamundaLibrary    ${CAMUNDA_HOST}
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
@@ -56,12 +51,12 @@ Test starting process
 ### Execute Task
 "Executing task" bascially means, you execute a robot task that *fetches* a workload from camunda, processes it and 
 returns its workload back to camunda during *completion*. Main keywords involved are:
-1. `CamundaLibrary.ExternalTask.Fetch and lock workloads`
-1. `CamundaLibrary.ExternalTask.Complete Task`
+1. `CamundaLibrary.Fetch and lock workloads`
+1. `CamundaLibrary.Complete Task`
 
 ```robot
 *** Settings ***
-Library    CamundaLibrary.ExternalTask    ${CAMUNDA_HOST}
+Library    CamundaLibrary    ${CAMUNDA_HOST}
 Library    Collections
 
 *** Variables ***

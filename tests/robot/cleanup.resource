@@ -1,5 +1,5 @@
 *** Settings ***
-Library    CamundaLibrary.ProcessInstance    ${CAMUNDA_HOST}
+Library    CamundaLibrary   ${CAMUNDA_HOST}
 
 *** Variable ***
 ${CAMUNDA_HOST}    http://localhost:8080

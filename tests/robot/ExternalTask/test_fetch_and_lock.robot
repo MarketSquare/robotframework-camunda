@@ -1,5 +1,5 @@
 *** Settings ***
-Library    CamundaLibrary.ExternalTask
+Library    CamundaLibrary    ${CAMUNDA_HOST}
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
@@ -27,5 +27,6 @@ Test 'fetch and lock' for inacurrate camunda url
     # THEN
     Should Be Equal    FAIL    ${pass_message}
     Should contain    ${error}    ConnectionError
+    [Teardown]    Set Camunda Url    ${CAMUNDA_HOST}
 
 

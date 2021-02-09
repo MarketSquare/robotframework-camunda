@@ -46,7 +46,7 @@ Unittests:
   before_script:
     - pip install -U unittest-xml-reporting
   script:
-    - python CamundaLibrary/*.py -v
+    - python CamundaLibrary/CamundaResources.py -v
   artifacts:
     expire_in: 1 week
     paths:
@@ -72,7 +72,7 @@ Dryrun Robottests:
 Integrationtests:
   stage: test
   services:
-    - name: camunda/camunda-bpm-platform:7.14.0
+    - name: camunda/camunda-bpm-platform:run-7.14.0
       alias: camunda
   before_script:
     - pip install .
