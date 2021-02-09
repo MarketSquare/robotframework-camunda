@@ -1,7 +1,5 @@
 *** Settings ***
-Library    CamundaLibrary.ProcessDefinition    ${CAMUNDA_HOST}
-Library    CamundaLibrary.ProcessInstance
-Library    CamundaLibrary.ExternalTask
+Library    CamundaLibrary    ${CAMUNDA_HOST}
 Library    Collections
 Library    OperatingSystem
 Resource    ../cleanup.resource
