@@ -72,7 +72,7 @@ Dryrun Robottests:
 Integrationtests:
   stage: test
   services:
-    - name: camunda/camunda-bpm-platform:7.14.0
+    - name: camunda/camunda-bpm-platform:run-7.14.0
       alias: camunda
   before_script:
     - pip install .
