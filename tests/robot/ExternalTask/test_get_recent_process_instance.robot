@@ -19,3 +19,4 @@ Never write recent process instance id when no workitem is fetched
 
     # THEN
     Should Be Empty    ${recent_task}    Should not have stored a recent task for none existing topic, but registered recent task id:\t${recent_task}
+
