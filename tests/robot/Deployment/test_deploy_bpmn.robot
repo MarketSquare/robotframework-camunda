@@ -20,3 +20,4 @@ Test error when deploying to incorrect url
     # THEN
     Should Be Equal    FAIL    ${pass_message}
     Should contain    ${error}    ConnectionError
+    [Teardown]    set camunda url     ${CAMUNDA_HOST}
