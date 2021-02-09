@@ -7,12 +7,7 @@ can be found [here](https://docs.camunda.org/manual/7.5/reference/rest/).
 invited to contribute pull requests.**
 
 ## Documentation
-Keyword documentation exists for sub-libraries:
-- [Deployment](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/deployment/)
-- [ProcessInstance](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/processinstance/)
-- [ProcessDefinition](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/processdefinition/)
-- [ExternalTask](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/externaltask/)
-
+Keyword documentation is provided [here](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/camundalibrary/)
 ## Installation
 The library is published on [pypi.org](https://pypi.org/project/robotframework-camunda/) and can be installed with pip:
 ```
