@@ -1,1 +1,2 @@
 from .CamundaLibrary import CamundaLibrary
+from .CamundaResources import CamundaResources
