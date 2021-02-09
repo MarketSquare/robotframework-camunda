@@ -14,7 +14,7 @@ from generic_camunda_client import ApiException, DeploymentWithDefinitionsDto, L
 import generic_camunda_client as openapi_client
 
 # local imports
-from .CamundaResources import CamundaResources
+import CamundaResources
 
 
 @library(scope='GLOBAL')
