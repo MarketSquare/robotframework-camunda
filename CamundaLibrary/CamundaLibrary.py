@@ -22,6 +22,17 @@ class CamundaLibrary:
     """
     Library for Camunda integration in Robot Framework
 
+    = Installation =
+
+    == Camunda ==
+
+    Easiest to run Camunda in docker:
+    | docker run -d --name camunda -p 8080:8080 camunda/camunda-bpm-platform:run-latest
+
+    == CamundaLibrary ==
+    You can use pip for installing CamundaLibrary:
+    | pip install robotframework-camunda
+
     = Usage =
 
     The library provides convenience keywords for accessing Camunda via REST API. You may deploy models,
