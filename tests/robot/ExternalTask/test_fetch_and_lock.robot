@@ -3,7 +3,7 @@ Library    CamundaLibrary    ${CAMUNDA_HOST}
 Library    Collections
 Resource    ../cleanup.resource
 Test Setup    Delete all instances from process '${PROCESS_DEFINITION_KEY}'
-Test Teardown    set camunda url    ${CAMUNDA_HOST}
+Test Teardown    Reset CamundaLibrary
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
@@ -58,3 +58,8 @@ Test 'fetch and lock' for inacurrate camunda url
     # THEN
     Should Be Equal    FAIL    ${pass_message}
     Should contain    ${error}    ConnectionError
+
+*** Keywords ***
+Reset CamundaLibrary
+    set camunda url    ${CAMUNDA_HOST}
+    complete task
