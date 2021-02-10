@@ -198,7 +198,7 @@ class CamundaLibrary:
 
     @keyword("Download file from variable")
     def download_file_from_variable(self, variable_name: str) -> str:
-        if not self.self.FETCH_RESPONSE:
+        if not self.FETCH_RESPONSE:
             logger.warn('Could not download file for variable. Maybe you did not fetch and lock a workitem before?')
         else:
             with self._shared_resources.api_client as api_client:
