@@ -9,7 +9,7 @@ Test 'fetch and lock' for non existing topic
     ${existing_topic}    Set Variable    process_demo_element
 
     # WHEN
-    ${work_items}    fetch and lock workloads   topic=${existing_topic}
+    ${work_items}    fetch workload   topic=${existing_topic}
 
     # THEN
     Should Not Be Empty    ${work_items}

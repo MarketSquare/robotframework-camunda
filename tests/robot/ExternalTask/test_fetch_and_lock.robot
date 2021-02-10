@@ -15,7 +15,7 @@ Test 'fetch and lock' for existing topic
     #GIVEN
     start process    ${PROCESS_DEFINITION_KEY}    ${{{'variable_1': 1}}}
     #WHEN
-    ${variables}    fetch and lock workloads    ${EXISTING_TOPIC}
+    ${variables}    fetch workload    ${EXISTING_TOPIC}
     #THEN
     Should Not Be Empty    ${variables}    Fetching failed. Expected workload at topic '${EXISTING_TOPIC}'
     #AND
@@ -31,7 +31,7 @@ Test 'fetch and lock' with only specific variables
     start process   ${PROCESS_DEFINITION_KEY}    ${input_variables}
 
     #WHEN
-    ${variables}    fetch and lock workloads    ${EXISTING_TOPIC}    variables=${{['${variable_name1}']}}
+    ${variables}    fetch workload    ${EXISTING_TOPIC}    variables=${{['${variable_name1}']}}
 
     #THEN
     Dictionary Should Contain key    ${variables}    ${variable_name1}
@@ -42,7 +42,7 @@ Test 'fetch and lock' for non existing topic
     ${non_existing_topic}    Set Variable    asdqeweasdwe
 
     # WHEN
-    ${work_items}    fetch and lock workloads   topic=${non_existing_topic}
+    ${work_items}    fetch workload   topic=${non_existing_topic}
 
     # THEN
     Should Be Empty    ${work_items}
@@ -53,7 +53,7 @@ Test 'fetch and lock' for inacurrate camunda url
     set camunda url    ${invalid_camunda_url}
 
     # WHEN
-    ${pass_message}    ${error}    Run Keyword and ignore error    fetch and lock workloads    topic=random
+    ${pass_message}    ${error}    Run Keyword and ignore error    fetch workload    topic=random
 
     # THEN
     Should Be Equal    FAIL    ${pass_message}
