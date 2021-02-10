@@ -24,8 +24,7 @@ class CamundaLibrary:
 
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
-    RECENT_PROCESS_INSTANCE: str = EMPTY_STRING
-    TASK_ID = ""
+    FETCH_RESPONSE: LockedExternalTaskDto
 
     def __init__(self, camunda_engine_url: str = 'http://localhost:8080'):
         self._shared_resources = CamundaResources()
@@ -99,18 +98,29 @@ class CamundaLibrary:
         if not work_items:
             return {}
 
-        self.TASK_ID = work_items[0].id
-        self.RECENT_PROCESS_INSTANCE = work_items[0].process_instance_id
+        self.FETCH_RESPONSE = work_items[0]
 
-        variables: Dict[str, VariableValueDto] = work_items[0].variables
+        variables: Dict[str, VariableValueDto] = self.FETCH_RESPONSE.variables
         return CamundaResources.convert_openapi_variables_to_dict(variables)
 
     @keyword("Get recent process instance")
     def get_process_instance_id(self):
-        """
+        """*DEPRECATED*
+        _Use `get fetch response` instead and check for ``process_instance_id`` element on the fetch reponse:
+        ``fetch_response[process_instance]``_
+
         Returns cached process instance id from previously called `fetch and lock workloads`
         """
-        return self.RECENT_PROCESS_INSTANCE
+        logger.warn('Method is deprecated. Use "Get fetch response"')
+        if self.FETCH_RESPONSE:
+            return self.FETCH_RESPONSE.process_instance_id
+        return self.EMPTY_STRING
+
+    @keyword("Get fetch response")
+    def get_fetch_response(self):
+        if self.FETCH_RESPONSE:
+            return self.FETCH_RESPONSE.to_dict()
+        return self.EMPTY_STRING
 
     @keyword("Complete task")
     def complete(self, result_set: Dict[str, Any] = None, files: Dict = None):
@@ -119,7 +129,7 @@ class CamundaLibrary:
 
         result_set must be a dictionary like: {'key' : 'value'}
         """
-        if not self.TASK_ID:
+        if not self.FETCH_RESPONSE:
             logger.warn('No task to complete. Maybe you did not fetch and lock a workitem before?')
         else:
             with self._shared_resources.api_client as api_client:
@@ -130,42 +140,39 @@ class CamundaLibrary:
                 complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID, variables=variables)
                 try:
                     logger.debug(f"Sending to Camunda for completing Task:\n{complete_task_dto}")
-                    api_instance.complete_external_task_resource(self.TASK_ID, complete_external_task_dto=complete_task_dto)
-                    self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
-                    self.TASK_ID=self.EMPTY_STRING
+                    api_instance.complete_external_task_resource(self.FETCH_RESPONSE.id, complete_external_task_dto=complete_task_dto)
+                    self.FETCH_RESPONSE = {}
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
 
     @keyword("Download file from variable")
     def download_file_from_variable(self, variable_name: str) -> str:
-        if not self.RECENT_PROCESS_INSTANCE:
+        if not self.self.FETCH_RESPONSE:
             logger.warn('Could not download file for variable. Maybe you did not fetch and lock a workitem before?')
         else:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ProcessInstanceApi(api_client)
 
                 try:
-                    response = api_instance.get_process_instance_variable_binary(id=self.RECENT_PROCESS_INSTANCE, var_name=variable_name)
+                    response = api_instance.get_process_instance_variable_binary(
+                        id=self.FETCH_RESPONSE.process_instance_id, var_name=variable_name)
                     logger.debug(response)
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->get_process_instance_variable_binary: {e}\n")
                 return response
-
 
     @keyword("Unlock")
     def unlock(self):
         """
         Unlocks recent task.
         """
-        if not self.TASK_ID:
+        if not self.FETCH_RESPONSE:
             logger.warn('No task to unlock. Maybe you did not fetch and lock a workitem before?')
         else:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ExternalTaskApi(api_client)
                 try:
-                    api_instance.unlock(self.TASK_ID)
-                    self.RECENT_PROCESS_INSTANCE = self.EMPTY_STRING
-                    self.TASK_ID=self.EMPTY_STRING
+                    api_instance.unlock(self.FETCH_RESPONSE.id)
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
 
