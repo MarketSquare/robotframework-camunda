@@ -30,7 +30,7 @@ Test starting process with variables
     start process    ${PROCESS_DEFINITION_KEY}   ${variables}
 
     # AND
-    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch workload   topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -55,7 +55,7 @@ Test starting process with variables after activity
     start process    ${PROCESS_DEFINITION_KEY}   ${variables}    after_activity_id=${after_activity_id}
 
     # AND
-    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch workload   topic=${existing_topic}
 
     # THEN
     Should be empty    ${first_workload}
@@ -76,7 +76,7 @@ Test starting process with variables before activity
     start process    ${PROCESS_DEFINITION_KEY}   ${variables}    before_activity_id=${before_activity_id}
 
     # AND
-    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch workload   topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -100,7 +100,7 @@ Test starting process with dict variables
     start process    ${PROCESS_DEFINITION_KEY}   ${variables}
 
     # AND
-    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch workload   topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -122,7 +122,7 @@ Test starting process with file variables
     start process    ${PROCESS_DEFINITION_KEY}   files=${files}
 
     # AND
-    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch workload   topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -147,7 +147,7 @@ Test file content from starting process variable
     start process    ${PROCESS_DEFINITION_KEY}   files=${files}
 
     # AND
-    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch workload   topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}

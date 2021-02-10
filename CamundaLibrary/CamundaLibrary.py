@@ -43,8 +43,16 @@ class CamundaLibrary:
 
     @keyword(name='Deploy model from file')
     def deploy_bpmn(self, path_bpmn_file: str):
-        """
-        Uploads a camunda model to camunda.
+        """Uploads a camunda model to camunda that is provided as path.
+
+        Return response from camunda rest api as dictionary. Further documentation: https://docs.camunda.org/manual/7.14/reference/rest/deployment/post-deployment/
+
+        By default, this keyword only deploys changed models and filters duplicates. Deployment name is the filename of
+        the model.
+
+        Example:
+            | ${path_to_bpm_file} | *Set Variable* | _../bpmn/my_model.bpm_ |
+            | ${response} | *Deploy model from file* | _${path_to_bpm_file}_ |
         """
         if not path_bpmn_file:
             raise ValueError('Failed deploying model, because no file provided.')
@@ -69,18 +77,53 @@ class CamundaLibrary:
         return response.to_dict()
 
     @keyword("Fetch and Lock workloads")
-    def fetch_and_lock(self, topic: str) -> Dict:
+    def fetch_and_lock_workloads(self, topic, **kwargs) -> Dict:
+        """*DEPRECATED*
+
+        Use `fetch workload`
+        """
+        logger.warn('Keyword "Fetch and Lock workloads" is deprecated. Use "Fetch workload" instead.')
+        return self.fetch_workload(topic, **kwargs)
+
+    @keyword("Fetch Workload")
+    def fetch_workload(self, topic: str, **kwargs) -> Dict:
         """
         Locks and fetches workloads from camunda on a given topic. Returns a list of variable dictionary.
-        Each dictionary representing 1 workload.
+        Each dictionary representing 1 workload from a process instance.
 
-        If camunda provides a new work item, the work_items process instance id is cached.
+        If a process instance was fetched, the process instance is cached and can be retrieved by keyword
+        `Get recent process instance`
+
+        The only mandatory parameter for this keyword is *topic* which is the name of the topic to fetch workload from.
+        More parameters can be added from the Camunda documentation: https://docs.camunda.org/manual/7.14/reference/rest/external-task/fetch/
+
+        If not provided, this keyword will use a lock_duration of 60000 ms (10 minutes) and set {{deserialize_value=True}}
+
+        Examples:
+            | ${input_variables} | *Create Dictionary* | _name=Robot_ |
+            | | *start process* | _my_demo_ | _${input_variables}_ |
+            | ${variables} | *fetch and lock workloads* | _first_task_in_demo_ |
+            | | *Dictionary Should Contain Key* | _${variables}_ | _name_ |
+            | | *Should Be Equal As String* | _Robot_ | _${variables}[name]_ |
+
+        Example deserializing only some variables:
+            | ${input_variables} | *Create Dictionary* | _name=Robot_ | _profession=Framework_ |
+            | | *start process* | _my_demo_ | _${input_variables}_ |
+            | ${variables_of_interest} | *Create List* | _profession_ |
+            | ${variables} | *Fetch Workload* | _first_task_in_demo_ | _variables=${variables_of_interest}_ |
+            | | *Dictionary Should Not Contain Key* | _${variables}_ | _name_ |
+            | | *Dictionary Should Contain Key* | _${variables}_ | _profession_ |
+            | | *Should Be Equal As String* | _Framework_ | _${variables}[profession]_ |
         """
         api_response = []
         with self._shared_resources.api_client as api_client:
             # Create an instance of the API class
             api_instance = openapi_client.ExternalTaskApi(api_client)
-            topic_dto=FetchExternalTaskTopicDto(topic_name=topic, lock_duration=60000, deserialize_values=True)
+            if 'lock_duration' not in kwargs:
+                kwargs['lock_duration'] = 60000
+            if 'deserialize_values' not in kwargs:
+                kwargs['deserialize_values'] = True
+            topic_dto=FetchExternalTaskTopicDto(topic_name=topic, **kwargs)
             fetch_external_tasks_dto = FetchExternalTasksDto(worker_id=self.WORKER_ID, max_tasks=1, topics=[topic_dto])
 
             try:
@@ -109,7 +152,15 @@ class CamundaLibrary:
         _Use `get fetch response` instead and check for ``process_instance_id`` element on the fetch reponse:
         ``fetch_response[process_instance]``_
 
-        Returns cached process instance id from previously called `fetch and lock workloads`
+        Returns cached process instance id from previously called `fetch and lock workloads`.
+
+        *Only this keyword can certainly tell, if workload has been fetched from Camunda*
+
+        Example:
+            | ${variables} | fetch and lock workloads | my_first_task_in_demo | |
+            | Run keyword if | not ${variables} | log | No variables found, but is due to lack of variables or because no workload was available? Must check process instance |
+            | ${process_instance} | get recent process instance | | |
+            | Run keyword if | ${process_instance} | complete task | |
         """
         logger.warn('Method is deprecated. Use "Get fetch response"')
         if self.FETCH_RESPONSE:
@@ -147,7 +198,7 @@ class CamundaLibrary:
 
     @keyword("Download file from variable")
     def download_file_from_variable(self, variable_name: str) -> str:
-        if not self.self.FETCH_RESPONSE:
+        if not self.FETCH_RESPONSE:
             logger.warn('Could not download file for variable. Maybe you did not fetch and lock a workitem before?')
         else:
             with self._shared_resources.api_client as api_client:
@@ -160,6 +211,7 @@ class CamundaLibrary:
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->get_process_instance_variable_binary: {e}\n")
                 return response
+
 
     @keyword("Unlock")
     def unlock(self):

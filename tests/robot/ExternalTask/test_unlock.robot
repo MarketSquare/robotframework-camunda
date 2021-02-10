@@ -14,7 +14,7 @@ Test 'fetch and lock' for non existing topic
     ${non_existing_topic}    Set Variable    asdqeweasdwe
 
     # AND
-    ${work_items}    fetch and lock workloads   topic=${non_existing_topic}
+    ${work_items}    fetch workload   topic=${non_existing_topic}
 
     # EXPECTED
     Should Be Empty    ${work_items}
