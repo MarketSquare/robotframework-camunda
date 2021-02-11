@@ -78,7 +78,7 @@ class CamundaLibrary:
 
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
-    FETCH_RESPONSE: LockedExternalTaskDto
+    FETCH_RESPONSE: LockedExternalTaskDto = None
 
     def __init__(self, camunda_engine_url: str = 'http://localhost:8080'):
         self._shared_resources = CamundaResources()
@@ -239,7 +239,11 @@ class CamundaLibrary:
         """
         if self.FETCH_RESPONSE:
             return self.FETCH_RESPONSE.to_dict()
-        return self.EMPTY_STRING
+        return self.FETCH_RESPONSE
+
+    @keyword("Drop fetch response")
+    def drop_fetch_response(self):
+        self.FETCH_RESPONSE = {}
 
     @keyword("Complete task", tags=['task'])
     def complete(self, result_set: Dict[str, Any] = None, files: Dict = None):
@@ -280,7 +284,7 @@ class CamundaLibrary:
                 try:
                     logger.debug(f"Sending to Camunda for completing Task:\n{complete_task_dto}")
                     api_instance.complete_external_task_resource(self.FETCH_RESPONSE.id, complete_external_task_dto=complete_task_dto)
-                    self.FETCH_RESPONSE = {}
+                    self.drop_fetch_response()
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
 
@@ -312,6 +316,7 @@ class CamundaLibrary:
                 api_instance = openapi_client.ExternalTaskApi(api_client)
                 try:
                     api_instance.unlock(self.FETCH_RESPONSE.id)
+                    self.drop_fetch_response()
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
 
