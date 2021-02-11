@@ -78,7 +78,7 @@ class CamundaLibrary:
 
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
-    FETCH_RESPONSE: LockedExternalTaskDto
+    FETCH_RESPONSE: LockedExternalTaskDto = None
 
     def __init__(self, camunda_engine_url: str = 'http://localhost:8080'):
         self._shared_resources = CamundaResources()
