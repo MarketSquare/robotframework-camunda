@@ -140,7 +140,7 @@ class CamundaLibrary:
         return self.fetch_workload(topic, **kwargs)
 
     @keyword("Fetch Workload", tags=['task'])
-    def fetch_workload(self, topic: str, async_response_timeout=None, **kwargs) -> Dict:
+    def fetch_workload(self, topic: str, async_response_timeout=None, use_priority=None, **kwargs) -> Dict:
         """
         Locks and fetches workloads from camunda on a given topic. Returns a list of variable dictionary.
         Each dictionary representing 1 workload from a process instance.
@@ -180,6 +180,7 @@ class CamundaLibrary:
             topic_dto=FetchExternalTaskTopicDto(topic_name=topic, **kwargs)
             fetch_external_tasks_dto = FetchExternalTasksDto(worker_id=self.WORKER_ID, max_tasks=1,
                                                              async_response_timeout=async_response_timeout,
+                                                             use_priority=use_priority,
                                                              topics=[topic_dto])
 
             try:
