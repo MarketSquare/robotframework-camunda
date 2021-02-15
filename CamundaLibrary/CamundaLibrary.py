@@ -60,8 +60,8 @@ class CamundaLibrary:
     You may achieve a kind of subscription by providing the ``asyncResponseTimeout`` with the `Fetch workload`
     keyword in order to achieve [https://docs.camunda.org/manual/7.14/user-guide/process-engine/external-tasks/#long-polling-to-fetch-and-lock-external-tasks|Long Polling].
 
-    | ${variables} | fetch workload | my_topic | asyncResponseTimeout=60000 |
-    | log | Waited at most 1 hour before this log statement got executed |
+    | ${variables} | fetch workload | my_topic | async_response_timeout=60000 |
+    | log | Waited at most 1 minute before this log statement got executed |
 
     = Missing Keywords =
 
