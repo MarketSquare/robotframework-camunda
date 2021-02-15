@@ -325,7 +325,7 @@ class CamundaLibrary:
 
     @keyword("Start process", tags=['process'])
     def start_process(self, process_key: str, variables: Dict = None, files: Dict = None,
-                      before_activity_id: str = None, after_activity_id: str = None) -> Dict:
+                      before_activity_id: str = None, after_activity_id: str = None,**kwargs) -> Dict:
         """
         Starts a new process instance from a process definition with given key.
 
@@ -354,17 +354,16 @@ class CamundaLibrary:
             openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(files)
             openapi_variables.update(openapi_files)
 
-            start_instructions = None
             if before_activity_id or after_activity_id:
                 instruction: ProcessInstanceModificationInstructionDto = ProcessInstanceModificationInstructionDto(
                     type='startBeforeActivity' if before_activity_id else 'startAfterActivity',
-                    activity_id=before_activity_id if before_activity_id else after_activity_id
+                    activity_id=before_activity_id if before_activity_id else after_activity_id,
                 )
-                start_instructions = [instruction]
+                kwargs.update(start_instructions=[instruction])
 
             start_process_instance_dto: StartProcessInstanceDto = StartProcessInstanceDto(
                 variables=openapi_variables,
-                start_instructions=start_instructions
+                **kwargs
             )
 
             try:
