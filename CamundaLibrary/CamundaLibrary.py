@@ -96,7 +96,7 @@ class CamundaLibrary:
         self._shared_resources.camunda_url = f'{url}/engine-rest'
 
     @keyword(name='Deploy model from file', tags=['deployment'])
-    def deploy_bpmn(self, path_bpmn_file: str):
+    def deploy_bpmn(self, *args):
         """Uploads a camunda model to camunda that is provided as path.
 
         Return response from camunda rest api as dictionary. Further documentation: https://docs.camunda.org/manual/7.14/reference/rest/deployment/post-deployment/
@@ -108,14 +108,14 @@ class CamundaLibrary:
             | ${path_to_bpm_file} | *Set Variable* | _../bpmn/my_model.bpm_ |
             | ${response} | *Deploy model from file* | _${path_to_bpm_file}_ |
         """
-        if not path_bpmn_file:
+        if not args:
             raise ValueError('Failed deploying model, because no file provided.')
 
-        filename = os.path.basename(path_bpmn_file)
+        filename = "dummy" #os.path.basename(args[0])
 
         with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.DeploymentApi(api_client)
-            data = path_bpmn_file
+            data = [*args]
             deployment_name = filename
 
             try:
