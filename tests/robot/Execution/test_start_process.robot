@@ -41,6 +41,29 @@ Test starting process with variables
     Should Be Equal    ${variable1_value}    ${first_workload}[${variable1_key}]
     [Teardown]    complete task
 
+Test starting process with business key
+    #GIVEN
+    ${PROCESS_DEFINITION_KEY}    Set Variable    demo_for_robot
+    ${existing_topic}    Set Variable    process_demo_element
+
+    ${expected_business_key}    Set Variable    business 1
+
+    # WHEN
+    start process    ${PROCESS_DEFINITION_KEY}   business_key=${expected_business_key}
+
+    # AND
+    ${first_workload}     fetch workload   topic=${existing_topic}    async_response_timeout=100
+    ${response}    get fetch response
+
+    # THEN
+    Should Not be empty    ${response}
+
+    # AND
+    dictionary should contain key    ${response}    business_key
+    Should Not be empty    ${response}[business_key]
+    Should Be Equal    ${expected_business_key}    ${response}[business_key]
+    [Teardown]    complete task
+
 Test starting process with variables after activity
     #GIVEN
     ${existing_topic}    Set Variable    process_demo_element

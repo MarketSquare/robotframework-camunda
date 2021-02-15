@@ -60,8 +60,8 @@ class CamundaLibrary:
     You may achieve a kind of subscription by providing the ``asyncResponseTimeout`` with the `Fetch workload`
     keyword in order to achieve [https://docs.camunda.org/manual/7.14/user-guide/process-engine/external-tasks/#long-polling-to-fetch-and-lock-external-tasks|Long Polling].
 
-    | ${variables} | fetch workload | my_topic | asyncResponseTimeout=60000 |
-    | log | Waited at most 1 hour before this log statement got executed |
+    | ${variables} | fetch workload | my_topic | async_response_timeout=60000 |
+    | log | Waited at most 1 minute before this log statement got executed |
 
     = Missing Keywords =
 
@@ -325,7 +325,7 @@ class CamundaLibrary:
 
     @keyword("Start process", tags=['process'])
     def start_process(self, process_key: str, variables: Dict = None, files: Dict = None,
-                      before_activity_id: str = None, after_activity_id: str = None) -> Dict:
+                      before_activity_id: str = None, after_activity_id: str = None,**kwargs) -> Dict:
         """
         Starts a new process instance from a process definition with given key.
 
@@ -341,6 +341,7 @@ class CamundaLibrary:
 
         == Examples ==
         | `start process`      | apply for job promotion    | _variables_= { 'employee' : 'John Doe', 'permission_for_application_granted' : True}   | _files_ = { 'cv' : 'documents/my_life.md'}  | _after_activity_id_ = 'Activity_ask_boss_for_persmission'   |
+        | `start process` | apply for promotion | business_key=John again |
         """
         if not process_key:
             raise ValueError('Error starting process. No process key provided.')
@@ -354,17 +355,16 @@ class CamundaLibrary:
             openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(files)
             openapi_variables.update(openapi_files)
 
-            start_instructions = None
             if before_activity_id or after_activity_id:
                 instruction: ProcessInstanceModificationInstructionDto = ProcessInstanceModificationInstructionDto(
                     type='startBeforeActivity' if before_activity_id else 'startAfterActivity',
-                    activity_id=before_activity_id if before_activity_id else after_activity_id
+                    activity_id=before_activity_id if before_activity_id else after_activity_id,
                 )
-                start_instructions = [instruction]
+                kwargs.update(start_instructions=[instruction])
 
             start_process_instance_dto: StartProcessInstanceDto = StartProcessInstanceDto(
                 variables=openapi_variables,
-                start_instructions=start_instructions
+                **kwargs
             )
 
             try:
