@@ -21,7 +21,7 @@ Test deployment of models and forms
     Should Not Be Empty     ${response}
 
     # AND
-    ${deployment}    get deployments    ${response}[id]
+    ${deployment}    get deployments    id=${response}[id]
     Should Not Be Empty    ${deployment}    No deployment found for id ${response}[id]
 
 Test error when deploying to incorrect url

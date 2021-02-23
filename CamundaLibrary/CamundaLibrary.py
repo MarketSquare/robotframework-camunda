@@ -183,10 +183,13 @@ class CamundaLibrary:
         return json
 
     @keyword(name='Get deployments', tags=['deployment'])
-    def get_deployments(self, **kwargs):
+    def get_deployments(self, deployment_id: str = None, **kwargs):
         """
         Retrieves all deployments that match given criteria.
         """
+        if deployment_id:
+            kwargs['id'] = deployment_id
+
         with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.DeploymentApi(api_client)
 
