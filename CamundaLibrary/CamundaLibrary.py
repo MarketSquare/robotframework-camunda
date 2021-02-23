@@ -13,7 +13,7 @@ import os
 from typing import List, Dict, Any
 import time
 
-from generic_camunda_client import ApiException, DeploymentWithDefinitionsDto, LockedExternalTaskDto, \
+from generic_camunda_client import ApiException, DeploymentWithDefinitionsDto, DeploymentDto, LockedExternalTaskDto, \
     VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto, ProcessDefinitionApi, \
     ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto,\
     ProcessInstanceApi, ProcessInstanceDto
@@ -199,13 +199,13 @@ class CamundaLibrary:
             api_instance = openapi_client.DeploymentApi(api_client)
 
             try:
-                response: DeploymentWithDefinitionsDto = api_instance.get_deployments(**kwargs)
+                response: List[DeploymentDto] = api_instance.get_deployments(**kwargs)
                 logger.info(f'Response from camunda:\t{response}')
             except ApiException as e:
                 logger.error(f'Failed get deployments:\n{e}')
                 raise e
 
-        return response.to_dict()
+        return [r.to_dict() for r in response]
 
     @keyword("Fetch and Lock workloads", tags=['task', 'deprecated'])
     def fetch_and_lock_workloads(self, topic, **kwargs) -> Dict:
