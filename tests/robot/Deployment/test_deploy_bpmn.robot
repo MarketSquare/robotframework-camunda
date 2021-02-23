@@ -13,9 +13,16 @@ Test deployment of models
 Test deployment of models and forms
     # GIVEN
     ${forms}    Create List    ${CURDIR}/../../bpmn/demo_for_robot.bpmn    ${CURDIR}/../../form/embeddedSampleForm.html
+
+    # WHEN
     ${response}    deploy    ${CURDIR}/../../form/embeddedSampleForm.html    ${CURDIR}/../../bpmn/demo_for_robot.bpmn
+
+    # THEN
     Should Not Be Empty     ${response}
-    log    ${response}
+
+    # AND
+    ${deployment}    get deployments    ${response}[id]
+    Should Not Be Empty    ${deployment}    No deployment found for id ${response}[id]
 
 Test error when deploying to incorrect url
     # GIVEN

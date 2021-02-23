@@ -182,6 +182,23 @@ class CamundaLibrary:
 
         return json
 
+    @keyword(name='Get deployments', tags=['deployment'])
+    def get_deployments(self, **kwargs):
+        """
+        Retrieves all deployments that match given criteria.
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance = openapi_client.DeploymentApi(api_client)
+
+            try:
+                response: DeploymentWithDefinitionsDto = api_instance.get_deployments(kwargs)
+                logger.info(f'Response from camunda:\t{response}')
+            except ApiException as e:
+                logger.error(f'Failed get deployments:\n{e}')
+                raise e
+
+        return response.to_dict()
+
     @keyword("Fetch and Lock workloads", tags=['task', 'deprecated'])
     def fetch_and_lock_workloads(self, topic, **kwargs) -> Dict:
         """*DEPRECATED*
