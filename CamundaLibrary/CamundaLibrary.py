@@ -108,7 +108,7 @@ class CamundaLibrary:
         Use `fetch workload`
         """
         logger.warn('Keyword "Fetch and Lock workloads" is deprecated. Use "Fetch workload" instead.')
-        return self.deploy_bpmn([path_to_model])
+        return self.deploy_bpmn(path_to_model)
 
     @keyword(name='Deploy', tags=['deployment'])
     def deploy_bpmn(self, *args):
@@ -129,7 +129,7 @@ class CamundaLibrary:
         if len(args)>1:
             return self.deploy_mulitple_files(*args)
 
-        filename = os.path.basename(*args[0])
+        filename = os.path.basename(args[0])
 
         with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.DeploymentApi(api_client)
