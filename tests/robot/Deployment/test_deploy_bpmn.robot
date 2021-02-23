@@ -10,6 +10,20 @@ Test deployment of models
     Should Not Be Empty     ${response}
     log    ${response}
 
+Test deployment of models and forms
+    # GIVEN
+    ${forms}    Create List    ${CURDIR}/../../bpmn/demo_for_robot.bpmn    ${CURDIR}/../../form/embeddedSampleForm.html
+
+    # WHEN
+    ${response}    deploy    ${CURDIR}/../../form/embeddedSampleForm.html    ${CURDIR}/../../bpmn/demo_for_robot.bpmn
+
+    # THEN
+    Should Not Be Empty     ${response}
+
+    # AND
+    ${deployment}    get deployments    id=${response}[id]
+    Should Not Be Empty    ${deployment}    No deployment found for id ${response}[id]
+
 Test error when deploying to incorrect url
     # GIVEN
     set camunda url    http://localhost:6666

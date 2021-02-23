@@ -1,13 +1,19 @@
 # robot imports
+
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
+
+# requests import
+from requests import HTTPError
+import  requests
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 # python imports
 import os
 from typing import List, Dict, Any
 import time
 
-from generic_camunda_client import ApiException, DeploymentWithDefinitionsDto, LockedExternalTaskDto, \
+from generic_camunda_client import ApiException, DeploymentWithDefinitionsDto, DeploymentDto, LockedExternalTaskDto, \
     VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto, ProcessDefinitionApi, \
     ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto,\
     ProcessInstanceApi, ProcessInstanceDto
@@ -96,26 +102,38 @@ class CamundaLibrary:
         self._shared_resources.camunda_url = f'{url}/engine-rest'
 
     @keyword(name='Deploy model from file', tags=['deployment'])
-    def deploy_bpmn(self, path_bpmn_file: str):
-        """Uploads a camunda model to camunda that is provided as path.
+    def deploy_model_from_file(self, path_to_model):
+        """*DEPRECATED*
+
+        Use `fetch workload`
+        """
+        logger.warn('Keyword "Fetch and Lock workloads" is deprecated. Use "Fetch workload" instead.')
+        return self.deploy(path_to_model)
+
+    @keyword(name='Deploy', tags=['deployment'])
+    def deploy(self, *args):
+        """Creates a deployment from all given files and uploads them to camunda.
 
         Return response from camunda rest api as dictionary. Further documentation: https://docs.camunda.org/manual/7.14/reference/rest/deployment/post-deployment/
 
         By default, this keyword only deploys changed models and filters duplicates. Deployment name is the filename of
-        the model.
+        the first file.
 
         Example:
-            | ${path_to_bpm_file} | *Set Variable* | _../bpmn/my_model.bpm_ |
-            | ${response} | *Deploy model from file* | _${path_to_bpm_file}_ |
+            | ${response} | *Deploy model from file* | _../bpmn/my_model.bpnm_ | _../forms/my_forms.html_ |
         """
-        if not path_bpmn_file:
+        if not args:
             raise ValueError('Failed deploying model, because no file provided.')
 
-        filename = os.path.basename(path_bpmn_file)
+        if len(args) > 1:
+            # We have to use plain REST then when uploading more than 1 file.
+            return self.deploy_mulitple_files(*args)
+
+        filename = os.path.basename(args[0])
 
         with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.DeploymentApi(api_client)
-            data = path_bpmn_file
+            data = [*args]
             deployment_name = filename
 
             try:
@@ -129,6 +147,65 @@ class CamundaLibrary:
                 raise e
 
         return response.to_dict()
+
+    def deploy_mulitple_files(self, *args):
+        """
+        # Due to https://jira.camunda.com/browse/CAM-13105 we cannot use generic camunda client when dealing with
+        # multiple files. We have to use plain REST then.
+        """
+
+        fields = {
+            'deployment-name': f'{os.path.basename(args[0])}',
+            'enable-duplicate-filtering': "true",
+            'deploy-changed-only': "true",
+        }
+
+        for file in args:
+            filename = os.path.basename(file)
+            fields[f'{filename}'] = (filename, open(file, 'rb'), 'application/octet-stream')
+
+        multipart_data = MultipartEncoder(
+            fields=fields
+        )
+
+        logger.debug(multipart_data.fields)
+
+        response = requests.post(f'{self._shared_resources.camunda_url}/deployment/create', data=multipart_data,
+                                 headers={'Content-Type': multipart_data.content_type})
+        json = response.json()
+        try:
+            response.raise_for_status()
+            logger.debug(json)
+        except HTTPError as e:
+            logger.error(json)
+            raise e
+
+        return json
+
+    @keyword(name='Get deployments', tags=['deployment'])
+    def get_deployments(self, deployment_id: str = None, **kwargs):
+        """
+        Retrieves all deployments that match given criteria. All parameters are available from https://docs.camunda.org/manual/latest/reference/rest/deployment/get-query/
+
+        Example:
+            | ${list_of_deployments} | get deployments | ${my_deployments_id} |
+            | ${list_of_deployments} | get deployments | id=${my_deployments_id} |
+            | ${list_of_deployments} | get deployments | after=2013-01-23T14:42:45.000+0200 |
+        """
+        if deployment_id:
+            kwargs['id'] = deployment_id
+
+        with self._shared_resources.api_client as api_client:
+            api_instance = openapi_client.DeploymentApi(api_client)
+
+            try:
+                response: List[DeploymentDto] = api_instance.get_deployments(**kwargs)
+                logger.info(f'Response from camunda:\t{response}')
+            except ApiException as e:
+                logger.error(f'Failed get deployments:\n{e}')
+                raise e
+
+        return [r.to_dict() for r in response]
 
     @keyword("Fetch and Lock workloads", tags=['task', 'deprecated'])
     def fetch_and_lock_workloads(self, topic, **kwargs) -> Dict:
