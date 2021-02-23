@@ -129,7 +129,7 @@ class CamundaLibrary:
         if len(args)>1:
             return self.deploy_mulitple_files(*args)
 
-        filename = os.path.basename(args[0])
+        filename = os.path.basename(*args[0])
 
         with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.DeploymentApi(api_client)
