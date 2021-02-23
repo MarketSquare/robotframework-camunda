@@ -185,7 +185,12 @@ class CamundaLibrary:
     @keyword(name='Get deployments', tags=['deployment'])
     def get_deployments(self, deployment_id: str = None, **kwargs):
         """
-        Retrieves all deployments that match given criteria.
+        Retrieves all deployments that match given criteria. All parameters are available from https://docs.camunda.org/manual/latest/reference/rest/deployment/get-query/
+
+        Example:
+            | ${list_of_deployments} | get deployments | ${my_deployments_id} |
+            | ${list_of_deployments} | get deployments | id=${my_deployments_id} |
+            | ${list_of_deployments} | get deployments | after=2013-01-23T14:42:45.000+0200 |
         """
         if deployment_id:
             kwargs['id'] = deployment_id
@@ -194,7 +199,7 @@ class CamundaLibrary:
             api_instance = openapi_client.DeploymentApi(api_client)
 
             try:
-                response: DeploymentWithDefinitionsDto = api_instance.get_deployments(kwargs)
+                response: DeploymentWithDefinitionsDto = api_instance.get_deployments(**kwargs)
                 logger.info(f'Response from camunda:\t{response}')
             except ApiException as e:
                 logger.error(f'Failed get deployments:\n{e}')
