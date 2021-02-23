@@ -102,13 +102,13 @@ class CamundaLibrary:
         self._shared_resources.camunda_url = f'{url}/engine-rest'
 
     @keyword(name='Deploy model from file', tags=['deployment'])
-    def deploy_model_from_file(self, *args):
+    def deploy_model_from_file(self, path_to_model):
         """*DEPRECATED*
 
         Use `fetch workload`
         """
         logger.warn('Keyword "Fetch and Lock workloads" is deprecated. Use "Fetch workload" instead.')
-        return self.deploy_bpmn(args)
+        return self.deploy_bpmn([path_to_model])
 
     @keyword(name='Deploy', tags=['deployment'])
     def deploy_bpmn(self, *args):
@@ -126,7 +126,7 @@ class CamundaLibrary:
         if not args:
             raise ValueError('Failed deploying model, because no file provided.')
 
-        if len(*args)>1:
+        if len(args)>1:
             return self.deploy_mulitple_files(*args)
 
         filename = os.path.basename(args[0])
@@ -154,10 +154,9 @@ class CamundaLibrary:
             'deployment-name': f'mulifile_upload'
         }
 
-        for arg in args:
-            for file in arg:
-                filename = os.path.basename(file)
-                fields[f'{filename}'] = (filename, open(file,'rb'), 'application/octet-stream')
+        for file in args:
+            filename = os.path.basename(file)
+            fields[f'{filename}'] = (filename, open(file,'rb'), 'application/octet-stream')
 
         multipart_data = MultipartEncoder(
             fields=fields
