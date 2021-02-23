@@ -24,7 +24,7 @@ Get all instances
 
 *** Keywords ***
 Upload process
-    deploy model from file    ${CURDIR}/../../bpmn/demo_for_robot.bpmn
+    deploy    ${CURDIR}/../../bpmn/demo_for_robot.bpmn
 
 should be 1 more process
     [Arguments]    ${before}    ${after}

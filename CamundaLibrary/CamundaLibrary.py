@@ -108,25 +108,25 @@ class CamundaLibrary:
         Use `fetch workload`
         """
         logger.warn('Keyword "Fetch and Lock workloads" is deprecated. Use "Fetch workload" instead.')
-        return self.deploy_bpmn(path_to_model)
+        return self.deploy(path_to_model)
 
     @keyword(name='Deploy', tags=['deployment'])
-    def deploy_bpmn(self, *args):
-        """Uploads a camunda model to camunda that is provided as path.
+    def deploy(self, *args):
+        """Creates a deployment from all given files and uploads them to camunda.
 
         Return response from camunda rest api as dictionary. Further documentation: https://docs.camunda.org/manual/7.14/reference/rest/deployment/post-deployment/
 
         By default, this keyword only deploys changed models and filters duplicates. Deployment name is the filename of
-        the model.
+        the first file.
 
         Example:
-            | ${path_to_bpm_file} | *Set Variable* | _../bpmn/my_model.bpm_ |
-            | ${response} | *Deploy model from file* | _${path_to_bpm_file}_ |
+            | ${response} | *Deploy model from file* | _../bpmn/my_model.bpnm_ | _../forms/my_forms.html_ |
         """
         if not args:
             raise ValueError('Failed deploying model, because no file provided.')
 
-        if len(args)>1:
+        if len(args) > 1:
+            # We have to use plain REST then when uploading more than 1 file.
             return self.deploy_mulitple_files(*args)
 
         filename = os.path.basename(args[0])
@@ -149,14 +149,20 @@ class CamundaLibrary:
         return response.to_dict()
 
     def deploy_mulitple_files(self, *args):
+        """
+        # Due to https://jira.camunda.com/browse/CAM-13105 we cannot use generic camunda client when dealing with
+        # multiple files. We have to use plain REST then.
+        """
 
         fields = {
-            'deployment-name': f'mulifile_upload'
+            'deployment-name': f'{os.path.basename(args[0])}',
+            'enable-duplicate-filtering': True,
+            'deploy-changed-only': True,
         }
 
         for file in args:
             filename = os.path.basename(file)
-            fields[f'{filename}'] = (filename, open(file,'rb'), 'application/octet-stream')
+            fields[f'{filename}'] = (filename, open(file, 'rb'), 'application/octet-stream')
 
         multipart_data = MultipartEncoder(
             fields=fields
@@ -165,7 +171,7 @@ class CamundaLibrary:
         logger.debug(multipart_data.fields)
 
         response = requests.post(f'{self._shared_resources.camunda_url}/deployment/create', data=multipart_data,
-                             headers={'Content-Type': multipart_data.content_type})
+                                 headers={'Content-Type': multipart_data.content_type})
         json = response.json()
         try:
             response.raise_for_status()
