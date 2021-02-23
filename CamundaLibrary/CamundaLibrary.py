@@ -1,6 +1,12 @@
 # robot imports
+
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
+
+# requests import
+from requests import HTTPError
+import  requests
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 # python imports
 import os
@@ -96,6 +102,15 @@ class CamundaLibrary:
         self._shared_resources.camunda_url = f'{url}/engine-rest'
 
     @keyword(name='Deploy model from file', tags=['deployment'])
+    def deploy_model_from_file(self, *args):
+        """*DEPRECATED*
+
+        Use `fetch workload`
+        """
+        logger.warn('Keyword "Fetch and Lock workloads" is deprecated. Use "Fetch workload" instead.')
+        return self.deploy_bpmn(args)
+
+    @keyword(name='Deploy', tags=['deployment'])
     def deploy_bpmn(self, *args):
         """Uploads a camunda model to camunda that is provided as path.
 
@@ -111,7 +126,10 @@ class CamundaLibrary:
         if not args:
             raise ValueError('Failed deploying model, because no file provided.')
 
-        filename = "dummy" #os.path.basename(args[0])
+        if len(*args)>1:
+            return self.deploy_mulitple_files(*args)
+
+        filename = os.path.basename(args[0])
 
         with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.DeploymentApi(api_client)
@@ -129,6 +147,35 @@ class CamundaLibrary:
                 raise e
 
         return response.to_dict()
+
+    def deploy_mulitple_files(self, *args):
+
+        fields = {
+            'deployment-name': f'mulifile_upload'
+        }
+
+        for arg in args:
+            for file in arg:
+                filename = os.path.basename(file)
+                fields[f'{filename}'] = (filename, open(file,'rb'), 'application/octet-stream')
+
+        multipart_data = MultipartEncoder(
+            fields=fields
+        )
+
+        logger.debug(multipart_data.fields)
+
+        response = requests.post(f'{self._shared_resources.camunda_url}/deployment/create', data=multipart_data,
+                             headers={'Content-Type': multipart_data.content_type})
+        json = response.json()
+        try:
+            response.raise_for_status()
+            logger.debug(json)
+        except HTTPError as e:
+            logger.error(json)
+            raise e
+
+        return json
 
     @keyword("Fetch and Lock workloads", tags=['task', 'deprecated'])
     def fetch_and_lock_workloads(self, topic, **kwargs) -> Dict:
