@@ -32,7 +32,7 @@ setup(
         "Topic :: Software Development",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Framework :: Robot Framework",
     ],
     license="Apache License, Version 2.0",
