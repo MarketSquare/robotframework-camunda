@@ -36,6 +36,6 @@ setup(
         "Framework :: Robot Framework",
     ],
     license="Apache License, Version 2.0",
-    install_requires=["robotframework>=3.2", "requests", "frozendict", 'generic-camunda-client>=0.0.4'],
+    install_requires=["robotframework>=3.2", "requests", "frozendict", 'generic-camunda-client>=0.0.4','requests_toolbelt'],
     include_package_data=True,
 )

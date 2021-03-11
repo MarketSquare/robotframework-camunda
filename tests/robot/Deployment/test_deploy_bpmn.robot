@@ -11,9 +11,6 @@ Test deployment of models
     log    ${response}
 
 Test deployment of models and forms
-    # GIVEN
-    ${forms}    Create List    ${CURDIR}/../../bpmn/demo_for_robot.bpmn    ${CURDIR}/../../form/embeddedSampleForm.html
-
     # WHEN
     ${response}    deploy    ${CURDIR}/../../form/embeddedSampleForm.html    ${CURDIR}/../../bpmn/demo_for_robot.bpmn
 
