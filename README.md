@@ -8,7 +8,7 @@ known issues or report one yourself. You are invited to contribute pull requests
 
 ## Documentation
 
-Keyword documentation is provided [here](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/camundalibrary/)
+Keyword documentation is provided [here](https://postadress.gitlab.io/robotframework/robotframework-camunda-mirror/latest/keywords/camundalibrary/)
 
 ## Installation
 
