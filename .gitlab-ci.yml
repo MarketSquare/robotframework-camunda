@@ -88,7 +88,7 @@ Integrationtests:
     - python -m pip install --upgrade setuptools wheel twine
     - python setup.py sdist bdist_wheel
     - TWINE_PASSWORD=${TEST_PYPI_DEPLOYTOKEN} TWINE_USERNAME=__token__ python -m twine
-      upload --repository testpypi dist/*
+      upload --verbose --repository testpypi dist/*
   only:
     - tags
 
@@ -98,7 +98,7 @@ package and deploy on pypi:
     - python -m pip install --upgrade setuptools wheel twine
     - python setup.py sdist bdist_wheel
     - TWINE_PASSWORD=${PYPI_DEPLOYMENT_TOKEN} TWINE_USERNAME=__token__ python -m twine
-      upload --repository pypi dist/*
+      upload --verbose --repository pypi dist/*
   only:
     - tags
 
