@@ -35,11 +35,6 @@ Build environment:
       --target runtime \
       .
     - docker push $FEATURE_IMAGE_NAME:runtime
-  only:
-    changes:
-    - Dockerfile
-    - ".gitlab-ci.yml"
-    - requirements.txt
 
 Unittests:
   stage: test
