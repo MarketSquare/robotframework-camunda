@@ -23,7 +23,7 @@ setup(
     long_description_content_type="text/markdown",
     author=name,
     author_email="markus.stahl@postadress.de",
-    url=os.environ.get('CI_PROJECT_URL'),
+    url="https://github.com/MarketSquare/robotframework-camunda",
     packages=find_packages(),
     classifiers=[
         "Intended Audience :: Developers",
