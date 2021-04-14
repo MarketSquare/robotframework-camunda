@@ -105,7 +105,7 @@ package and deploy on pypi:
 pages:
   stage: deploy
   before_script:
-    - pip install robotframework==4.0b2 .
+    - pip install robotframework .
   script:
     - python libdoc/generate_libdoc.py
   artifacts:
