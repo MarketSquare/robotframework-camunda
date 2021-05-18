@@ -15,8 +15,8 @@ import time
 
 from generic_camunda_client import ApiException, DeploymentWithDefinitionsDto, DeploymentDto, LockedExternalTaskDto, \
     VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto, ProcessDefinitionApi, \
-    ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto,\
-    ProcessInstanceApi, ProcessInstanceDto
+    ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto, \
+    ProcessInstanceApi, ProcessInstanceDto, VersionApi
 import generic_camunda_client as openapi_client
 
 # local imports
@@ -486,3 +486,16 @@ class CamundaLibrary:
                 raise e
 
         return [process_instance.to_dict() for process_instance in response]
+
+    @keyword("Get Version", tags=['version'])
+    def get_version(self):
+        """
+        Returns Version of Camunda.
+
+        == Example ==
+        | ${camunda_version_dto} | Get Version |
+        | ${camunda_version} | Set Variable | ${camunda_version_dto.version} |
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance: VersionApi = openapi_client.VersionApi(api_client)
+            return api_instance.get_rest_api_version()
