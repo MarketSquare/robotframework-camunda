@@ -101,20 +101,21 @@ class CamundaLibrary:
             raise ValueError('Cannot set camunda engine url: no url given.')
         self._shared_resources.camunda_url = f'{url}/engine-rest'
 
-    @keyword(name='Deploy model from file', tags=['deployment'])
+    @keyword(name='Deploy Model From File', tags=['deployment'])
     def deploy_model_from_file(self, path_to_model):
         """*DEPRECATED*
 
-        Use `fetch workload`
+        Use `Deploy`
         """
-        logger.warn('Keyword "Fetch and Lock workloads" is deprecated. Use "Fetch workload" instead.')
+        logger.warn('Keyword "Deploy Model From File" is deprecated. Use "Deploy" instead.')
         return self.deploy(path_to_model)
 
     @keyword(name='Deploy', tags=['deployment'])
     def deploy(self, *args):
         """Creates a deployment from all given files and uploads them to camunda.
 
-        Return response from camunda rest api as dictionary. Further documentation: https://docs.camunda.org/manual/7.14/reference/rest/deployment/post-deployment/
+        Return response from camunda rest api as dictionary.
+        Further documentation: https://docs.camunda.org/manual/7.14/reference/rest/deployment/post-deployment/
 
         By default, this keyword only deploys changed models and filters duplicates. Deployment name is the filename of
         the first file.
@@ -127,7 +128,7 @@ class CamundaLibrary:
 
         if len(args) > 1:
             # We have to use plain REST then when uploading more than 1 file.
-            return self.deploy_mulitple_files(*args)
+            return self.deploy_multiple_files(*args)
 
         filename = os.path.basename(args[0])
 
@@ -148,7 +149,7 @@ class CamundaLibrary:
 
         return response.to_dict()
 
-    def deploy_mulitple_files(self, *args):
+    def deploy_multiple_files(self, *args):
         """
         # Due to https://jira.camunda.com/browse/CAM-13105 we cannot use generic camunda client when dealing with
         # multiple files. We have to use plain REST then.
