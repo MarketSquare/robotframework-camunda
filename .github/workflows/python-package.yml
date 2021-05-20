@@ -20,7 +20,7 @@ jobs:
       camunda:
         image: camunda/camunda-bpm-platform:run-7.14.0
         ports:
-        - 8080:8080
+        - 8080:1234
 
     steps:
     - uses: actions/checkout@v2
@@ -43,7 +43,7 @@ jobs:
       uses: jtalk/url-health-check-action@v1.5
       with:
         # Check the following URLs one by one sequentially
-        url: http://camunda:8080/engine-rest/version
+        url: http://localhost:1234/engine-rest/version
         # Follow redirects, or just report success on 3xx status codes
         follow-redirect: no # Optional, defaults to "no"
         # Fail this action after this many failed attempts
