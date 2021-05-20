@@ -34,25 +34,3 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-  integrationtest:
-    runs-on: ubuntu-latest
-    services:
-      camunda:
-        image: camunda/camunda-bpm-platform:run-7.14.0
-        ports:
-          - 8080:8080
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-    - name: Test with robot      
-      run: |
-        pip install .
-        robot -d logs -b debug.log -v CAMUNDA_HOST:http://localhost:8080 tests/robot/**/*.robot
-    - name: Archive production artifacts
-      uses: actions/upload-artifact@v2
-      if: always()
-      with:
-        name: robot logs
-        path: |
-          logs/

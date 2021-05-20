@@ -1,0 +1,49 @@
+name: Robot tests
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  integrationtest:
+    runs-on: ubuntu-latest
+    services:
+      camunda:
+        image: camunda/camunda-bpm-platform:run-7.14.0
+        ports:
+          - 8080:8080
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+    - name: Test with robot
+      run: |
+        pip install .
+        robot -d logs -b debug.log -x xunit.xml -v CAMUNDA_HOST:http://localhost:8080 tests/robot/**/*.robot
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      if: always()
+      with:
+        name: robot logs
+        path: |
+          logs/
+
+  publish-test-results:
+    name: "Publish Unit Tests Results"
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    # the build-and-test job might be skipped, we don't need to run this job then
+    if: success() || failure()
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+
+      - name: Publish Unit Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v1
+        with:
+          files: logs/xunit.xml
