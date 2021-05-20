@@ -19,7 +19,7 @@ jobs:
         python-version: [3.7, 3.8, 3.9]
     services:
       camunda:
-        image: camunda/camunda-bpm-platform:run-7.14
+        image: camunda/camunda-bpm-platform:run-7.14.0
 
     steps:
     - uses: actions/checkout@v2
