@@ -41,4 +41,4 @@ jobs:
     - name: Test with robot     
       run: |
         pip install .
-        robot -d logs -b debug.log tests/robot/**/*.robot
+        robot -d logs -b debug.log -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/*.robot
