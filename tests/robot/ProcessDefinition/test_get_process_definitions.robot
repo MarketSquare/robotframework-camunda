@@ -13,7 +13,7 @@ Get All Process Definitions
     At Least One Process Definition Is Present
 
     # When
-    Camunda Is Requestet For All Existing Process Definitions
+    Camunda Is Requested For All Existing Process Definitions
 
     # Then
     Camunda Answered With A List Of At Least One Process Definition
@@ -23,7 +23,7 @@ Get All Process Definitions
 At Least One Process Definition Is Present
     Deploy    ${CURDIR}/../../bpmn/demo_for_robot.bpmn
 
-Camunda Is Requestet For All Existing Process Definitions
+Camunda Is Requested For All Existing Process Definitions
     ${PROCESS_DEFINITIONS}    Get Process Definitions
     Set Global Variable    ${PROCESS_DEFINITIONS}
 

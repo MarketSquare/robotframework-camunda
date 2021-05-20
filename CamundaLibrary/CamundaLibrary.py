@@ -501,7 +501,7 @@ class CamundaLibrary:
             api_instance: VersionApi = openapi_client.VersionApi(api_client)
             return api_instance.get_rest_api_version()
 
-    @keyword("Get Process Definitions")
+    @keyword("Get Process Definitions", tags=['process'])
     def get_process_definitions(self, **kwargs):
         """
         Returns a list of process definitions that fulfill given parameters.
@@ -519,4 +519,22 @@ class CamundaLibrary:
             except ApiException as e:
                 logger.error(f'Failed to get process definitions:\n{e}')
                 raise e
+        return response
+
+    @keyword("Get Activity Instance", tags=['process'])
+    def get_activity_instance(self, **kwargs):
+        """
+        Returns an Activity Instance (Tree) for a given process instance.
+
+        == Example ==
+        | ${tree} | Get Activity Instance | id=fcab43bc-b970-11eb-be75-0242ac110002 |
+
+        https://docs.camunda.org/manual/7.5/reference/rest/process-instance/get-activity-instances/
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance = openapi_client.ProcessInstanceApi(api_client)
+            try:
+                response = api_instance.get_activity_instance_tree(**kwargs)
+            except ApiException as e:
+                logger.error(f'failed to get activity tree for process instance {kwargs}:\n{e}')
         return response
