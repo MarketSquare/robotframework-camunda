@@ -11,7 +11,6 @@ on:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -44,7 +43,7 @@ jobs:
       uses: jtalk/url-health-check-action@v1.5
       with:
         # Check the following URLs one by one sequentially
-        url: http://camunda:8080/engine-rest/version
+        url: http://localhost:8080/engine-rest/version
         # Follow redirects, or just report success on 3xx status codes
         follow-redirect: no # Optional, defaults to "no"
         # Fail this action after this many failed attempts
@@ -56,4 +55,4 @@ jobs:
     - name: Test with robot     
       run: |
         pip install .
-        robot -d logs -b debug.log -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/*.robot
+        robot -d logs -b debug.log -v CAMUNDA_HOST:http://localhost:8080 tests/robot/**/*.robot
