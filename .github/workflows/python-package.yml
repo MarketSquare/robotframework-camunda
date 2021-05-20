@@ -49,3 +49,9 @@ jobs:
       run: |
         pip install .
         robot -d logs -b debug.log -v CAMUNDA_HOST:http://localhost:8080 tests/robot/**/*.robot
+    - name: Archive production artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: robot logs
+        path: |
+          logs/
