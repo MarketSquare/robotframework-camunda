@@ -502,3 +502,23 @@ class CamundaLibrary:
         with self._shared_resources.api_client as api_client:
             api_instance: VersionApi = openapi_client.VersionApi(api_client)
             return api_instance.get_rest_api_version()
+
+    @keyword("Get Process Definitions")
+    def get_process_definitions(self, **kwargs):
+        """
+        Returns a list of process definitions that fulfill given parameters.
+
+        See Rest API documentation on ``https://docs.camunda.org/manual`` for available parameters.
+
+        == Example ==
+        | ${list} | Get Process Definitions | name=my_process_definition |
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance = openapi_client.ProcessDefinitionApi(api_client)
+
+            try:
+                response = api_instance.get_process_definitions(**kwargs)
+            except ApiException as e:
+                logger.error(f'Failed to get process definitions:\n{e}')
+                raise e
+        return response
