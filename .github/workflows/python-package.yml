@@ -40,6 +40,19 @@ jobs:
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Check the deployed service URL
+      uses: jtalk/url-health-check-action@v1.5
+      with:
+        # Check the following URLs one by one sequentially
+        url: http://camunda:8080/engine-rest/version
+        # Follow redirects, or just report success on 3xx status codes
+        follow-redirect: no # Optional, defaults to "no"
+        # Fail this action after this many failed attempts
+        max-attempts: 3 # Optional, defaults to 1
+        # Delay between retries
+        retry-delay: 5s # Optional, only applicable to max-attempts > 1
+        # Retry all errors, including 404
+        retry-all: no # Optional, defaults to "no"
     - name: Test with robot     
       run: |
         pip install .
