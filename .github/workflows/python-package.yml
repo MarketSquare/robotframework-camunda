@@ -46,12 +46,12 @@ jobs:
     - name: Set up Python 3.9
       uses: actions/setup-python@v2
     - name: Test with robot      
+      continue-on-error: true
       run: |
         pip install .
         robot -d logs -b debug.log -v CAMUNDA_HOST:http://localhost:8080 tests/robot/**/*.robot
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
-      continue-on-error: true
       with:
         name: robot logs
         path: |
