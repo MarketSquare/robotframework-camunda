@@ -22,7 +22,7 @@ Get Process Definitions
 
 *** Keywords ***
 Process Instance Is Present
-    ${response}   Start Process    testing_activity_tree
+    ${response}   Start Process    demo_for_robot
     Set Global Variable    ${PROCESS_INSTANCE_ID}    ${response}[id]
 
 Camunda Is Requested For Activity Instances Of The Process Instance
