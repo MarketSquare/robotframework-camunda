@@ -1,5 +1,6 @@
 *** Settings ***
 Library    CamundaLibrary    ${CAMUNDA_HOST}
+Suite Teardown    Clean Up Process Instance
 
 
 *** Variables ***
@@ -31,3 +32,10 @@ Camunda Is Requested For Activity Instances Of The Process Instance
 
 Camunda Answered With An Activity Instance Tree
     Should Not Be Empty    '${ACTIVITY_INSTANCE_TREE}'
+    ${activity_instances}    Set Variable    ${ACTIVITY_INSTANCE_TREE.child_activity_instances}
+    Length Should Be    ${activity_instances}    1
+    Should Be Equal    Activity_service_1    ${activity_instances[0].activity_id}
+
+Clean Up Process Instance
+    Run Keyword If    $PROCESS_INSTANCE_ID
+    ...    Delete Process Instance    ${PROCESS_INSTANCE_ID}
