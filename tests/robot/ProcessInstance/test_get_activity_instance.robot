@@ -30,4 +30,4 @@ Camunda Is Requested For Activity Instances Of The Process Instance
     Set Global Variable    ${ACTIVITY_INSTANCE_TREE}
 
 Camunda Answered With An Activity Instance Tree
-    Should Not Be Empty    ${ACTIVITY_INSTANCE_TREE}
+    Should Not Be Empty    '${ACTIVITY_INSTANCE_TREE}'
