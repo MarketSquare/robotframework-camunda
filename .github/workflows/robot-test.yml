@@ -16,8 +16,7 @@ jobs:
     - name: Test with robot
       run: |
         pip install .
-        sleep 10
-        robot -d logs -b debug.log -x xunit.xml -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/*.robot
+        robot -d logs -b debug.log -x xunit.xml -L DEBUG -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/*.robot
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       if: always()
@@ -37,7 +36,7 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v2
         with:
-          path: logs
+           name: robot logs
 
       - name: Publish Unit Test Results
         uses: EnricoMi/publish-unit-test-result-action@v1
