@@ -1,3 +1,5 @@
+[![pipeline status](https://gitlab.com/postadress/robotframework/robotframework-camunda-mirror/badges/master/pipeline.svg)](https://gitlab.com/postadress/robotframework/robotframework-camunda-mirror/-/commits/master)
+
 # Robot Framework Camunda
 
 This library provides keywords for accessing camunda workflow engine. Complete REST API reference of camunda 
