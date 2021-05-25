@@ -514,7 +514,7 @@ class CamundaLibrary:
         | ${list} | Get Process Definitions | name=my_process_definition |
         """
         with self._shared_resources.api_client as api_client:
-            api_instance = openapi_client.ProcessDefinitionApi(api_client)
+            api_instance: ProcessDefinitionApi = openapi_client.ProcessDefinitionApi(api_client)
 
             try:
                 response = api_instance.get_process_definitions(**kwargs)
@@ -534,9 +534,39 @@ class CamundaLibrary:
         https://docs.camunda.org/manual/7.5/reference/rest/process-instance/get-activity-instances/
         """
         with self._shared_resources.api_client as api_client:
-            api_instance = openapi_client.ProcessInstanceApi(api_client)
+            api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(api_client)
+
             try:
                 response = api_instance.get_activity_instance_tree(**kwargs)
             except ApiException as e:
                 logger.error(f'failed to get activity tree for process instance {kwargs}:\n{e}')
+        return response
+
+    @keyword("Get Process Instance Variable", tags=['process'])
+    def get_process_instance_variable(self, process_instance_id: str, variable_name: str):
+        """
+        Returns the variable with the given name from the process instance with
+        the given process_instance_id.
+
+        Parameters:
+            - ``process_instance_id``: ID of the target process instance
+            - ``variable_name``: name of the variable to read
+
+        == Example ==
+        | ${variable} | Get Process Instance Variable |
+        | ...         | process_instance_id=fcab43bc-b970-11eb-be75-0242ac110002 |
+        | ...         | variable_name=foo |
+
+        See also:
+        https://docs.camunda.org/manual/7.5/reference/rest/process-instance/variables/get-single-variable/
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(api_client)
+
+            try:
+                response = api_instance.get_process_instance_variable(
+                    id=process_instance_id, var_name=variable_name)
+            except ApiException as e:
+                logger.error(f'Failed to get variable {variable_name} from '
+                             f'process instance {process_instance_id}:\n{e}')
         return response
