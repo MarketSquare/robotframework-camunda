@@ -157,8 +157,6 @@ class CamundaLibrary:
 
         fields = {
             'deployment-name': f'{os.path.basename(args[0])}',
-            'enable-duplicate-filtering': "true",
-            'deploy-changed-only': "true",
         }
 
         for file in args:

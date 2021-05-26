@@ -11,7 +11,7 @@
       <bpmn:incoming>Flow_0xskn85</bpmn:incoming>
       <bpmn:outgoing>Flow_1m77rg0</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:userTask id="Activity_user_1" name="Do something manually">
+    <bpmn:userTask id="Activity_user_1" name="Do something manually" camunda:formKey="embedded:deployment:embeddedSampleForm.html">
       <bpmn:incoming>Flow_1m77rg0</bpmn:incoming>
       <bpmn:outgoing>Flow_0thahmr</bpmn:outgoing>
     </bpmn:userTask>
@@ -27,17 +27,17 @@
       <bpmndi:BPMNShape id="Participant_0sda6b4_di" bpmnElement="Participant_0sda6b4" isHorizontal="true">
         <dc:Bounds x="129" y="57" width="600" height="250" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0xskn85_di" bpmnElement="Flow_0xskn85">
-        <di:waypoint x="245" y="170" />
-        <di:waypoint x="300" y="170" />
+      <bpmndi:BPMNEdge id="Flow_0thahmr_di" bpmnElement="Flow_0thahmr">
+        <di:waypoint x="560" y="170" />
+        <di:waypoint x="622" y="170" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="Flow_1m77rg0_di" bpmnElement="Flow_1m77rg0">
         <di:waypoint x="400" y="170" />
         <di:waypoint x="460" y="170" />
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0thahmr_di" bpmnElement="Flow_0thahmr">
-        <di:waypoint x="560" y="170" />
-        <di:waypoint x="622" y="170" />
+      <bpmndi:BPMNEdge id="Flow_0xskn85_di" bpmnElement="Flow_0xskn85">
+        <di:waypoint x="245" y="170" />
+        <di:waypoint x="300" y="170" />
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="209" y="152" width="36" height="36" />
