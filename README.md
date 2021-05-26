@@ -1,14 +1,16 @@
+[![pipeline status](https://gitlab.com/postadress/robotframework/robotframework-camunda-mirror/badges/master/pipeline.svg)](https://gitlab.com/postadress/robotframework/robotframework-camunda-mirror/-/commits/master)
+
 # Robot Framework Camunda
 
 This library provides keywords for accessing camunda workflow engine. Complete REST API reference of camunda 
 can be found [here](https://docs.camunda.org/manual/7.14/reference/rest/).
 
-**Please review [issue board](https://gitlab.com/postadress/robotframework/robotframework-camunda/-/issues) for 
+**Please review [issue board](https://github.com/MarketSquare/robotframework-camunda/issues) for 
 known issues or report one yourself. You are invited to contribute pull requests.**
 
 ## Documentation
 
-Keyword documentation is provided [here](https://postadress.gitlab.io/robotframework/robotframework-camunda/latest/keywords/camundalibrary/)
+Keyword documentation is provided [here](https://postadress.gitlab.io/robotframework/robotframework-camunda-mirror/latest/keywords/camundalibrary/)
 
 ## Installation
 

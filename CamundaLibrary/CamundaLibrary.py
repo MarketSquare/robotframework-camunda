@@ -101,20 +101,21 @@ class CamundaLibrary:
             raise ValueError('Cannot set camunda engine url: no url given.')
         self._shared_resources.camunda_url = f'{url}/engine-rest'
 
-    @keyword(name='Deploy model from file', tags=['deployment'])
+    @keyword(name='Deploy Model From File', tags=['deployment'])
     def deploy_model_from_file(self, path_to_model):
         """*DEPRECATED*
 
-        Use `fetch workload`
+        Use `Deploy`
         """
-        logger.warn('Keyword "Fetch and Lock workloads" is deprecated. Use "Fetch workload" instead.')
+        logger.warn('Keyword "Deploy Model From File" is deprecated. Use "Deploy" instead.')
         return self.deploy(path_to_model)
 
     @keyword(name='Deploy', tags=['deployment'])
     def deploy(self, *args):
         """Creates a deployment from all given files and uploads them to camunda.
 
-        Return response from camunda rest api as dictionary. Further documentation: https://docs.camunda.org/manual/7.14/reference/rest/deployment/post-deployment/
+        Return response from camunda rest api as dictionary.
+        Further documentation: https://docs.camunda.org/manual/7.14/reference/rest/deployment/post-deployment/
 
         By default, this keyword only deploys changed models and filters duplicates. Deployment name is the filename of
         the first file.
@@ -127,7 +128,7 @@ class CamundaLibrary:
 
         if len(args) > 1:
             # We have to use plain REST then when uploading more than 1 file.
-            return self.deploy_mulitple_files(*args)
+            return self.deploy_multiple_files(*args)
 
         filename = os.path.basename(args[0])
 
@@ -148,7 +149,7 @@ class CamundaLibrary:
 
         return response.to_dict()
 
-    def deploy_mulitple_files(self, *args):
+    def deploy_multiple_files(self, *args):
         """
         # Due to https://jira.camunda.com/browse/CAM-13105 we cannot use generic camunda client when dealing with
         # multiple files. We have to use plain REST then.
@@ -501,3 +502,41 @@ class CamundaLibrary:
         with self._shared_resources.api_client as api_client:
             api_instance: VersionApi = openapi_client.VersionApi(api_client)
             return api_instance.get_rest_api_version()
+
+    @keyword("Get Process Definitions", tags=['process'])
+    def get_process_definitions(self, **kwargs):
+        """
+        Returns a list of process definitions that fulfill given parameters.
+
+        See Rest API documentation on ``https://docs.camunda.org/manual`` for available parameters.
+
+        == Example ==
+        | ${list} | Get Process Definitions | name=my_process_definition |
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance = openapi_client.ProcessDefinitionApi(api_client)
+
+            try:
+                response = api_instance.get_process_definitions(**kwargs)
+            except ApiException as e:
+                logger.error(f'Failed to get process definitions:\n{e}')
+                raise e
+        return response
+
+    @keyword("Get Activity Instance", tags=['process'])
+    def get_activity_instance(self, **kwargs):
+        """
+        Returns an Activity Instance (Tree) for a given process instance.
+
+        == Example ==
+        | ${tree} | Get Activity Instance | id=fcab43bc-b970-11eb-be75-0242ac110002 |
+
+        https://docs.camunda.org/manual/7.5/reference/rest/process-instance/get-activity-instances/
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance = openapi_client.ProcessInstanceApi(api_client)
+            try:
+                response = api_instance.get_activity_instance_tree(**kwargs)
+            except ApiException as e:
+                logger.error(f'failed to get activity tree for process instance {kwargs}:\n{e}')
+        return response
