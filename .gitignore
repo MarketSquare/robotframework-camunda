@@ -10,3 +10,4 @@ lsp/
 
 *.log
 *.zip
+.robocop
