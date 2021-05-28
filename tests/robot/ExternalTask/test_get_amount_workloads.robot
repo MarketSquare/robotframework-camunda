@@ -1,7 +1,6 @@
 *** Settings ***
 Library    CamundaLibrary    ${CAMUNDA_HOST}
 Resource    ../cleanup.resource
-Test Setup    Delete all instances from process '${PROCESS_DEFINITION_KEY}'
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
@@ -24,6 +23,7 @@ There shall be as many tasks as started processes
 *** Keywords ***
 Start processes and check amount of workloads
     [Arguments]    ${n}
+    Delete all instances from process '${PROCESS_DEFINITION_KEY}'
     FOR     ${i}    IN RANGE    0    ${n}
         start process     ${PROCESS_DEFINITION_KEY}
     END
@@ -33,11 +33,12 @@ Start processes and check amount of workloads
 
 Start process with business key and check for particular workload
     [Arguments]    ${n}
+    Delete all instances from process '${PROCESS_DEFINITION_KEY}'
     FOR     ${i}    IN RANGE    0    ${n}
         start process     ${PROCESS_DEFINITION_KEY}    business_key=${i}
     END
 
-    ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}    ${business_key}=${n}
+    ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}    business_key=${n}
     Should be equal as integers    ${amount_of_workloads}    0
 
     ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}    ${business_key}=1
