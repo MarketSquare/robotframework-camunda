@@ -29,16 +29,16 @@ Start processes and check amount of workloads
     END
 
     ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}
-    Should be equals as integers    ${amount_of_workloads}    ${n}
+    Should be equal as integers    ${amount_of_workloads}    ${n}
 
 Start process with business key and check for particular workload
     [Arguments]    ${n}
     FOR     ${i}    IN RANGE    0    ${n}
-        start process     ${PROCESS_DEFINITION_KEY}    ${i}
+        start process     ${PROCESS_DEFINITION_KEY}    business_key=${i}
     END
 
     ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}    ${business_key}=${n}
-    Should be equals as integers    ${amount_of_workloads}    0
+    Should be equal as integers    ${amount_of_workloads}    0
 
     ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}    ${business_key}=1
     Should be equals as integers    ${amount_of_workloads}    1
