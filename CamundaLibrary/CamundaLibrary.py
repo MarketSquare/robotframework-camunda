@@ -5,8 +5,10 @@ from robot.api.logger import librarylogger as logger
 
 # requests import
 from requests import HTTPError
-import  requests
+import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoder
+
+from url_normalize import url_normalize
 
 # python imports
 import os
@@ -99,7 +101,11 @@ class CamundaLibrary:
         """
         if not url:
             raise ValueError('Cannot set camunda engine url: no url given.')
-        self._shared_resources.camunda_url = f'{url}/engine-rest'
+        self._shared_resources.camunda_url = url_normalize(f'{url}/engine-rest')
+
+    @keyword("Get Camunda URL")
+    def get_camunda_url(self) -> str:
+        return self._shared_resources.camunda_url
 
     @keyword(name='Deploy Model From File', tags=['deployment'])
     def deploy_model_from_file(self, path_to_model):

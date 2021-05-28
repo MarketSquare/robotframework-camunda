@@ -2,3 +2,4 @@ robotframework>=3.2
 generic-camunda-client
 requests
 requests_toolbelt
+url-normalize
