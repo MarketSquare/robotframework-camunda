@@ -35,12 +35,9 @@ Start process with business key and check for particular workload
     [Arguments]    ${n}
     Delete all instances from process '${PROCESS_DEFINITION_KEY}'
     FOR     ${i}    IN RANGE    0    ${n}
-        start process     ${PROCESS_DEFINITION_KEY}    business_key=${i}
+        ${last_process_instance}    start process     ${PROCESS_DEFINITION_KEY}    business_key=${i}
     END
 
-    ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}    business_key=${n}
-    Should be equal as integers    ${amount_of_workloads}    0
-
-    ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}    ${business_key}=1
+    ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}    process_instance_id=${last_process_instance}[id]
     Should be equals as integers    ${amount_of_workloads}    1
 
