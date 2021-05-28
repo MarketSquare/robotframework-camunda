@@ -1,10 +1,10 @@
 *** Settings ***
-Library    CamundaLibrary    ${CAMUNDA_URL}
+Library    CamundaLibrary    ${CAMUNDA_HOST}
 Resource    ../cleanup.resource
 Test Setup    Delete all instances from process '${PROCESS_DEFINITION_KEY}'
 
 *** Variables ***
-${CAMUNDA_URL}    http://localhost:8080
+${CAMUNDA_HOST}    http://localhost:8080
 ${PROCESS_DEFINITION_KEY}    demo_for_robot
 ${TOPIC_NAME}    process_demo_element
 
