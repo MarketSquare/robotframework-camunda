@@ -43,5 +43,5 @@ Start process with business key and check for particular workload
     END
 
     ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}    process_instance_id=${last_process_instance}[id]
-    Should be equals as integers    ${amount_of_workloads}    1
+    Should be equal as integers    ${amount_of_workloads}    1
 
