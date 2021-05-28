@@ -15,7 +15,7 @@ import os
 from typing import List, Dict, Any
 import time
 
-from generic_camunda_client import ApiException, DeploymentWithDefinitionsDto, DeploymentDto, LockedExternalTaskDto, \
+from generic_camunda_client import ApiException, CountResultDto, DeploymentWithDefinitionsDto, DeploymentDto, LockedExternalTaskDto, \
     VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto, ProcessDefinitionApi, \
     ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto, \
     ProcessInstanceApi, ProcessInstanceDto, VersionApi
@@ -106,6 +106,24 @@ class CamundaLibrary:
     @keyword("Get Camunda URL")
     def get_camunda_url(self) -> str:
         return self._shared_resources.camunda_url
+
+    @keyword("Get amount of workloads")
+    def get_amount_of_workloads(self, topic: str, **kwargs) -> int:
+        """
+        Retrieves count of tasks. By default expects a topic name, but all parameters from the original endpoint
+        may be provided: https://docs.camunda.org/manual/latest/reference/rest/external-task/get-query-count/
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance = openapi_client.ExternalTaskApi(api_client)
+
+            try:
+                response: CountResultDto = api_instance.get_external_tasks_count(topic_name=topic, **kwargs)
+            except ApiException as e:
+                logger.error(f'Failed to count workload for topic "{topic}":\n{e}')
+                raise e
+
+        logger.info(f'Amount of workloads for "{topic}":\t{response.count}')
+        return response.count
 
     @keyword(name='Deploy Model From File', tags=['deployment'])
     def deploy_model_from_file(self, path_to_model):
