@@ -9,12 +9,16 @@ ${TOPIC_NAME}    process_demo_element
 
 *** Test Case ***
 There shall be as many tasks as started processes
+    [Documentation]    https://github.com/MarketSquare/robotframework-camunda/issues/6
+    [Tags]    issue-6
     [Template]    Start processes and check amount of workloads
     1
     2
     4
 
 There shall be as many tasks as started processes
+    [Documentation]    https://github.com/MarketSquare/robotframework-camunda/issues/6
+    [Tags]    issue-6
     [Template]    Start process with business key and check for particular workload
     1
     2
