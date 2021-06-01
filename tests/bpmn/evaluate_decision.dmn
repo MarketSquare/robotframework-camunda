@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="Definitions_08g6y9a" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
+  <decision id="demo_decision" name="Demo Decision">
+    <decisionTable id="DecisionTable_1s4yshf" hitPolicy="FIRST">
+      <input id="Input_1" label="First Name">
+        <inputExpression id="InputExpression_1" typeRef="string" expressionLanguage="javascript">
+          <text>firstname</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1cbea8u" label="Age">
+        <inputExpression id="LiteralExpression_0p3k401" typeRef="integer" expressionLanguage="javascript">
+          <text>age</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_02mbbuy" label="Married">
+        <inputExpression id="LiteralExpression_10caoqm" typeRef="boolean" expressionLanguage="javascript">
+          <text>infos.get("married")</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" name="level" typeRef="long" />
+      <rule id="DecisionRule_1ci7bdm">
+        <inputEntry id="UnaryTests_0562oaa">
+          <text>"Max"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1gmbqme">
+          <text>20</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0nk27ua">
+          <text>true</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0nqqdl4">
+          <text>3001001001</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1q8yjmc">
+        <inputEntry id="UnaryTests_1aa74tg">
+          <text>"Bea"</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0g2i4cz">
+          <text>30</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1muj4g0">
+          <text>false</text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1m3ih6l">
+          <text>0</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1u56rug">
+        <inputEntry id="UnaryTests_1yktsu2">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_18wplse">
+          <text></text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0j8bis7">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1ejcp0i">
+          <text>-1</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="demo_decision">
+        <dc:Bounds height="80" width="180" x="160" y="80" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

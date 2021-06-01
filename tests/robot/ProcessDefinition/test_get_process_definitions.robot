@@ -25,6 +25,7 @@ At Least One Process Definition Is Present
 
 Camunda Is Requested For All Existing Process Definitions
     ${PROCESS_DEFINITIONS}    Get Process Definitions
+    Log    ${PROCESS_DEFINITIONS}
     Set Global Variable    ${PROCESS_DEFINITIONS}
 
 Camunda Answered With A List Of At Least One Process Definition
