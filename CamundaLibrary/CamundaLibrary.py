@@ -15,10 +15,11 @@ import os
 from typing import List, Dict, Any
 import time
 
-from generic_camunda_client import ApiException, CountResultDto, DeploymentWithDefinitionsDto, DeploymentDto, LockedExternalTaskDto, \
+from generic_camunda_client import ApiException, CountResultDto, DeploymentWithDefinitionsDto, DeploymentDto, \
+    LockedExternalTaskDto, \
     VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto, ProcessDefinitionApi, \
     ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto, \
-    ProcessInstanceApi, ProcessInstanceDto, VersionApi
+    ProcessInstanceApi, ProcessInstanceDto, VersionApi, EvaluateDecisionDto
 import generic_camunda_client as openapi_client
 
 # local imports
@@ -592,3 +593,25 @@ class CamundaLibrary:
                 logger.error(f'Failed to get variable {variable_name} from '
                              f'process instance {process_instance_id}:\n{e}')
         return response
+
+    @keyword("Evaluate Decision", tags=['decision'])
+    def evaluate_decision(self, key: str, variables: dict) -> list:
+        """
+        Evaluates a given decision and returns the result.
+        The input values of the decision have to be supplied with `variables`.
+
+        == Example ==
+        | ${variables} | Create Dictionary | my_input=42 |
+        | ${response} | Evaluate Decision | my_decision_table | ${variables} |
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance = openapi_client.DecisionDefinitionApi(api_client)
+            dto = CamundaResources.convert_dict_to_openapi_variables(variables)
+            try:
+                response = api_instance.evaluate_decision_by_key(
+                    key=key,
+                    evaluate_decision_dto=openapi_client.EvaluateDecisionDto(dto))
+                return [CamundaResources.convert_openapi_variables_to_dict(r)
+                        for r in response]
+            except ApiException as e:
+                logger.error(f'Failed to evaluate decision {key}:\n{e}')

@@ -67,7 +67,7 @@ class CamundaResources:
         """
         if not open_api_variables:
             return {}
-        return {k: CamundaResources.convert_variable_dto(v) for (k, v) in open_api_variables.items()}
+        return {k: CamundaResources.convert_variable_dto(v) for k, v in open_api_variables.items()}
 
     @staticmethod
     def convert_dict_to_openapi_variables(variabes: dict) -> Dict[str,VariableValueDto]:
@@ -87,7 +87,7 @@ class CamundaResources:
         """
         if not variabes:
             return {}
-        return {k: CamundaResources.convert_to_variable_dto(v) for (k, v) in variabes.items()}
+        return {k: CamundaResources.convert_to_variable_dto(v) for k, v in variabes.items()}
 
     @staticmethod
     def convert_file_dict_to_openapi_variables(files: Dict[str, str]) -> Dict[str, VariableValueDto]:
@@ -137,6 +137,7 @@ class CamundaResources:
         if dto.type == 'File':
             return dto.to_dict()
         return dto.value
+
 
 if __name__ == '__main__':
     import doctest
