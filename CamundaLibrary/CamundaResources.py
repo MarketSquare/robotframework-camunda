@@ -1,7 +1,10 @@
+import collections
+
 from generic_camunda_client import Configuration, ApiClient, VariableValueDto
 from typing import Dict, Any
 import os
 import base64
+import json
 
 
 class CamundaResources:
@@ -130,12 +133,16 @@ class CamundaResources:
 
     @staticmethod
     def convert_to_variable_dto(value: Any) -> VariableValueDto:
+        if isinstance(value, collections.abc.Mapping):
+            return VariableValueDto(value=json.dumps(value), type='Json')
         return VariableValueDto(value=value)
 
     @staticmethod
     def convert_variable_dto(dto: VariableValueDto) -> Any:
         if dto.type == 'File':
             return dto.to_dict()
+        if dto.type == 'Json':
+            return json.loads(dto.value)
         return dto.value
 
 

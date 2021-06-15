@@ -277,7 +277,7 @@ class CamundaLibrary:
             if 'lock_duration' not in kwargs:
                 kwargs['lock_duration'] = 60000
             if 'deserialize_values' not in kwargs:
-                kwargs['deserialize_values'] = True
+                kwargs['deserialize_values'] = False
             topic_dto=FetchExternalTaskTopicDto(topic_name=topic, **kwargs)
             fetch_external_tasks_dto = FetchExternalTasksDto(worker_id=self.WORKER_ID, max_tasks=1,
                                                              async_response_timeout=async_response_timeout,

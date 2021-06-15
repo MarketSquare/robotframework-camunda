@@ -23,7 +23,7 @@ Decision Table Provides Correct Value
 
 *** Keywords ***
 Decision DMD Was Deployed
-    ${response}    Deploy Model From File    tests/bpmn/evaluate_decision.dmn
+    ${response}    Deploy    tests/bpmn/evaluate_decision.dmn
     Should Be True    $response['id']
     ...    msg=Failed to deploy decision table.
 
@@ -47,6 +47,7 @@ Request Decision
     Append To List    ${DECISIONS}    ${response}
 
 Decision Will Be Correct
+    Log    ${DECISIONS}
     Should Be Equal As Integers    3001001001    ${DECISIONS}[0][0][level]
     Should Be Equal As Integers    0             ${DECISIONS}[1][0][level]
     Should Be Equal As Integers    -1            ${DECISIONS}[2][0][level]
