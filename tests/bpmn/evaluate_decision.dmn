@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="Definitions_08g6y9a" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.4.0">
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" id="Definitions_08g6y9a" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="4.6.0">
   <decision id="demo_decision" name="Demo Decision">
     <decisionTable id="DecisionTable_1s4yshf" hitPolicy="FIRST">
       <input id="Input_1" label="First Name">
@@ -13,8 +13,8 @@
         </inputExpression>
       </input>
       <input id="InputClause_02mbbuy" label="Married">
-        <inputExpression id="LiteralExpression_10caoqm" typeRef="boolean" expressionLanguage="javascript">
-          <text>infos.get("married")</text>
+        <inputExpression id="LiteralExpression_10caoqm" typeRef="boolean">
+          <text>infos.married</text>
         </inputExpression>
       </input>
       <output id="Output_1" name="level" typeRef="long" />
