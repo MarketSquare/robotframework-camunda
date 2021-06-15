@@ -10,7 +10,7 @@ ${RESPONSE}                  ${EMPTY}
 
 
 *** Test Cases ***
-Get Process Definitions
+Get Process Instance Variable
     # Given
     Process Instance Is Present
 
