@@ -8,7 +8,7 @@ jobs:
     container: python:3.9
     services:
       camunda:
-        image: camunda/camunda-bpm-platform:run-7.14.0
+        image: camunda/camunda-bpm-platform:run-7.15.0
         ports:
           - 8080:8080
     steps:
