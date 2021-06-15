@@ -1,4 +1,4 @@
-import collections
+from collections.abc import Collection
 
 from generic_camunda_client import Configuration, ApiClient, VariableValueDto
 from typing import Dict, Any
@@ -133,9 +133,12 @@ class CamundaResources:
 
     @staticmethod
     def convert_to_variable_dto(value: Any) -> VariableValueDto:
-        if isinstance(value, collections.abc.Mapping):
+        if isinstance(value, str):
+            return VariableValueDto(value=value)
+        elif isinstance(value, Collection):   # String is also a collection and must be filtered before Collection.
             return VariableValueDto(value=json.dumps(value), type='Json')
-        return VariableValueDto(value=value)
+        else:
+            return VariableValueDto(value=value)
 
     @staticmethod
     def convert_variable_dto(dto: VariableValueDto) -> Any:
