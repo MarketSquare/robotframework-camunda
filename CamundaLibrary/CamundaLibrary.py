@@ -19,7 +19,8 @@ from generic_camunda_client import ApiException, CountResultDto, DeploymentWithD
     LockedExternalTaskDto, \
     VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto, ProcessDefinitionApi, \
     ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto, \
-    ProcessInstanceApi, ProcessInstanceDto, VersionApi, EvaluateDecisionDto
+    ProcessInstanceApi, ProcessInstanceDto, VersionApi, EvaluateDecisionDto, MessageApi, \
+    MessageCorrelationResultWithVariableDto, CorrelationMessageDto
 import generic_camunda_client as openapi_client
 
 # local imports
@@ -230,6 +231,28 @@ class CamundaLibrary:
                 raise e
 
         return [r.to_dict() for r in response]
+
+    @keyword("Deliver Message", tags="message")
+    def deliver_message(self, message_name, **kwargs):
+        """
+        Delivers a message using Camunda REST API: https://docs.camunda.org/manual/7.15/reference/rest/message/post-message/
+
+        Example:
+            | ${result} | deliver message | msg_payment_received |
+            | ${result} | deliver message | msg_payment_received | process_variables = ${variable_dictionary} |
+            | ${result} | deliver message | msg_payment_received | business_key = ${correlating_business_key} |
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance: MessageApi = openapi_client.MessageApi(api_client)
+            correlation_message: CorrelationMessageDto = CorrelationMessageDto(**kwargs)
+            correlation_message.message_name = message_name
+
+            try:
+                response: MessageCorrelationResultWithVariableDto = api_instance.deliver_message(correlation_message)
+            except ApiException as e:
+                logger.error(f'Failed to deliver message:\n{e}')
+                raise e
+        return response.to_dict()
 
     @keyword("Fetch and Lock workloads", tags=['task', 'deprecated'])
     def fetch_and_lock_workloads(self, topic, **kwargs) -> Dict:
