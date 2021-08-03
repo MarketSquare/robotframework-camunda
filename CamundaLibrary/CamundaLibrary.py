@@ -88,7 +88,7 @@ class CamundaLibrary:
 
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
-    FETCH_RESPONSE: LockedExternalTaskDto = None
+    FETCH_RESPONSE: LockedExternalTaskDto = {}
 
     def __init__(self, camunda_engine_url: str = 'http://localhost:8080'):
         self._shared_resources = CamundaResources()
@@ -232,7 +232,7 @@ class CamundaLibrary:
 
         return [r.to_dict() for r in response]
 
-    @keyword("Deliver Message", tags="message")
+    @keyword("Deliver Message", tags=["message"])
     def deliver_message(self, message_name, **kwargs):
         """
         Delivers a message using Camunda REST API: https://docs.camunda.org/manual/7.15/reference/rest/message/post-message/
@@ -246,13 +246,30 @@ class CamundaLibrary:
             api_instance: MessageApi = openapi_client.MessageApi(api_client)
             correlation_message: CorrelationMessageDto = CorrelationMessageDto(**kwargs)
             correlation_message.message_name = message_name
+            if not 'result_enabled' in kwargs:
+                correlation_message.result_enabled = True
+
+            logger.debug(f'Message:\n{api_client.sanitize_for_serialization(correlation_message)}')
 
             try:
-                response: MessageCorrelationResultWithVariableDto = api_instance.deliver_message(correlation_message)
+                response = requests.post(f'{self._shared_resources.camunda_url}/message', json=api_client.sanitize_for_serialization(correlation_message),
+                                         headers={'Content-Type': 'application/json'})
+                #response: MessageCorrelationResultWithVariableDto = \
+                #    api_instance.deliver_message(correlation_message_dto=correlation_message)
             except ApiException as e:
                 logger.error(f'Failed to deliver message:\n{e}')
                 raise e
-        return response.to_dict()
+
+        if correlation_message.result_enabled:
+            json = response.json()
+            logger.debug(json)
+
+        try:
+            response.raise_for_status()
+        except HTTPError as e:
+            raise e
+
+        return json if correlation_message else {}
 
     @keyword("Fetch and Lock workloads", tags=['task', 'deprecated'])
     def fetch_and_lock_workloads(self, topic, **kwargs) -> Dict:
