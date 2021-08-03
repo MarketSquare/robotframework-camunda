@@ -1,5 +1,6 @@
 *** Settings ***
-Library     CamundaLibrary    ${CAMUNDA_HOST}
+Library    CamundaLibrary    ${CAMUNDA_HOST}
+Library    Collections
 Resource    ../cleanup.resource
 Suite Setup    Deploy    ${MODEL}
 
@@ -60,6 +61,61 @@ Test Messaging without Message Result
     Last topic should have no workload
 
     Should Be Empty   ${message_response}
+
+Test Messaging with variable
+    [Setup]    Prepare testcase
+    #GIVEN
+    ${process_variables}    Create Dictionary    message=Hello World
+    Get workload from topic '${TOPIC_RECEIVE_MESSAGE}'
+    Last topic should have no workload
+    ${workload}    Get workload from topic '${TOPIC_SEND_MESSAGE}'
+
+    # EXPECT
+    Last topic should have workload
+
+    # WHEN
+    ${message_response}    Deliver Message    ${MESSAGE_NAME}    process_variables=${process_variables}
+    Complete task
+
+    # THEN
+    ${received_message_workload}    Get workload from topic '${TOPIC_RECEIVE_MESSAGE}'
+    Last topic should have workload
+    Dictionaries Should Be Equal    ${process_variables}    ${received_message_workload}
+    Complete task
+
+    Get workload from topic '${TOPIC_SEND_MESSAGE}'
+    Last topic should have no workload
+
+    Should Not Be Empty   ${message_response}
+    [Teardown]   Complete Task
+
+Test Messaging with dict variable
+    [Setup]    Prepare testcase
+    #GIVEN
+    ${languages}    Create List    Suomi    English
+    ${person}    Create Dictionary    firstname=Pekka    lastname=Klärck    languages=${languages}
+    ${process_variables}    Create Dictionary    person=${person}
+    Get workload from topic '${TOPIC_RECEIVE_MESSAGE}'
+    Last topic should have no workload
+    ${workload}    Get workload from topic '${TOPIC_SEND_MESSAGE}'
+
+    # EXPECT
+    Last topic should have workload
+
+    # WHEN
+    ${message_response}    Deliver Message    ${MESSAGE_NAME}    process_variables=${process_variables}
+    Complete task
+
+    # THEN
+    ${received_message_workload}    Get workload from topic '${TOPIC_RECEIVE_MESSAGE}'
+    Last topic should have workload
+    Dictionaries Should Be Equal    ${process_variables}    ${received_message_workload}
+    Complete task
+
+    Get workload from topic '${TOPIC_SEND_MESSAGE}'
+    Last topic should have no workload
+
+    Should Not Be Empty   ${message_response}
 
 
 *** Keywords ***

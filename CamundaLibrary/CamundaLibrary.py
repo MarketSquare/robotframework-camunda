@@ -247,6 +247,9 @@ class CamundaLibrary:
             correlation_message.message_name = message_name
             if not 'result_enabled' in kwargs:
                 correlation_message.result_enabled = True
+            if 'process_variables' in kwargs:
+                correlation_message.process_variables = CamundaResources.dict_to_camunda_json(
+                    kwargs['process_variables'])
 
             serialized_message = api_client.sanitize_for_serialization(correlation_message)
             logger.debug(f'Message:\n{serialized_message}')
@@ -529,7 +532,7 @@ class CamundaLibrary:
             api_instance = openapi_client.ProcessInstanceApi(api_client)
 
             try:
-                api_instance.delete_process_instance(id=process_instance_id)
+                response = api_instance.delete_process_instance(id=process_instance_id)
             except ApiException as e:
                 logger.error(f'Failed to delete process instance {process_instance_id}:\n{e}')
                 raise e
