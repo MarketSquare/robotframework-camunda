@@ -19,7 +19,8 @@ from generic_camunda_client import ApiException, CountResultDto, DeploymentWithD
     LockedExternalTaskDto, \
     VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto, ProcessDefinitionApi, \
     ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto, \
-    ProcessInstanceApi, ProcessInstanceDto, VersionApi, EvaluateDecisionDto
+    ProcessInstanceApi, ProcessInstanceDto, VersionApi, EvaluateDecisionDto, MessageApi, \
+    MessageCorrelationResultWithVariableDto, CorrelationMessageDto
 import generic_camunda_client as openapi_client
 
 # local imports
@@ -87,7 +88,7 @@ class CamundaLibrary:
 
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
-    FETCH_RESPONSE: LockedExternalTaskDto = None
+    FETCH_RESPONSE: LockedExternalTaskDto = {}
 
     def __init__(self, camunda_engine_url: str = 'http://localhost:8080'):
         self._shared_resources = CamundaResources()
@@ -230,6 +231,48 @@ class CamundaLibrary:
                 raise e
 
         return [r.to_dict() for r in response]
+
+    @keyword("Deliver Message", tags=["message"])
+    def deliver_message(self, message_name, **kwargs):
+        """
+        Delivers a message using Camunda REST API: https://docs.camunda.org/manual/7.15/reference/rest/message/post-message/
+
+        Example:
+            | ${result} | deliver message | msg_payment_received |
+            | ${result} | deliver message | msg_payment_received | process_variables = ${variable_dictionary} |
+            | ${result} | deliver message | msg_payment_received | business_key = ${correlating_business_key} |
+        """
+        with self._shared_resources.api_client as api_client:
+            correlation_message: CorrelationMessageDto = CorrelationMessageDto(**kwargs)
+            correlation_message.message_name = message_name
+            if not 'result_enabled' in kwargs:
+                correlation_message.result_enabled = True
+            if 'process_variables' in kwargs:
+                correlation_message.process_variables = CamundaResources.dict_to_camunda_json(
+                    kwargs['process_variables'])
+
+            serialized_message = api_client.sanitize_for_serialization(correlation_message)
+            logger.debug(f'Message:\n{serialized_message}')
+
+            try:
+                response = requests.post(f'{self._shared_resources.camunda_url}/message', json=serialized_message,
+                                         headers={'Content-Type': 'application/json'})
+            except ApiException as e:
+                logger.error(f'Failed to deliver message:\n{e}')
+                raise e
+
+        try:
+            response.raise_for_status()
+        except HTTPError as e:
+            logger.error(response.text)
+            raise e
+
+        if correlation_message.result_enabled:
+            json = response.json()
+            logger.debug(json)
+            return json
+        else:
+            return {}
 
     @keyword("Fetch and Lock workloads", tags=['task', 'deprecated'])
     def fetch_and_lock_workloads(self, topic, **kwargs) -> Dict:
@@ -489,7 +532,7 @@ class CamundaLibrary:
             api_instance = openapi_client.ProcessInstanceApi(api_client)
 
             try:
-                api_instance.delete_process_instance(id=process_instance_id)
+                response = api_instance.delete_process_instance(id=process_instance_id)
             except ApiException as e:
                 logger.error(f'Failed to delete process instance {process_instance_id}:\n{e}')
                 raise e

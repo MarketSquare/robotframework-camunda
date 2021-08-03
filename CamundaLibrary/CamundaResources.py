@@ -1,10 +1,10 @@
-from collections.abc import Collection
-
-from generic_camunda_client import Configuration, ApiClient, VariableValueDto
-from typing import Dict, Any
-import os
 import base64
 import json
+import os
+from collections.abc import Collection
+from typing import Dict, Any
+
+from generic_camunda_client import Configuration, ApiClient, VariableValueDto
 
 
 class CamundaResources:
@@ -73,7 +73,7 @@ class CamundaResources:
         return {k: CamundaResources.convert_variable_dto(v) for k, v in open_api_variables.items()}
 
     @staticmethod
-    def convert_dict_to_openapi_variables(variabes: dict) -> Dict[str,VariableValueDto]:
+    def convert_dict_to_openapi_variables(variabes: dict) -> Dict[str, VariableValueDto]:
         """
         Converts the variables to a simple dictionary
         :return: dict
@@ -135,7 +135,7 @@ class CamundaResources:
     def convert_to_variable_dto(value: Any) -> VariableValueDto:
         if isinstance(value, str):
             return VariableValueDto(value=value)
-        elif isinstance(value, Collection):   # String is also a collection and must be filtered before Collection.
+        elif isinstance(value, Collection):  # String is also a collection and must be filtered before Collection.
             return VariableValueDto(value=json.dumps(value), type='Json')
         else:
             return VariableValueDto(value=value)
@@ -147,6 +147,25 @@ class CamundaResources:
         if dto.type == 'Json':
             return json.loads(dto.value)
         return dto.value
+
+    @staticmethod
+    def dict_to_camunda_json(d: dict) -> Any:
+        """
+        Example:
+        >>> CamundaResources.dict_to_camunda_json({'a':1})
+        {'a': {'value': 1}}
+
+        >>> CamundaResources.dict_to_camunda_json({'person': {'age': 25}})
+        {'person': {'value': '{"age": 25}', 'type': 'Json'}}
+
+        >>> CamundaResources.dict_to_camunda_json({'languages': ['English', 'Suomi']})
+        {'languages': {'value': '["English", "Suomi"]', 'type': 'Json'}}
+
+        >>> CamundaResources.dict_to_camunda_json({'person': {'age': 25, 'languages': ['English', 'Suomi']}})
+        {'person': {'value': '{"age": 25, "languages": ["English", "Suomi"]}', 'type': 'Json'}}
+        """
+        return {k: {'value': json.dumps(v), 'type': 'Json'} if isinstance(v, Collection) else {'value': v}
+                for k, v in d.items()}
 
 
 if __name__ == '__main__':
