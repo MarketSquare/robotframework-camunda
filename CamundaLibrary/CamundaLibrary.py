@@ -249,27 +249,28 @@ class CamundaLibrary:
             if not 'result_enabled' in kwargs:
                 correlation_message.result_enabled = True
 
-            logger.debug(f'Message:\n{api_client.sanitize_for_serialization(correlation_message)}')
+            serialized_message = api_client.sanitize_for_serialization(correlation_message)
+            logger.debug(f'Message:\n{serialized_message}')
 
             try:
-                response = requests.post(f'{self._shared_resources.camunda_url}/message', json=api_client.sanitize_for_serialization(correlation_message),
+                response = requests.post(f'{self._shared_resources.camunda_url}/message', json=serialized_message,
                                          headers={'Content-Type': 'application/json'})
-                #response: MessageCorrelationResultWithVariableDto = \
-                #    api_instance.deliver_message(correlation_message_dto=correlation_message)
             except ApiException as e:
                 logger.error(f'Failed to deliver message:\n{e}')
                 raise e
 
-        if correlation_message.result_enabled:
-            json = response.json()
-            logger.debug(json)
-
         try:
             response.raise_for_status()
         except HTTPError as e:
+            logger.error(response.text)
             raise e
 
-        return json if correlation_message else {}
+        if correlation_message.result_enabled:
+            json = response.json()
+            logger.debug(json)
+            return json
+        else:
+            return {}
 
     @keyword("Fetch and Lock workloads", tags=['task', 'deprecated'])
     def fetch_and_lock_workloads(self, topic, **kwargs) -> Dict:

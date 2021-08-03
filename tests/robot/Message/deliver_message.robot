@@ -1,7 +1,7 @@
 *** Settings ***
 Library     CamundaLibrary    ${CAMUNDA_HOST}
 Resource    ../cleanup.resource
-Suite Setup    Prepare camunda
+Suite Setup    Deploy    ${MODEL}
 
 *** Variables ***
 ${MODEL}    ${CURDIR}/../../bpmn/message_test.bpmn
@@ -13,8 +13,8 @@ ${MESSAGE_NAME}    receive_message
 
 
 *** Test Cases ***
-Test Messaging
-    [Setup]    Start process    ${PROCESS_DEFINITION_KEY_SEND_MESSAGE}
+Test Messaging with Message Result
+    [Setup]    Prepare testcase
     #GIVEN
     Get workload from topic '${TOPIC_RECEIVE_MESSAGE}'
     Last topic should have no workload
@@ -24,7 +24,7 @@ Test Messaging
     Last topic should have workload
     
     # WHEN
-    ${response}    Deliver Message    ${MESSAGE_NAME}
+    ${message_response}    Deliver Message    ${MESSAGE_NAME}
     Complete task
     
     # THEN 
@@ -35,12 +35,39 @@ Test Messaging
     Get workload from topic '${TOPIC_SEND_MESSAGE}'
     Last topic should have no workload
 
+    Should Not Be Empty   ${message_response}
+
+Test Messaging without Message Result
+    [Setup]    Prepare testcase
+    #GIVEN
+    Get workload from topic '${TOPIC_RECEIVE_MESSAGE}'
+    Last topic should have no workload
+    ${workload}    Get workload from topic '${TOPIC_SEND_MESSAGE}'
+
+    # EXPECT
+    Last topic should have workload
+
+    # WHEN
+    ${message_response}    Deliver Message    ${MESSAGE_NAME}    result_enabled=${False}
+    Complete task
+
+    # THEN
+    Get workload from topic '${TOPIC_RECEIVE_MESSAGE}'
+    Last topic should have workload
+    Complete task
+
+    Get workload from topic '${TOPIC_SEND_MESSAGE}'
+    Last topic should have no workload
+
+    Should Be Empty   ${message_response}
+
 
 *** Keywords ***
-Prepare camunda
-    Deploy    ${MODEL}
+Prepare testcase
     Delete all instances from process '${PROCESS_DEFINITION_KEY_SEND_MESSAGE}'
     Delete all instances from process '${PROCESS_DEFINITION_KEY_RECEIVE_MESSAGE}'
+    Start process    ${PROCESS_DEFINITION_KEY_SEND_MESSAGE}
+
 
 Get workload from topic '${topic}'
     ${workload}    Fetch Workload    ${topic}
