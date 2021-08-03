@@ -243,7 +243,6 @@ class CamundaLibrary:
             | ${result} | deliver message | msg_payment_received | business_key = ${correlating_business_key} |
         """
         with self._shared_resources.api_client as api_client:
-            api_instance: MessageApi = openapi_client.MessageApi(api_client)
             correlation_message: CorrelationMessageDto = CorrelationMessageDto(**kwargs)
             correlation_message.message_name = message_name
             if not 'result_enabled' in kwargs:
