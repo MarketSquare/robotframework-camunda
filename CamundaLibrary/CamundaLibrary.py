@@ -590,7 +590,7 @@ class CamundaLibrary:
         return response
 
     @keyword("Get Activity Instance", tags=['process'])
-    def get_activity_instance(self, **kwargs):
+    def get_activity_instance(self, id):
         """
         Returns an Activity Instance (Tree) for a given process instance.
 
@@ -603,9 +603,9 @@ class CamundaLibrary:
             api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(api_client)
 
             try:
-                response = api_instance.get_activity_instance_tree(**kwargs)
+                response = api_instance.get_activity_instance_tree(id)
             except ApiException as e:
-                logger.error(f'failed to get activity tree for process instance {kwargs}:\n{e}')
+                logger.error(f'failed to get activity tree for process instance with id {id}:\n{e}')
         return response
 
     @keyword("Get Process Instance Variable", tags=['process'])
