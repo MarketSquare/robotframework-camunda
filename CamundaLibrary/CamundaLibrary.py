@@ -19,7 +19,7 @@ from generic_camunda_client import ApiException, CountResultDto, DeploymentWithD
     LockedExternalTaskDto, \
     VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto, ProcessDefinitionApi, \
     ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto, \
-    ProcessInstanceApi, ProcessInstanceDto, VersionApi, EvaluateDecisionDto
+    ProcessInstanceApi, ProcessInstanceDto, VersionApi, ActivityInstanceDto
 import generic_camunda_client as openapi_client
 
 # local imports
@@ -560,10 +560,11 @@ class CamundaLibrary:
             api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(api_client)
 
             try:
-                response = api_instance.get_activity_instance_tree(**kwargs)
+                response: ActivityInstanceDto = api_instance.get_activity_instance_tree(**kwargs)
             except ApiException as e:
                 logger.error(f'failed to get activity tree for process instance {kwargs}:\n{e}')
-        return response
+                raise e
+        return response.to_dict()
 
     @keyword("Get Process Instance Variable", tags=['process'])
     def get_process_instance_variable(self, process_instance_id: str, variable_name: str):
