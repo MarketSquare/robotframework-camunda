@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0qiqts0" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.2.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0qiqts0" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
   <bpmn:collaboration id="Collaboration_0p8xj2y">
     <bpmn:participant id="Participant_0sda6b4" name="Demo Robot" processRef="demo_for_robot" />
   </bpmn:collaboration>
@@ -7,25 +7,37 @@
     <bpmn:startEvent id="StartEvent_1" name="Trigger received">
       <bpmn:outgoing>Flow_0xskn85</bpmn:outgoing>
     </bpmn:startEvent>
-    <bpmn:serviceTask id="Activity_service_1" name="Process element" camunda:type="external" camunda:topic="process_demo_element">
+    <bpmn:serviceTask id="Activity_process_element" name="Process element" camunda:type="external" camunda:topic="process_demo_element">
       <bpmn:incoming>Flow_0xskn85</bpmn:incoming>
       <bpmn:outgoing>Flow_1m77rg0</bpmn:outgoing>
     </bpmn:serviceTask>
-    <bpmn:userTask id="Activity_user_1" name="Do something manually" camunda:formKey="embedded:deployment:embeddedSampleForm.html">
+    <bpmn:userTask id="Activity_manual" name="Do something manually" camunda:formKey="embedded:deployment:embeddedSampleForm.html">
       <bpmn:incoming>Flow_1m77rg0</bpmn:incoming>
       <bpmn:outgoing>Flow_0thahmr</bpmn:outgoing>
     </bpmn:userTask>
     <bpmn:endEvent id="Event_06qztq3">
       <bpmn:incoming>Flow_0thahmr</bpmn:incoming>
+      <bpmn:incoming>Flow_0uflgxn</bpmn:incoming>
     </bpmn:endEvent>
-    <bpmn:sequenceFlow id="Flow_0xskn85" sourceRef="StartEvent_1" targetRef="Activity_service_1" />
-    <bpmn:sequenceFlow id="Flow_1m77rg0" sourceRef="Activity_service_1" targetRef="Activity_user_1" />
-    <bpmn:sequenceFlow id="Flow_0thahmr" sourceRef="Activity_user_1" targetRef="Event_06qztq3" />
+    <bpmn:sequenceFlow id="Flow_0xskn85" sourceRef="StartEvent_1" targetRef="Activity_process_element" />
+    <bpmn:sequenceFlow id="Flow_1m77rg0" sourceRef="Activity_process_element" targetRef="Activity_manual" />
+    <bpmn:sequenceFlow id="Flow_0thahmr" sourceRef="Activity_manual" targetRef="Event_06qztq3" />
+    <bpmn:boundaryEvent id="Event_demo_error" name="An Error occured" attachedToRef="Activity_process_element">
+      <bpmn:outgoing>Flow_0jgdhq6</bpmn:outgoing>
+      <bpmn:errorEventDefinition id="ErrorEventDefinition_1kugatc" errorRef="Error_19xhp28" camunda:errorCodeVariable="error_code" camunda:errorMessageVariable="error_message" />
+    </bpmn:boundaryEvent>
+    <bpmn:sequenceFlow id="Flow_0jgdhq6" sourceRef="Event_demo_error" targetRef="Activity_error_handling" />
+    <bpmn:sequenceFlow id="Flow_0uflgxn" sourceRef="Activity_error_handling" targetRef="Event_06qztq3" />
+    <bpmn:serviceTask id="Activity_error_handling" name="Do error handling" camunda:type="external" camunda:topic="handle_error">
+      <bpmn:incoming>Flow_0jgdhq6</bpmn:incoming>
+      <bpmn:outgoing>Flow_0uflgxn</bpmn:outgoing>
+    </bpmn:serviceTask>
   </bpmn:process>
+  <bpmn:error id="Error_19xhp28" name="demo_error" errorCode="de1" camunda:errorMessage="An error occured during demo" />
   <bpmndi:BPMNDiagram id="BPMNDiagram_1">
     <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Collaboration_0p8xj2y">
       <bpmndi:BPMNShape id="Participant_0sda6b4_di" bpmnElement="Participant_0sda6b4" isHorizontal="true">
-        <dc:Bounds x="129" y="57" width="600" height="250" />
+        <dc:Bounds x="129" y="57" width="661" height="393" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge id="Flow_0thahmr_di" bpmnElement="Flow_0thahmr">
         <di:waypoint x="560" y="170" />
@@ -39,20 +51,40 @@
         <di:waypoint x="245" y="170" />
         <di:waypoint x="300" y="170" />
       </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jgdhq6_di" bpmnElement="Flow_0jgdhq6">
+        <di:waypoint x="350" y="228" />
+        <di:waypoint x="350" y="320" />
+        <di:waypoint x="460" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uflgxn_di" bpmnElement="Flow_0uflgxn">
+        <di:waypoint x="560" y="320" />
+        <di:waypoint x="591" y="320" />
+        <di:waypoint x="591" y="170" />
+        <di:waypoint x="622" y="170" />
+      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="209" y="152" width="36" height="36" />
         <bpmndi:BPMNLabel>
           <dc:Bounds x="188" y="195" width="79" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_0qv44sp_di" bpmnElement="Activity_service_1">
+      <bpmndi:BPMNShape id="Activity_0qv44sp_di" bpmnElement="Activity_process_element">
         <dc:Bounds x="300" y="130" width="100" height="80" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Activity_1cxrwut_di" bpmnElement="Activity_user_1">
+      <bpmndi:BPMNShape id="Activity_1cxrwut_di" bpmnElement="Activity_manual">
         <dc:Bounds x="460" y="130" width="100" height="80" />
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Event_06qztq3_di" bpmnElement="Event_06qztq3">
         <dc:Bounds x="622" y="152" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0de9uw5_di" bpmnElement="Activity_error_handling">
+        <dc:Bounds x="460" y="280" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1ar6zj2_di" bpmnElement="Event_demo_error">
+        <dc:Bounds x="332" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="258" y="247" width="83" height="14" />
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
