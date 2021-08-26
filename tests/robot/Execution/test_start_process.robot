@@ -72,7 +72,7 @@ Test starting process with variables after activity
     ${variable1_key}    Set Variable    my_value
     ${variables}    Create Dictionary    ${variable1_key}=${variable1_value}
 
-    ${after_activity_id}    Set Variable    Activity_service_1
+    ${after_activity_id}    Set Variable    Activity_process_element
 
     # WHEN
     start process    ${PROCESS_DEFINITION_KEY}   ${variables}    after_activity_id=${after_activity_id}
@@ -93,7 +93,7 @@ Test starting process with variables before activity
     ${variable1_key}    Set Variable    my_value
     ${variables}    Create Dictionary    ${variable1_key}=${variable1_value}
 
-    ${before_activity_id}    Set Variable    Activity_service_1
+    ${before_activity_id}    Set Variable    Activity_process_element
 
     # WHEN
     start process    ${PROCESS_DEFINITION_KEY}   ${variables}    before_activity_id=${before_activity_id}
