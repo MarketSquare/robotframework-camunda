@@ -1,14 +1,17 @@
 name: Robot tests
 
-on: [pull_request]
+on: [push, pull_request]
 
 jobs:
   integrationtest:
     runs-on: ubuntu-latest
     container: python:3.9
+    strategy:
+      matrix:
+        camunda_version: ['run-7.14.0','run-7.15.0']
     services:
       camunda:
-        image: camunda/camunda-bpm-platform:run-7.14.0
+        image: camunda/camunda-bpm-platform:${{ matrix.camunda_version }}
         ports:
           - 8080:8080
     steps:
