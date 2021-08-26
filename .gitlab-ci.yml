@@ -66,8 +66,12 @@ Dryrun Robottests:
 
 Integrationtests:
   stage: test
+  parallel:
+    matrix:
+      - CAMUNDA_VERSION: run-7.14.0
+      - CAMUNDA_VERSION: run-7.15.0
   services:
-    - name: camunda/camunda-bpm-platform:run-7.14.0
+    - name: camunda/camunda-bpm-platform:${CAMUNDA_VERSION}
       alias: camunda
   before_script:
     - pip install .
