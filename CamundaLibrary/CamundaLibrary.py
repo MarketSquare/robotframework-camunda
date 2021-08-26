@@ -388,9 +388,31 @@ class CamundaLibrary:
             return self.FETCH_RESPONSE.to_dict()
         return self.FETCH_RESPONSE
 
-    @keyword("Drop fetch response")
+    @keyword("Drop fetch response", tags=['task'])
     def drop_fetch_response(self):
         self.FETCH_RESPONSE = {}
+
+    @keyword("Throw BPMN Error", tags=['task'])
+    def bpmn_error(self, error_code: str, error_message:str = None, variables: Dict[str, Any] = None, files: Dict = None):
+        if not self.FETCH_RESPONSE:
+            logger.warn('No task to complete. Maybe you did not fetch and lock a workitem before?')
+        else:
+            with self._shared_resources.api_client as api_client:
+                api_instance = openapi_client.ExternalTaskApi(api_client)
+                variables = CamundaResources.convert_dict_to_openapi_variables(variables)
+                openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(files)
+                variables.update(openapi_files)
+                bpmn_error = openapi_client.ExternalTaskBpmnError(worker_id=self.WORKER_ID,
+                                                                           error_message=error_message,
+                                                                           error_code=error_code,
+                                                                           variables=variables)
+                try:
+                    logger.debug(f"Sending BPMN error for task:\n{bpmn_error}")
+                    api_instance.handle_external_task_bpmn_error(self.FETCH_RESPONSE.id,
+                                                                 external_task_bpmn_error=bpmn_error)
+                    self.drop_fetch_response()
+                except ApiException as e:
+                    logger.error(f"Exception when calling ExternalTaskApi->handle_external_task_bpmn_error: {e}\n")
 
     @keyword("Complete task", tags=['task'])
     def complete(self, result_set: Dict[str, Any] = None, files: Dict = None):
