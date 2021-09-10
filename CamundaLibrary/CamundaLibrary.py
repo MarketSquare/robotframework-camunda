@@ -594,7 +594,7 @@ class CamundaLibrary:
         """
         Returns a list of process instances that are active for a certain process definition identified by key.
         """
-        self.get_process_instances(process_definition_key=process_definition_key, active='true')
+        return self.get_process_instances(process_definition_key=process_definition_key, active='true')
 
     @keyword("Get process instances")
     def get_process_instances(self, **kwargs):
