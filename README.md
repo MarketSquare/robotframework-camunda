@@ -37,10 +37,14 @@ Library    CamundaLibrary    ${CAMUNDA_HOST}
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
+${MODEL_FOLDER}    ${CURDIR}/../models
 
 *** Test Cases ***
-Test deployment of models
-    ${response}    deploy model from file    ${CURDIR}/../../bpmn/demo_for_robot.bpmn
+Test deployment of a single model in 1 deployment
+    ${response}    deploy    ${MODEL_FOLDER}/demo_for_robot.bpmn
+
+Test deployment of several models in 1 deployment
+    ${response}    deploy    ${MODEL_FOLDER}/demo_for_robot.bpmn    ${MODEL_FOLDER}/demo_embedded_form.html
 ```
 
 ### Starting a process instance
