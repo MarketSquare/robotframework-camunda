@@ -90,11 +90,13 @@ class CamundaLibrary:
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
     FETCH_RESPONSE: LockedExternalTaskDto = {}
+    DEFAULT_LOCK_DURATION = None
 
     def __init__(self, camunda_engine_url: str = 'http://localhost:8080'):
         self._shared_resources = CamundaResources()
         if camunda_engine_url:
             self.set_camunda_url(camunda_engine_url)
+        self.DEFAULT_LOCK_DURATION = self.reset_task_lock_duration()
 
     @keyword("Set Camunda URL")
     def set_camunda_url(self, url: str):
@@ -105,6 +107,22 @@ class CamundaLibrary:
         if not url:
             raise ValueError('Cannot set camunda engine url: no url given.')
         self._shared_resources.camunda_url = url_normalize(f'{url}/engine-rest')
+
+    @keyword("Set Task Lock Duration")
+    def set_task_lock_duration(self, lock_duration: int):
+        try:
+            self.DEFAULT_LOCK_DURATION = int(lock_duration)
+        except ValueError:
+            logger.error(f'Failed to set lock duration. Value does not seem a valid integer:\t{lock_duration}')
+
+    @keyword("Reset Task Lock Duration")
+    def reset_task_lock_duration(self):
+        try:
+            lock_duration = int(os.environ.get('CAMUNDA_TASK_LOCK_DURATION', 600000))
+        except ValueError as e:
+            logger.warn(f'Failed to interpret "CAMUNDA_TASK_LOCK_DURATION". Environment variable does not seem to contain a valid integer:\t{e}')
+            lock_duration = 600000
+        return lock_duration
 
     @keyword("Get Camunda URL")
     def get_camunda_url(self) -> str:
@@ -319,7 +337,7 @@ class CamundaLibrary:
             # Create an instance of the API class
             api_instance = openapi_client.ExternalTaskApi(api_client)
             if 'lock_duration' not in kwargs:
-                kwargs['lock_duration'] = 60000
+                kwargs['lock_duration'] = self.DEFAULT_LOCK_DURATION
             if 'deserialize_values' not in kwargs:
                 kwargs['deserialize_values'] = False
             topic_dto=FetchExternalTaskTopicDto(topic_name=topic, **kwargs)
