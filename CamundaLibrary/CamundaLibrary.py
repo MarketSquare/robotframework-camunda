@@ -108,15 +108,26 @@ class CamundaLibrary:
             raise ValueError('Cannot set camunda engine url: no url given.')
         self._shared_resources.camunda_url = url_normalize(f'{url}/engine-rest')
 
-    @keyword("Set Task Lock Duration")
+    @keyword("Set Task Lock Duration", tags=["task"])
     def set_task_lock_duration(self, lock_duration: int):
+        """
+        Sets lock duration used as default when fetching. Camunda locks a process instance for the period. If the
+        external task os not completed, Camunda gives the process instance free for another attempt only when lock
+        duration has expired.
+
+        Value is in milliseconds (1000 = 1 minute)
+        """
         try:
             self.DEFAULT_LOCK_DURATION = int(lock_duration)
         except ValueError:
             logger.error(f'Failed to set lock duration. Value does not seem a valid integer:\t{lock_duration}')
 
-    @keyword("Reset Task Lock Duration")
+    @keyword("Reset Task Lock Duration", tags=["task"])
     def reset_task_lock_duration(self):
+        """
+        Counter keyword for "Set Task Lock Duration". Resets lock duration to the default. The default is either
+        environment variable CAMUNDA_TASK_LOCK_DURATION or 600000 (10 minutes).
+        """
         try:
             lock_duration = int(os.environ.get('CAMUNDA_TASK_LOCK_DURATION', 600000))
         except ValueError as e:
