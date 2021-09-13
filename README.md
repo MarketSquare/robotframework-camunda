@@ -1,4 +1,4 @@
-[![pipeline status](https://gitlab.com/postadress/robotframework/robotframework-camunda-mirror/badges/master/pipeline.svg)](https://gitlab.com/postadress/robotframework/robotframework-camunda-mirror/-/commits/master)
+[![PyPI status](https://img.shields.io/pypi/status/robotframework-camunda.svg)](https://pypi.python.org/pypi/robotframework-camunda/) [![pipeline status](https://gitlab.com/postadress/robotframework/robotframework-camunda-mirror/badges/master/pipeline.svg)](https://gitlab.com/postadress/robotframework/robotframework-camunda-mirror/-/commits/master) [![PyPi license](https://badgen.net/pypi/license/robotframework-camunda/)](https://pypi.com/project/robotframework-camunda/) [![PyPi version](https://badgen.net/pypi/v/robotframework-camunda/)](https://pypi.com/project/robotframework-camunda) [![PyPI pyversions](https://img.shields.io/pypi/pyversions/robotframework-camunda.svg)](https://pypi.python.org/pypi/robotframework-camunda/) [![PyPI download month](https://img.shields.io/pypi/dm/robotframework-camunda.svg)](https://pypi.python.org/pypi/robotframework-camunda/) 
 
 # Robot Framework Camunda
 
@@ -37,10 +37,14 @@ Library    CamundaLibrary    ${CAMUNDA_HOST}
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
+${MODEL_FOLDER}    ${CURDIR}/../models
 
 *** Test Cases ***
-Test deployment of models
-    ${response}    deploy model from file    ${CURDIR}/../../bpmn/demo_for_robot.bpmn
+Test deployment of a single model in 1 deployment
+    ${response}    deploy    ${MODEL_FOLDER}/demo_for_robot.bpmn
+
+Test deployment of several models in 1 deployment
+    ${response}    deploy    ${MODEL_FOLDER}/demo_for_robot.bpmn    ${MODEL_FOLDER}/demo_embedded_form.html
 ```
 
 ### Starting a process instance
