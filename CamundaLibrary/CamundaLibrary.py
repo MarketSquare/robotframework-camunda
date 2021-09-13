@@ -447,7 +447,7 @@ class CamundaLibrary:
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->handle_external_task_bpmn_error: {e}\n")
 
-    @keyword("Notify failure", tags=["task", "beta"])
+    @keyword("Notify failure", tags=["task"])
     def notify_failure(self, **kwargs):
         """
         Raises a failure to Camunda. When retry counter is less than 1, an incident is created by Camunda.
@@ -470,7 +470,6 @@ class CamundaLibrary:
                 try:
                     api_instance.handle_failure(id=self.FETCH_RESPONSE.id,
                                                 external_task_failure_dto=external_task_failure_dto)
-                    self.unlock()
                     self.drop_fetch_response()
                 except ApiException as e:
                     logger.error("Exception when calling ExternalTaskApi->handle_failure: %s\n" % e)

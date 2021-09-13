@@ -39,4 +39,4 @@ Test 'Notify failure' for existing topic
 
     ${incident}    Get incidents    process_instance_id=${process_instance}[process_instance_id]
     log    ${incident}
-    Should Not be Empty    ${incident}
+    Should Not be Empty    ${incident}     Getting incident failed. There is no incident availabe matching the process instance.
