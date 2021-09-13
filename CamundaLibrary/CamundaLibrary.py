@@ -453,8 +453,8 @@ class CamundaLibrary:
         Check for camunda client documentation for all parameters of the request body: https://noordsestern.gitlab.io/camunda-client-for-python/7-15-0/docs/ExternalTaskApi.html#handle_failure
 
         Example:
-        | | ${variables} | *fetch workload* | _my_first_task_in_demo_ | |
-        | | *notify failure* | retries=3 | error_message= | _json=${{ {'workerId': '${fetch_response}[worker_id]'} }}_ |
+        | *notify failure* |  |  |
+        | *notify failure* | retries=3 | error_message=Task failed due to... |
         """
         if not self.FETCH_RESPONSE:
             logger.warn('No task to notify failure for. Maybe you did not fetch and lock a workitem before?')
