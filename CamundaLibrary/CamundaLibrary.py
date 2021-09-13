@@ -20,7 +20,8 @@ from generic_camunda_client import ApiException, CountResultDto, DeploymentWithD
     VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto, ProcessDefinitionApi, \
     ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto, \
     ProcessInstanceApi, ProcessInstanceDto, VersionApi, EvaluateDecisionDto, MessageApi, \
-    MessageCorrelationResultWithVariableDto, CorrelationMessageDto, ActivityInstanceDto
+    MessageCorrelationResultWithVariableDto, CorrelationMessageDto, ActivityInstanceDto, ExternalTaskFailureDto, \
+    IncidentApi, IncidentDto
 
 import generic_camunda_client as openapi_client
 
@@ -88,7 +89,7 @@ class CamundaLibrary:
     WORKER_ID = f'robotframework-camundalibrary-{time.time()}'
 
     EMPTY_STRING = ""
-    KNOWN_TOPICS: Dict[str,Dict[str, Any]] = {}
+    KNOWN_TOPICS: Dict[str, Dict[str, Any]] = {}
     FETCH_RESPONSE: LockedExternalTaskDto = {}
     DEFAULT_LOCK_DURATION = None
 
@@ -131,7 +132,8 @@ class CamundaLibrary:
         try:
             lock_duration = int(os.environ.get('CAMUNDA_TASK_LOCK_DURATION', 600000))
         except ValueError as e:
-            logger.warn(f'Failed to interpret "CAMUNDA_TASK_LOCK_DURATION". Environment variable does not seem to contain a valid integer:\t{e}')
+            logger.warn(
+                f'Failed to interpret "CAMUNDA_TASK_LOCK_DURATION". Environment variable does not seem to contain a valid integer:\t{e}')
             lock_duration = 600000
         return lock_duration
 
@@ -351,7 +353,7 @@ class CamundaLibrary:
                 kwargs['lock_duration'] = self.DEFAULT_LOCK_DURATION
             if 'deserialize_values' not in kwargs:
                 kwargs['deserialize_values'] = False
-            topic_dto=FetchExternalTaskTopicDto(topic_name=topic, **kwargs)
+            topic_dto = FetchExternalTaskTopicDto(topic_name=topic, **kwargs)
             fetch_external_tasks_dto = FetchExternalTasksDto(worker_id=self.WORKER_ID, max_tasks=1,
                                                              async_response_timeout=async_response_timeout,
                                                              use_priority=use_priority,
@@ -423,7 +425,8 @@ class CamundaLibrary:
         self.FETCH_RESPONSE = {}
 
     @keyword("Throw BPMN Error", tags=['task'])
-    def bpmn_error(self, error_code: str, error_message:str = None, variables: Dict[str, Any] = None, files: Dict = None):
+    def bpmn_error(self, error_code: str, error_message: str = None, variables: Dict[str, Any] = None,
+                   files: Dict = None):
         if not self.FETCH_RESPONSE:
             logger.warn('No task to complete. Maybe you did not fetch and lock a workitem before?')
         else:
@@ -433,9 +436,9 @@ class CamundaLibrary:
                 openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(files)
                 variables.update(openapi_files)
                 bpmn_error = openapi_client.ExternalTaskBpmnError(worker_id=self.WORKER_ID,
-                                                                           error_message=error_message,
-                                                                           error_code=error_code,
-                                                                           variables=variables)
+                                                                  error_message=error_message,
+                                                                  error_code=error_code,
+                                                                  variables=variables)
                 try:
                     logger.debug(f"Sending BPMN error for task:\n{bpmn_error}")
                     api_instance.handle_external_task_bpmn_error(self.FETCH_RESPONSE.id,
@@ -443,6 +446,56 @@ class CamundaLibrary:
                     self.drop_fetch_response()
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->handle_external_task_bpmn_error: {e}\n")
+
+    @keyword("Notify failure", tags=["task", "beta"])
+    def notify_failure(self, **kwargs):
+        """
+        Raises a failure to Camunda. When retry counter is less than 1, an incident is created by Camunda.
+
+        CamundaLibrary takes care of providing the worker_id and task_id. *retry_timeout* is equal to *lock_duration* for external tasks.
+        Check for camunda client documentation for all parameters of the request body: https://noordsestern.gitlab.io/camunda-client-for-python/7-15-0/docs/ExternalTaskApi.html#handle_failure
+
+        Example:
+        | *notify failure* |  |  |
+        | *notify failure* | retries=3 | error_message=Task failed due to... |
+        """
+        if not self.FETCH_RESPONSE:
+            logger.warn('No task to notify failure for. Maybe you did not fetch and lock a workitem before?')
+        else:
+            with self._shared_resources.api_client as api_client:
+                api_instance = openapi_client.ExternalTaskApi(api_client)
+                external_task_failure_dto = ExternalTaskFailureDto(worker_id=self.WORKER_ID, retry_timeout=60000,
+                                                                   **kwargs)
+
+                try:
+                    api_instance.handle_failure(id=self.FETCH_RESPONSE.id,
+                                                external_task_failure_dto=external_task_failure_dto)
+                    self.unlock()
+                    self.drop_fetch_response()
+                except ApiException as e:
+                    logger.error("Exception when calling ExternalTaskApi->handle_failure: %s\n" % e)
+
+    @keyword("Get incidents")
+    def get_incidents(self, **kwargs):
+        """
+        Retrieves incidents matching given filter arguments.
+
+        For full parameter list checkout: https://noordsestern.gitlab.io/camunda-client-for-python/7-15-0/docs/IncidentApi.html#get_incidents
+
+        Example:
+        | ${all_incidents} | *get incidents* |  |
+        | ${incidents_of_process_instance | *get incidentse* | process_instance_id=${process_instance}[process_instance_id] |
+        """
+        with self._shared_resources.api_client as api_client:
+            api_instance: IncidentApi = openapi_client.IncidentApi(api_client)
+
+            try:
+                response: List[IncidentDto] = api_instance.get_incidents(**kwargs)
+            except ApiException as e:
+                logger.error(f'Failed to get incidents:\n{e}')
+                raise e
+
+        return [incident.to_dict() for incident in response]
 
     @keyword("Complete task", tags=['task'])
     def complete(self, result_set: Dict[str, Any] = None, files: Dict = None):
@@ -479,10 +532,12 @@ class CamundaLibrary:
                 variables = CamundaResources.convert_dict_to_openapi_variables(result_set)
                 openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(files)
                 variables.update(openapi_files)
-                complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID, variables=variables)
+                complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID,
+                                                                           variables=variables)
                 try:
                     logger.debug(f"Sending to Camunda for completing Task:\n{complete_task_dto}")
-                    api_instance.complete_external_task_resource(self.FETCH_RESPONSE.id, complete_external_task_dto=complete_task_dto)
+                    api_instance.complete_external_task_resource(self.FETCH_RESPONSE.id,
+                                                                 complete_external_task_dto=complete_task_dto)
                     self.drop_fetch_response()
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
@@ -521,7 +576,7 @@ class CamundaLibrary:
 
     @keyword("Start process", tags=['process'])
     def start_process(self, process_key: str, variables: Dict = None, files: Dict = None,
-                      before_activity_id: str = None, after_activity_id: str = None,**kwargs) -> Dict:
+                      before_activity_id: str = None, after_activity_id: str = None, **kwargs) -> Dict:
         """
         Starts a new process instance from a process definition with given key.
 
@@ -690,7 +745,7 @@ class CamundaLibrary:
         return response
 
     @keyword("Get Activity Instance", tags=['process'])
-    def get_activity_instance(self, id:str):
+    def get_activity_instance(self, id: str):
         """
         Returns an Activity Instance (Tree) for a given process instance.
 
