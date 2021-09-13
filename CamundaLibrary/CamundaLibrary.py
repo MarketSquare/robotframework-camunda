@@ -70,7 +70,7 @@ class CamundaLibrary:
 
     == Subscribing a topic / long polling ==
     You may achieve a kind of subscription by providing the ``asyncResponseTimeout`` with the `Fetch workload`
-    keyword in order to achieve [https://docs.camunda.org/manual/7.14/user-guide/process-engine/external-tasks/#long-polling-to-fetch-and-lock-external-tasks|Long Polling].
+    keyword in order to achieve [https://docs.camunda.org/manual/latest/user-guide/process-engine/external-tasks/#long-polling-to-fetch-and-lock-external-tasks|Long Polling].
 
     | ${variables} | fetch workload | my_topic | async_response_timeout=60000 |
     | log | Waited at most 1 minute before this log statement got executed |
@@ -83,7 +83,7 @@ class CamundaLibrary:
     = Feedback =
 
     Feedback is very much appreciated regardless if it is comments, reported issues, feature requests or even merge
-    requests. You are welcome to participating in any way at the [https://gitlab.com/postadress/robotframework/robotframework-camunda|GitLab project of CamundaLibrary].
+    requests. You are welcome to participating in any way at the [https://github.com/MarketSquare/robotframework-camunda|GitHub project of CamundaLibrary].
     """
 
     WORKER_ID = f'robotframework-camundalibrary-{time.time()}'
@@ -447,7 +447,7 @@ class CamundaLibrary:
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->handle_external_task_bpmn_error: {e}\n")
 
-    @keyword("Notify failure", tags=["task", "beta"])
+    @keyword("Notify failure", tags=["task"])
     def notify_failure(self, **kwargs):
         """
         Raises a failure to Camunda. When retry counter is less than 1, an incident is created by Camunda.
@@ -470,7 +470,6 @@ class CamundaLibrary:
                 try:
                     api_instance.handle_failure(id=self.FETCH_RESPONSE.id,
                                                 external_task_failure_dto=external_task_failure_dto)
-                    self.unlock()
                     self.drop_fetch_response()
                 except ApiException as e:
                     logger.error("Exception when calling ExternalTaskApi->handle_failure: %s\n" % e)

@@ -12,6 +12,7 @@ image: "$FEATURE_IMAGE_NAME:runtime"
 # scan for secret spoiling in project
 include:
   - template: Secret-Detection.gitlab-ci.yml
+  - template: Security/SAST.gitlab-ci.yml
 
 variables:
   FEATURE_IMAGE_NAME: "$CI_REGISTRY_IMAGE/$CI_COMMIT_REF_SLUG"
@@ -121,5 +122,3 @@ pages:
  # do some code analysis 
 sast:
   stage: test
-  include:
-  - template: Security/SAST.gitlab-ci.yml
