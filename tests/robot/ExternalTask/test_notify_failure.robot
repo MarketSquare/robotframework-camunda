@@ -18,11 +18,25 @@ Test 'Notify failure' for existing topic
     ${variables}    Create Dictionary    text=Manna Manna
 
     # AND
-    ${work_items}    fetch workload   topic=${existing_topic}
+    fetch workload   topic=${existing_topic}
+    ${process_instance}    Get fetch response
+    log    ${process_instance}
+
+    # EXPECT
+    Should Not be Empty    ${process_instance}    Failure while setting up test case. No process instance available to send failure for.
 
     # WHEN
     notify failure
 
     # THEN
     ${workload}    Fetch Workload    topic=${existing_topic}
-    Should Be Empty    ${workload}
+    Should Be Empty    ${workload}    Notifying Failure failed. Process instance should not be available anymore at service task.
+
+    # AND
+    ${process_instance_after_failure}    Get process instances    process_instance_ids=${process_instance}[process_instance_id]
+    log    ${process_instance_after_failure}
+    Should Not Be Empty    ${process_instance_after_failure}    Notifying Failure failed. Process instance is instance but should be an incident.
+
+    ${incident}    Get incidents    process_instance_id=${process_instance}[process_instance_id]
+    log    ${incident}
+    Should Not be Empty    ${incident}
