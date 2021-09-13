@@ -16,7 +16,7 @@ BPMN error without task does not fail
     # only throws a warning
     throw bpmn error    de1
 
-Test 'fetch and lock' for existing topic
+Test 'throw bpmn error' for existing topic
     [Setup]    set camunda url    ${CAMUNDA_HOST}
     # GIVEN
     Start process    ${PROCESS_DEFINITION_KEY}
