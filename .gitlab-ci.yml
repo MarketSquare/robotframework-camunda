@@ -121,5 +121,5 @@ pages:
  # do some code analysis 
 sast:
   stage: test
-include:
-- template: Security/SAST.gitlab-ci.yml
+  include:
+  - template: Security/SAST.gitlab-ci.yml
