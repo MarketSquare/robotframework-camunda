@@ -459,17 +459,22 @@ class CamundaLibrary:
         | *notify failure* |  |  |
         | *notify failure* | retries=3 | error_message=Task failed due to... |
         """
-        if not self.FETCH_RESPONSE:
+        current_process_instance = self.FETCH_RESPONSE
+        if not current_process_instance:
             logger.warn('No task to notify failure for. Maybe you did not fetch and lock a workitem before?')
         else:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ExternalTaskApi(api_client)
-                if not 'retry_timeout' in kwargs:
+                if 'retry_timeout' not in kwargs:
                     kwargs['retry_timeout'] = 60000
+
+                if None is not current_process_instance.retries:
+                    kwargs['retries'] = current_process_instance.retries - 1
+
                 external_task_failure_dto = ExternalTaskFailureDto(worker_id=self.WORKER_ID, **kwargs)
 
                 try:
-                    api_instance.handle_failure(id=self.FETCH_RESPONSE.id,
+                    api_instance.handle_failure(id=current_process_instance.id,
                                                 external_task_failure_dto=external_task_failure_dto)
                     self.drop_fetch_response()
                 except ApiException as e:
