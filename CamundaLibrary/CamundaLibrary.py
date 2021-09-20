@@ -452,6 +452,10 @@ class CamundaLibrary:
         """
         Raises a failure to Camunda. When retry counter is less than 1, an incident is created by Camunda.
 
+        You can specify number of retries with the *retries* argument. If current fetched process instance already has
+        *retries* parameter set, the *retries* argument of this keyword is ignored. Instead, the retries counter will
+        be decreased by 1.
+
         CamundaLibrary takes care of providing the worker_id and task_id. *retry_timeout* is equal to *lock_duration* for external tasks.
         Check for camunda client documentation for all parameters of the request body: https://noordsestern.gitlab.io/camunda-client-for-python/7-15-0/docs/ExternalTaskApi.html#handle_failure
 
