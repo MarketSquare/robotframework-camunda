@@ -464,8 +464,9 @@ class CamundaLibrary:
         else:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ExternalTaskApi(api_client)
-                external_task_failure_dto = ExternalTaskFailureDto(worker_id=self.WORKER_ID, retry_timeout=60000,
-                                                                   **kwargs)
+                if not 'retry_timeout' in kwargs:
+                    kwargs['retry_timeout'] = 60000
+                external_task_failure_dto = ExternalTaskFailureDto(worker_id=self.WORKER_ID, **kwargs)
 
                 try:
                     api_instance.handle_failure(id=self.FETCH_RESPONSE.id,

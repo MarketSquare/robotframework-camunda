@@ -40,3 +40,32 @@ Test 'Notify failure' for existing topic
     ${incident}    Get incidents    process_instance_id=${process_instance}[process_instance_id]
     log    ${incident}
     Should Not be Empty    ${incident}     Getting incident failed. There is no incident availabe matching the process instance.
+
+Test 'Notify failure' with setting retry_timeout
+    # GIVEN
+    Start process    ${PROCESS_DEFINITION_KEY}
+    ${variables}    Create Dictionary    text=Manna Manna
+
+    # AND
+    fetch workload   topic=${existing_topic}
+    ${process_instance}    Get fetch response
+    log    ${process_instance}
+
+    # EXPECT
+    Should Not be Empty    ${process_instance}    Failure while setting up test case. No process instance available to send failure for.
+
+    # WHEN
+    notify failure    retry_timeout=100
+
+    # THEN
+    ${workload}    Fetch Workload    topic=${existing_topic}
+    Should Be Empty    ${workload}    Notifying Failure failed. Process instance should not be available anymore at service task.
+
+    # AND
+    ${process_instance_after_failure}    Get process instances    process_instance_ids=${process_instance}[process_instance_id]
+    log    ${process_instance_after_failure}
+    Should Not Be Empty    ${process_instance_after_failure}    Notifying Failure failed. Process instance is instance but should be an incident.
+
+    ${incident}    Get incidents    process_instance_id=${process_instance}[process_instance_id]
+    log    ${incident}
+    Should Not be Empty    ${incident}     Getting incident failed. There is no incident availabe matching the process instance.
