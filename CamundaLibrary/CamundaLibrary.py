@@ -565,6 +565,7 @@ class CamundaLibrary:
                     logger.debug(response)
                 except ApiException as e:
                     logger.error(f"Exception when calling ExternalTaskApi->get_process_instance_variable_binary: {e}\n")
+                    raise e
                 return response
 
     @keyword("Unlock", tags=['task'])
