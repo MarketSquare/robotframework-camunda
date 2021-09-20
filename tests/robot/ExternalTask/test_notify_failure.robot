@@ -17,7 +17,7 @@ Test 'Notify failure' for existing topic
     Given A new process instance
     ${process_instance}    And process instance fetched
 
-    When notify failure
+    When notify failure   retry_timeout=${None}
 
     Then No Process Instance available at topic    topic=${existing_topic}    error_message=Notifying Failure failed. Process instance should not be available anymore at service task.
     And Process instance is incident    ${process_instance}
@@ -54,7 +54,7 @@ A new process instance
     ${variables}    Create Dictionary    text=Manna Manna
 
 process instance fetched
-    fetch workload   topic=${existing_topic}        lock_duration=1000
+    fetch workload   topic=${existing_topic}        lock_duration=500
     ${process_instance}    Get fetch response
     log    ${process_instance}
     Should Not be Empty    ${process_instance}    Failure while setting up test case. No process instance available to send failure for.

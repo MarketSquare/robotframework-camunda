@@ -465,7 +465,7 @@ class CamundaLibrary:
         else:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ExternalTaskApi(api_client)
-                if 'retry_timeout' not in kwargs:
+                if 'retry_timeout' not in kwargs or None is kwargs['retry_timeout'] or not kwargs['retry_timeout']:
                     kwargs['retry_timeout'] = 60000
 
                 if None is not current_process_instance.retries:
