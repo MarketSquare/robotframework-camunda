@@ -1,5 +1,6 @@
 # robot imports
 
+from generic_camunda_client.configuration import Configuration
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
 
@@ -93,10 +94,10 @@ class CamundaLibrary:
     FETCH_RESPONSE: LockedExternalTaskDto = {}
     DEFAULT_LOCK_DURATION = None
 
-    def __init__(self, camunda_engine_url: str = 'http://localhost:8080'):
+    def __init__(self, camunda_engine_url: str = 'http://localhost:8080', configuration: Dict={}):
         self._shared_resources = CamundaResources()
-        if camunda_engine_url:
-            self.set_camunda_url(camunda_engine_url)
+        self._shared_resources.client_configuration = Configuration(host=url_normalize(f'{camunda_engine_url}/engine-rest'), **configuration)
+
         self.DEFAULT_LOCK_DURATION = self.reset_task_lock_duration()
 
     @keyword("Set Camunda URL")
