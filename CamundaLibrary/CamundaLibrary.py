@@ -94,11 +94,21 @@ class CamundaLibrary:
     FETCH_RESPONSE: LockedExternalTaskDto = {}
     DEFAULT_LOCK_DURATION = None
 
-    def __init__(self, camunda_engine_url: str = 'http://localhost:8080', configuration: Dict={}):
+    def __init__(self, camunda_engine_url: str = 'http://localhost:8080', configuration: Dict = None):
+        if configuration is None:
+            configuration = dict()
         self._shared_resources = CamundaResources()
-        self._shared_resources.client_configuration = Configuration(host=url_normalize(f'{camunda_engine_url}/engine-rest'), **configuration)
+        if 'host' not in configuration.keys():
+            configuration['host'] = url_normalize(f'{camunda_engine_url}/engine-rest')
+        self.set_camunda_configuration(configuration)
 
         self.DEFAULT_LOCK_DURATION = self.reset_task_lock_duration()
+
+    @keyword
+    def set_camunda_configuration(self, configuration: Dict):
+        if 'host' not in configuration.keys():
+            configuration['host'] = self._shared_resources.camunda_url
+        self._shared_resources.client_configuration = Configuration(**configuration)
 
     @keyword("Set Camunda URL")
     def set_camunda_url(self, url: str):
