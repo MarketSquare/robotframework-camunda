@@ -11,3 +11,7 @@ lsp/
 *.log
 *.zip
 .robocop
+log.html
+report.html
+output.xml
+*.pyc
