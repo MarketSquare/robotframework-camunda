@@ -1,7 +1,6 @@
 *** Settings ***
 Library    CamundaLibrary   ${CAMUNDA_HOST}
 Test Setup    Set Camunda Configuration    ${configuration}
-Variables    ../config.py
 
 *** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
