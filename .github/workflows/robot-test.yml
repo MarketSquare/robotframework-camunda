@@ -9,7 +9,7 @@ jobs:
     strategy:
       matrix:
         camunda_version: ['run-7.14.0','run-7.15.0']
-        auth_enabled: ['true', 'false']
+        auth_enabled: ['false', 'true']
     services:
       camunda:
         image: camunda/camunda-bpm-platform:${{ matrix.camunda_version }}
