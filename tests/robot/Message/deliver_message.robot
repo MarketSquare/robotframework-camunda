@@ -1,5 +1,5 @@
 *** Settings ***
-Library    CamundaLibrary    ${CAMUNDA_HOST}    ${configuration}
+Library    CamundaLibrary    configuration=${configuration}
 Library    Collections
 Resource    ../cleanup.resource
 Suite Setup    Deploy    ${MODEL}
