@@ -9,18 +9,21 @@ jobs:
     strategy:
       matrix:
         camunda_version: ['run-7.14.0','run-7.15.0']
+        auth_enabled: ['true', 'false']
     services:
       camunda:
         image: camunda/camunda-bpm-platform:${{ matrix.camunda_version }}
         ports:
           - 8080:8080
+        env:
+          camunda.bpm.run.auth.enabled: ${{ matrix.auth_enabled }}
     steps:
     - uses: actions/checkout@v2
     - name: Test with robot
       run: |
         pip install .
         sleep 10
-        robot -d logs -b debug.log -x xunit.xml -L DEBUG -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/*.robot
+        robot -d logs -b debug.log -x xunit.xml -L DEBUG -V tests/robot/config_cicd.py -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/*.robot
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
       if: always()
