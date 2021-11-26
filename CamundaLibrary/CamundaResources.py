@@ -44,7 +44,7 @@ class CamundaResources:
     def client_configuration(self, value):
         self._client_configuration = value
         if self._api_client:
-            self.api_client = self._create_task_client()
+            self._api_client = self._create_task_client()
 
     @property
     def api_client(self) -> ApiClient:
