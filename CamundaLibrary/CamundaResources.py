@@ -44,7 +44,7 @@ class CamundaResources:
     def client_configuration(self, value):
         self._client_configuration = value
         if self._api_client:
-            self.api_client
+            self.api_client = self._create_task_client()
 
     @property
     def api_client(self) -> ApiClient:
@@ -57,7 +57,15 @@ class CamundaResources:
             raise ValueError('No URL to camunda set. Please initialize Library with url or use keyword '
                              '"Set Camunda URL" first.')
 
-        return ApiClient(self.client_configuration)
+        # the generated client for camunda ignores auth parameters from the configuration. Therefore we must set default headers here:
+        client = ApiClient(self.client_configuration)
+        if self.client_configuration.username:
+            client.set_default_header('Authorization',self.client_configuration.get_basic_auth_token())
+        elif self.client_configuration.api_key:
+            identifier = list(self.client_configuration.api_key.keys())[0]
+            client.set_default_header('Authorization', self.client_configuration.get_api_key_with_prefix(identifier))
+
+        return client
 
     @staticmethod
     def convert_openapi_variables_to_dict(open_api_variables: Dict[str, VariableValueDto]) -> Dict:

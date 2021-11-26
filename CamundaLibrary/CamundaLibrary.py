@@ -236,10 +236,14 @@ class CamundaLibrary:
             fields=fields
         )
 
+        headers={'Content-Type': multipart_data.content_type}
+        if self._shared_resources.client_configuration.username:
+            headers['Authorization'] = self._shared_resources.client_configuration.get_basic_auth_token()
+
         logger.debug(multipart_data.fields)
 
         response = requests.post(f'{self._shared_resources.camunda_url}/deployment/create', data=multipart_data,
-                                 headers={'Content-Type': multipart_data.content_type})
+                                 headers=headers)
         json = response.json()
         try:
             response.raise_for_status()
