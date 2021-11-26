@@ -8,7 +8,7 @@ jobs:
     container: python:3.9
     strategy:
       matrix:
-        auth_enabled: ['false', 'true']      
+        auth_enabled: ['false']      
         camunda_version: ['run-7.14.0','run-7.15.0']
     services:
       camunda:
