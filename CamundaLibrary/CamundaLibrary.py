@@ -236,9 +236,8 @@ class CamundaLibrary:
             fields=fields
         )
 
-        headers={'Content-Type': multipart_data.content_type}
-        if self._shared_resources.client_configuration.username:
-            headers['Authorization'] = self._shared_resources.client_configuration.get_basic_auth_token()
+        headers=self._shared_resources.api_client.default_headers.copy()
+        headers['Content-Type'] =multipart_data.content_type
 
         logger.debug(multipart_data.fields)
 
@@ -301,9 +300,12 @@ class CamundaLibrary:
             serialized_message = api_client.sanitize_for_serialization(correlation_message)
             logger.debug(f'Message:\n{serialized_message}')
 
+            headers=self._shared_resources.api_client.default_headers.copy()
+            headers['Content-Type'] = 'application/json'
+
             try:
                 response = requests.post(f'{self._shared_resources.camunda_url}/message', json=serialized_message,
-                                         headers={'Content-Type': 'application/json'})
+                                         headers=headers)
             except ApiException as e:
                 logger.error(f'Failed to deliver message:\n{e}')
                 raise e
