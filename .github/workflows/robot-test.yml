@@ -8,8 +8,8 @@ jobs:
     container: python:3.9
     strategy:
       matrix:
+        auth_enabled: ['false', 'true']      
         camunda_version: ['run-7.14.0','run-7.15.0']
-        auth_enabled: ['false', 'true']
     services:
       camunda:
         image: camunda/camunda-bpm-platform:${{ matrix.camunda_version }}
