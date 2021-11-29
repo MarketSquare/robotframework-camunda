@@ -3,7 +3,7 @@ Library    CamundaLibrary
 Library    Collections
 
 *** Test Cases ***
-Test 'fetch and lock' for non existing topic
+Test 'fetch workload' for non existing topic
     [Setup]    set camunda url    http://localhost:8080
     # GIVEN
     ${existing_topic}    Set Variable    process_demo_element
@@ -14,7 +14,7 @@ Test 'fetch and lock' for non existing topic
     # THEN
     #Should Not Be Empty    ${work_items}
 
-    ${recent_task}    Get recent process instance
+    ${recent_task}    get fetch response
     log    Recent task:\t${recent_task}
 
     ${my_result}    Create Dictionary    lastname=Stahl

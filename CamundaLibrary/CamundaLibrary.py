@@ -159,14 +159,6 @@ class CamundaLibrary:
         logger.info(f'Amount of workloads for "{topic}":\t{response.count}')
         return response.count
 
-    @keyword(name='Deploy Model From File', tags=['deployment'])
-    def deploy_model_from_file(self, path_to_model):
-        """*DEPRECATED*
-
-        Use `Deploy`
-        """
-        logger.warn('Keyword "Deploy Model From File" is deprecated. Use "Deploy" instead.')
-        return self.deploy(path_to_model)
 
     @keyword(name='Deploy', tags=['deployment'])
     def deploy(self, *args):
@@ -306,14 +298,6 @@ class CamundaLibrary:
         else:
             return {}
 
-    @keyword("Fetch and Lock workloads", tags=['task', 'deprecated'])
-    def fetch_and_lock_workloads(self, topic, **kwargs) -> Dict:
-        """*DEPRECATED*
-
-        Use `fetch workload`
-        """
-        logger.warn('Keyword "Fetch and Lock workloads" is deprecated. Use "Fetch workload" instead.')
-        return self.fetch_workload(topic, **kwargs)
 
     @keyword("Fetch Workload", tags=['task'])
     def fetch_workload(self, topic: str, async_response_timeout=None, use_priority=None, **kwargs) -> Dict:
@@ -322,7 +306,7 @@ class CamundaLibrary:
         Each dictionary representing 1 workload from a process instance.
 
         If a process instance was fetched, the process instance is cached and can be retrieved by keyword
-        `Get recent process instance`
+        `Get Fetch Response`
 
         The only mandatory parameter for this keyword is *topic* which is the name of the topic to fetch workload from.
         More parameters can be added from the Camunda documentation: https://docs.camunda.org/manual/7.14/reference/rest/external-task/fetch/
@@ -332,7 +316,7 @@ class CamundaLibrary:
         Examples:
             | ${input_variables} | *Create Dictionary* | _name=Robot_ |
             | | *start process* | _my_demo_ | _${input_variables}_ |
-            | ${variables} | *fetch and lock workloads* | _first_task_in_demo_ |
+            | ${variables} | *fetch workload* | _first_task_in_demo_ |
             | | *Dictionary Should Contain Key* | _${variables}_ | _name_ |
             | | *Should Be Equal As String* | _Robot_ | _${variables}[name]_ |
 
@@ -379,26 +363,6 @@ class CamundaLibrary:
         variables: Dict[str, VariableValueDto] = self.FETCH_RESPONSE.variables
         return CamundaResources.convert_openapi_variables_to_dict(variables)
 
-    @keyword("Get recent process instance", tags=['task', 'deprecated'])
-    def get_process_instance_id(self):
-        """*DEPRECATED*
-        _Use `get fetch response` instead and check for ``process_instance_id`` element on the fetch reponse:
-        ``fetch_response[process_instance]``_
-
-        Returns cached process instance id from previously called `fetch and lock workloads`.
-
-        *Only this keyword can certainly tell, if workload has been fetched from Camunda*
-
-        Example:
-            | ${variables} | fetch and lock workloads | my_first_task_in_demo | |
-            | Run keyword if | not ${variables} | log | No variables found, but is due to lack of variables or because no workload was available? Must check process instance |
-            | ${process_instance} | get recent process instance | | |
-            | Run keyword if | ${process_instance} | complete task | |
-        """
-        logger.warn('Method is deprecated. Use "Get fetch response"')
-        if self.FETCH_RESPONSE:
-            return self.FETCH_RESPONSE.process_instance_id
-        return self.EMPTY_STRING
 
     @keyword("Get fetch response", tags=['task'])
     def get_fetch_response(self):
@@ -412,7 +376,7 @@ class CamundaLibrary:
             | |
             | *** Tasks *** |
             | | *Create Session* | _alias=camunda_ | _url=http://localhost:8080_ |
-            | | ${variables} | *fetch and lock workloads* | _my_first_task_in_demo_ | |
+            | | ${variables} | *fetch workload* | _my_first_task_in_demo_ | |
             | | ${fetch_response} | *get fetch response* | | |
             | | *POST On Session* | _camunda_ | _engine-rest/external-task/${fetch_response}[id]/complete_ | _json=${{ {'workerId': '${fetch_response}[worker_id]'} }}_ |
         """

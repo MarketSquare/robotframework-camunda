@@ -196,7 +196,7 @@ Test starting process with file variables
     start process    ${process_definition_key}   files=${files}
 
     # AND
-    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch workload   topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -222,7 +222,7 @@ Test file content from starting process variable
     start process    ${process_definition_key}   files=${files}
 
     # AND
-    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch workload   topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -248,7 +248,7 @@ Test starting process with file variables
     start process    ${process_definition_key}   files=${files}
 
     # AND
-    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch workload   topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -274,7 +274,7 @@ Test file content from starting process variable
     start process    ${process_definition_key}   files=${files}
 
     # AND
-    ${first_workload}     fetch and lock workloads   topic=${existing_topic}
+    ${first_workload}     fetch workload   topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
