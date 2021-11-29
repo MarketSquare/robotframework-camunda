@@ -14,7 +14,7 @@ Test 'fetch workload' for non existing topic
     # THEN
     #Should Not Be Empty    ${work_items}
 
-    ${recent_task}    Get recent process instance
+    ${recent_task}    get fetch response
     log    Recent task:\t${recent_task}
 
     ${my_result}    Create Dictionary    lastname=Stahl

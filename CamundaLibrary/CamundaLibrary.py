@@ -306,7 +306,7 @@ class CamundaLibrary:
         Each dictionary representing 1 workload from a process instance.
 
         If a process instance was fetched, the process instance is cached and can be retrieved by keyword
-        `Get recent process instance`
+        `Get Fetch Response`
 
         The only mandatory parameter for this keyword is *topic* which is the name of the topic to fetch workload from.
         More parameters can be added from the Camunda documentation: https://docs.camunda.org/manual/7.14/reference/rest/external-task/fetch/
