@@ -8,7 +8,7 @@ jobs:
     container: python:3.9
     strategy:
       matrix:
-        camunda_version: ['run-7.14.0','run-7.15.0']
+        camunda_version: ['run-7.14.0','run-7.15.0','run-7.16.0']
     services:
       camunda:
         image: camunda/camunda-bpm-platform:${{ matrix.camunda_version }}
