@@ -15,7 +15,7 @@ Never write recent process instance id when no workitem is fetched
     Should be Empty    ${work_items}    Did not expect to receive work items for not existing topic:\t${not_existing_topic}
 
     # WHEN
-    ${recent_task}    Get recent process instance
+    ${recent_task}    get fetch response
 
     # THEN
     Should Be Empty    ${recent_task}    Should not have stored a recent task for none existing topic, but registered recent task id:\t${recent_task}

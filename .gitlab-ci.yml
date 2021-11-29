@@ -71,6 +71,7 @@ Integrationtests:
     matrix:
       - CAMUNDA_VERSION: run-7.14.0
       - CAMUNDA_VERSION: run-7.15.0
+      - CAMUNDA_VERSION: run-7.16.0
   services:
     - name: camunda/camunda-bpm-platform:${CAMUNDA_VERSION}
       alias: camunda
