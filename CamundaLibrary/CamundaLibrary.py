@@ -316,7 +316,7 @@ class CamundaLibrary:
         Examples:
             | ${input_variables} | *Create Dictionary* | _name=Robot_ |
             | | *start process* | _my_demo_ | _${input_variables}_ |
-            | ${variables} | *fetch and lock workloads* | _first_task_in_demo_ |
+            | ${variables} | *fetch workload* | _first_task_in_demo_ |
             | | *Dictionary Should Contain Key* | _${variables}_ | _name_ |
             | | *Should Be Equal As String* | _Robot_ | _${variables}[name]_ |
 
@@ -376,7 +376,7 @@ class CamundaLibrary:
             | |
             | *** Tasks *** |
             | | *Create Session* | _alias=camunda_ | _url=http://localhost:8080_ |
-            | | ${variables} | *fetch and lock workloads* | _my_first_task_in_demo_ | |
+            | | ${variables} | *fetch workload* | _my_first_task_in_demo_ | |
             | | ${fetch_response} | *get fetch response* | | |
             | | *POST On Session* | _camunda_ | _engine-rest/external-task/${fetch_response}[id]/complete_ | _json=${{ {'workerId': '${fetch_response}[worker_id]'} }}_ |
         """

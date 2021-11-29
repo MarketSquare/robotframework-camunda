@@ -3,7 +3,7 @@ Library    CamundaLibrary
 Library    Collections
 
 *** Test Cases ***
-Test 'fetch and lock' for non existing topic
+Test 'fetch workload' for non existing topic
     [Setup]    set camunda url    http://localhost:8080
     # GIVEN
     ${existing_topic}    Set Variable    process_demo_element
