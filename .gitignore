@@ -7,7 +7,12 @@ tmp/
 .idea/
 public/
 lsp/
+.vscode/
 
 *.log
 *.zip
 .robocop
+log.html
+report.html
+output.xml
+*.pyc
