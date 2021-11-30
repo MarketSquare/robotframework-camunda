@@ -1,5 +1,5 @@
 *** Settings ***
-Library    CamundaLibrary    ${CAMUNDA_HOST}    ${configuration}
+Library    CamundaLibrary
 Suite Setup    Set Camunda Configuration    ${configuration}
 
 *** Variables ***
