@@ -30,7 +30,7 @@ import generic_camunda_client as openapi_client
 from .CamundaResources import CamundaResources
 
 
-@library(scope='GLOBAL')
+@library(scope='SUITE')
 class CamundaLibrary:
     """
     Library for Camunda integration in Robot Framework
