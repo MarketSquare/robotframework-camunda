@@ -94,20 +94,40 @@ class CamundaLibrary:
     FETCH_RESPONSE: LockedExternalTaskDto = {}
     DEFAULT_LOCK_DURATION = None
 
-    def __init__(self, camunda_engine_url: str = 'http://localhost:8080', configuration: Dict = None):
-        if configuration is None:
-            configuration = dict()
-        self._shared_resources = CamundaResources()
-        if 'host' not in configuration.keys():
-            configuration['host'] = url_normalize(f'{camunda_engine_url}/engine-rest')
-        self.set_camunda_configuration(configuration)
+    def __init__(self,  host="http://localhost:8080",
+                 api_key=None, api_key_prefix=None,
+                 username=None, password=None,
+                 discard_unknown_keys=False):
+
+        self.set_camunda_configuration(host=host, api_key=api_key, api_key_prefix=api_key_prefix, username=username, password=password, discard_unknown_keys=discard_unknown_keys)
 
         self.DEFAULT_LOCK_DURATION = self.reset_task_lock_duration()
 
     @keyword
-    def set_camunda_configuration(self, configuration: Dict):
-        if 'host' not in configuration.keys():
-            configuration['host'] = self._shared_resources.camunda_url
+    def set_camunda_configuration(self,host="http://localhost:8080",
+                 api_key=None, api_key_prefix=None,
+                 username=None, password=None,
+                 discard_unknown_keys=False):
+        if not 'host':
+            raise ValueError(f"Incomplete configuration. Configuration must include at least the Camunda host url!")
+
+        configuration = {
+            'host': url_normalize(f'{host}/engine-rest'),
+            'username': username,
+            'password': password,
+            'discard_unknown_keys': discard_unknown_keys
+        }
+
+        if api_key is not None:
+            configuration=['api_key'] = {
+                'default': api_key
+            }
+            if api_key_prefix is not None:
+                configuration['api_key_prefix'] = {
+                'default': api_key_prefix
+            }
+
+        logger.debug(f"New configuration for Camunda client:\t{configuration}")
         self._shared_resources.client_configuration = Configuration(**configuration)
 
     @keyword("Set Camunda URL")
@@ -176,7 +196,7 @@ class CamundaLibrary:
         """Creates a deployment from all given files and uploads them to camunda.
 
         Return response from camunda rest api as dictionary.
-        Further documentation: https://docs.camunda.org/manual/7.14/reference/rest/deployment/post-deployment/
+        Further documentation: https://docs.camunda.org/manual/latest/reference/rest/deployment/post-deployment/
 
         By default, this keyword only deploys changed models and filters duplicates. Deployment name is the filename of
         the first file.
