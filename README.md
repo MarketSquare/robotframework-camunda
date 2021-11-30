@@ -96,9 +96,13 @@ Process workload
 ```
 
 ### Authentication
+
+**Prerequisite: CamundaLibrary >= 2.0**
+
 If your Camunda Platform REST API requires authentication (it should at least in production!) then you do not need to pass the host url to CamundaLibrary during intialization. You require the `Set Camunda Configuration` keyword. The keyword expects a dictionary with host url and (optional) either username with password or api key with optional api key prefix. See the following example.
 
 ```robot
+*** Settings ***
 Library    CamundaLibrary
 
 
