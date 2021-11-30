@@ -94,3 +94,23 @@ Process workload
     ${my_result}    Create Dictionary    lastname=Stahl
     complete task   ${my_result}
 ```
+
+### Authentication
+If your Camunda Platform REST API requires authentication (it should at least in production!) then you do not need to pass the host url to CamundaLibrary during intialization. You require the `Set Camunda Configuration` keyword. The keyword expects a dictionary with host url and (optional) either username with password or api key with optional api key prefix. See the following example.
+
+```robot
+Library    CamundaLibrary
+
+
+*** Test Cases ***
+Demonstrate basic auth
+    ${camunda_config}    Create Dictionary    host=http://localhost:8080    username=markus    password=%{ENV_PASSWORD}
+    Set Camunda Configuration    ${camunda_config}
+    ${deployments}    Get deployments    #uses basic auth now implictly
+
+Demonstrate Api Key
+    ${camunda_config}    Create Dictionary    host=http://localhost:8080    api_key=%{ENV_API_KEY}   api_key_prefix=Bearer
+    Set Camunda Configuration    ${camunda_config}
+    ${deployments}    Get deployments    #uses api key implicitly
+```
+If you would pass in username+password *and* and API key, the API key will always be chosen over the username+password. So better leave it out for not confusing everybody.
