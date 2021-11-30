@@ -119,7 +119,7 @@ class CamundaLibrary:
         }
 
         if api_key is not None:
-            configuration=['api_key'] = {
+            configuration['api_key'] = {
                 'default': api_key
             }
             if api_key_prefix is not None:
