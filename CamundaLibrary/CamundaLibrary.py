@@ -1,5 +1,6 @@
 # robot imports
 
+from generic_camunda_client.configuration import Configuration
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
 
@@ -93,11 +94,35 @@ class CamundaLibrary:
     FETCH_RESPONSE: LockedExternalTaskDto = {}
     DEFAULT_LOCK_DURATION = None
 
-    def __init__(self, camunda_engine_url: str = 'http://localhost:8080'):
+    def __init__(self,  host="http://localhost:8080"):
         self._shared_resources = CamundaResources()
-        if camunda_engine_url:
-            self.set_camunda_url(camunda_engine_url)
+        self.set_camunda_configuration(configuration={'host': host})
         self.DEFAULT_LOCK_DURATION = self.reset_task_lock_duration()
+
+    @keyword
+    def set_camunda_configuration(self,configuration: dict):
+        if 'host' not in configuration.keys():
+            raise ValueError(f"Incomplete configuration. Configuration must include at least the Camunda host url:\t{configuration}")
+
+        # weird things happen when dictionary is not copied and keyword is called repeatedly. Somehow robot or python remember the configuration from the previous call
+        camunda_config = configuration.copy()
+
+        host = configuration['host']
+        camunda_config['host'] = url_normalize(f'{host}/engine-rest')
+
+        if 'api_key' in configuration.keys():
+            api_key = configuration['api_key']
+            camunda_config['api_key'] = {
+                'default': api_key
+            }
+            if 'api_key_prefix' in configuration.keys():
+                api_key_prefix = configuration['api_key_prefix']
+                camunda_config['api_key_prefix'] = {
+                'default': api_key_prefix
+            }
+
+        logger.debug(f"New configuration for Camunda client:\t{camunda_config}")
+        self._shared_resources.client_configuration = Configuration(**camunda_config)
 
     @keyword("Set Camunda URL")
     def set_camunda_url(self, url: str):
@@ -165,7 +190,7 @@ class CamundaLibrary:
         """Creates a deployment from all given files and uploads them to camunda.
 
         Return response from camunda rest api as dictionary.
-        Further documentation: https://docs.camunda.org/manual/7.14/reference/rest/deployment/post-deployment/
+        Further documentation: https://docs.camunda.org/manual/latest/reference/rest/deployment/post-deployment/
 
         By default, this keyword only deploys changed models and filters duplicates. Deployment name is the filename of
         the first file.
@@ -217,10 +242,13 @@ class CamundaLibrary:
             fields=fields
         )
 
+        headers=self._shared_resources.api_client.default_headers.copy()
+        headers['Content-Type'] =multipart_data.content_type
+
         logger.debug(multipart_data.fields)
 
         response = requests.post(f'{self._shared_resources.camunda_url}/deployment/create', data=multipart_data,
-                                 headers={'Content-Type': multipart_data.content_type})
+                                 headers=headers)
         json = response.json()
         try:
             response.raise_for_status()
@@ -278,9 +306,12 @@ class CamundaLibrary:
             serialized_message = api_client.sanitize_for_serialization(correlation_message)
             logger.debug(f'Message:\n{serialized_message}')
 
+            headers=self._shared_resources.api_client.default_headers.copy()
+            headers['Content-Type'] = 'application/json'
+
             try:
                 response = requests.post(f'{self._shared_resources.camunda_url}/message', json=serialized_message,
-                                         headers={'Content-Type': 'application/json'})
+                                         headers=headers)
             except ApiException as e:
                 logger.error(f'Failed to deliver message:\n{e}')
                 raise e

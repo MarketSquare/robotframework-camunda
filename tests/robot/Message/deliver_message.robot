@@ -1,8 +1,8 @@
 *** Settings ***
-Library    CamundaLibrary    ${CAMUNDA_HOST}
+Library    CamundaLibrary
 Library    Collections
 Resource    ../cleanup.resource
-Suite Setup    Deploy    ${MODEL}
+Suite Setup    Prepare Test Suite
 
 *** Variables ***
 ${MODEL}    ${CURDIR}/../../bpmn/message_test.bpmn
@@ -119,6 +119,10 @@ Test Messaging with dict variable
 
 
 *** Keywords ***
+Prepare Test Suite
+    Set Camunda Configuration    ${configuration}
+    Deploy    ${MODEL}
+
 Prepare testcase
     Delete all instances from process '${PROCESS_DEFINITION_KEY_SEND_MESSAGE}'
     Delete all instances from process '${PROCESS_DEFINITION_KEY_RECEIVE_MESSAGE}'

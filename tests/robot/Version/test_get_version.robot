@@ -1,6 +1,7 @@
 *** Settings ***
-Library    CamundaLibrary    ${CAMUNDA_HOST}
+Library    CamundaLibrary
 Library    String
+Suite Setup    Set Camunda Configuration    ${configuration}
 
 
 *** Variables ***

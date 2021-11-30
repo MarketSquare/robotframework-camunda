@@ -1,5 +1,6 @@
 *** Settings ***
-Library    CamundaLibrary    ${CAMUNDA_HOST}
+Library    CamundaLibrary
+Suite Setup    Set Camunda Configuration    ${configuration}
 Resource    ../cleanup.resource
 
 *** Variables ***
