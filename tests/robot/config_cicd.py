@@ -1,5 +1,5 @@
 configuration = {
-    'host' : 'http://camunda:8080/engine-rest',
+    'host' : 'http://camunda:8080',
     'username': 'demo',
     'password': 'demo'
 }

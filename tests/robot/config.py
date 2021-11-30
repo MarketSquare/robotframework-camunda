@@ -1,5 +1,5 @@
 configuration = {
-    'host' : 'http://localhost:8080/engine-rest',
+    'host' : 'http://localhost:8080',
     'username': 'demo',
     'password': 'demo'
 }

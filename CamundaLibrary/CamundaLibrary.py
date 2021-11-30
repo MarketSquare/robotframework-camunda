@@ -94,41 +94,35 @@ class CamundaLibrary:
     FETCH_RESPONSE: LockedExternalTaskDto = {}
     DEFAULT_LOCK_DURATION = None
 
-    def __init__(self,  host="http://localhost:8080",
-                 api_key=None, api_key_prefix=None,
-                 username=None, password=None,
-                 discard_unknown_keys=False):
-
-        self.set_camunda_configuration(host=host, api_key=api_key, api_key_prefix=api_key_prefix, username=username, password=password, discard_unknown_keys=discard_unknown_keys)
-
+    def __init__(self,  host="http://localhost:8080"):
+        self._shared_resources = CamundaResources()
+        self.set_camunda_configuration(configuration={'host': host})
         self.DEFAULT_LOCK_DURATION = self.reset_task_lock_duration()
 
     @keyword
-    def set_camunda_configuration(self,host="http://localhost:8080",
-                 api_key=None, api_key_prefix=None,
-                 username=None, password=None,
-                 discard_unknown_keys=False):
-        if not 'host':
-            raise ValueError(f"Incomplete configuration. Configuration must include at least the Camunda host url!")
+    def set_camunda_configuration(self,configuration: dict):
+        if 'host' not in configuration.keys():
+            raise ValueError(f"Incomplete configuration. Configuration must include at least the Camunda host url:\t{configuration}")
 
-        configuration = {
-            'host': url_normalize(f'{host}/engine-rest'),
-            'username': username,
-            'password': password,
-            'discard_unknown_keys': discard_unknown_keys
-        }
+        # weird things happen when dictionary is not copied and keyword is called repeatedly. Somehow robot or python remember the configuration from the previous call
+        camunda_config = configuration.copy()
 
-        if api_key is not None:
-            configuration['api_key'] = {
+        host = configuration['host']
+        camunda_config['host'] = url_normalize(f'{host}/engine-rest')
+
+        if 'api_key' in configuration.keys():
+            api_key = configuration['api_key']
+            camunda_config['api_key'] = {
                 'default': api_key
             }
-            if api_key_prefix is not None:
-                configuration['api_key_prefix'] = {
+            if 'api_key_prefix' in configuration.keys():
+                api_key_prefix = configuration['api_key_prefix']
+                camunda_config['api_key_prefix'] = {
                 'default': api_key_prefix
             }
 
-        logger.debug(f"New configuration for Camunda client:\t{configuration}")
-        self._shared_resources.client_configuration = Configuration(**configuration)
+        logger.debug(f"New configuration for Camunda client:\t{camunda_config}")
+        self._shared_resources.client_configuration = Configuration(**camunda_config)
 
     @keyword("Set Camunda URL")
     def set_camunda_url(self, url: str):

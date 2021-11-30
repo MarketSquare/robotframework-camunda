@@ -1,8 +1,9 @@
 *** Settings ***
-Library    CamundaLibrary    ${CAMUNDA_HOST}    ${configuration}
+Library    CamundaLibrary
 Library    Collections
 Library    OperatingSystem
 Resource    ../cleanup.resource
+Suite Setup    Set Camunda Configuration    ${configuration}
 Test Setup    Delete all instances from process '${PROCESS_DEFINITION_KEY}'
 
 

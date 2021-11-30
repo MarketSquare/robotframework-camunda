@@ -1,16 +1,11 @@
 *** Settings ***
-Library    CamundaLibrary   ${CAMUNDA_HOST}
+Library    CamundaLibrary
 Test Setup    Set Camunda Configuration    ${configuration}
-Variables    ../config.py
-
-*** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
 
 *** Test Cases ***
 Test deployment of models
     ${response}    deploy    ${CURDIR}/../../bpmn/demo_for_robot.bpmn
     Should Not Be Empty     ${response}
-    log    ${response}
 
 Test deployment of models and forms
     # WHEN
@@ -33,4 +28,4 @@ Test error when deploying to incorrect url
     # THEN
     Should Be Equal    FAIL    ${pass_message}
     Should contain    ${error}    ConnectionError
-    [Teardown]    set camunda url     ${CAMUNDA_HOST}
+    [Teardown]    set camunda url     ${configuration}[host]
