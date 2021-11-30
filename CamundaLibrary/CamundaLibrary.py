@@ -178,8 +178,7 @@ class CamundaLibrary:
             try:
                 response: CountResultDto = api_instance.get_external_tasks_count(topic_name=topic, **kwargs)
             except ApiException as e:
-                logger.error(f'Failed to count workload for topic "{topic}":\n{e}')
-                raise e
+                raise ApiException(f'Failed to count workload for topic "{topic}":\n{e}')
 
         logger.info(f'Amount of workloads for "{topic}":\t{response.count}')
         return response.count
@@ -219,8 +218,7 @@ class CamundaLibrary:
                                                                                         data=data)
                 logger.info(f'Response from camunda:\t{response}')
             except ApiException as e:
-                logger.error(f'Failed to upload {filename}:\n{e}')
-                raise e
+                raise ApiException(f'Failed to upload {filename}:\n{e}')
 
         return response.to_dict()
 
@@ -254,8 +252,7 @@ class CamundaLibrary:
             response.raise_for_status()
             logger.debug(json)
         except HTTPError as e:
-            logger.error(json)
-            raise e
+            raise ApiException(json)
 
         return json
 
@@ -279,8 +276,7 @@ class CamundaLibrary:
                 response: List[DeploymentDto] = api_instance.get_deployments(**kwargs)
                 logger.info(f'Response from camunda:\t{response}')
             except ApiException as e:
-                logger.error(f'Failed get deployments:\n{e}')
-                raise e
+                raise ApiException(f'Failed get deployments:\n{e}')
 
         return [r.to_dict() for r in response]
 
@@ -313,14 +309,13 @@ class CamundaLibrary:
                 response = requests.post(f'{self._shared_resources.camunda_url}/message', json=serialized_message,
                                          headers=headers)
             except ApiException as e:
-                logger.error(f'Failed to deliver message:\n{e}')
-                raise e
+                raise ApiException(f'Failed to deliver message:\n{e}')
 
         try:
             response.raise_for_status()
         except HTTPError as e:
-            logger.error(response.text)
-            raise e
+            logger.error(e)
+            raise ApiException(response.text)
 
         if correlation_message.result_enabled:
             json = response.json()
@@ -378,7 +373,7 @@ class CamundaLibrary:
                 api_response = api_instance.fetch_and_lock(fetch_external_tasks_dto=fetch_external_tasks_dto)
                 logger.info(api_response)
             except ApiException as e:
-                logger.error("Exception when calling ExternalTaskApi->fetch_and_lock: %s\n" % e)
+                raise ApiException("Exception when calling ExternalTaskApi->fetch_and_lock: %s\n" % e)
 
         work_items: List[LockedExternalTaskDto] = api_response
         if work_items:
@@ -440,7 +435,7 @@ class CamundaLibrary:
                                                                  external_task_bpmn_error=bpmn_error)
                     self.drop_fetch_response()
                 except ApiException as e:
-                    logger.error(f"Exception when calling ExternalTaskApi->handle_external_task_bpmn_error: {e}\n")
+                    raise ApiException(f"Exception when calling ExternalTaskApi->handle_external_task_bpmn_error: {e}\n")
 
     @keyword("Notify failure", tags=["task"])
     def notify_failure(self, **kwargs):
@@ -477,7 +472,7 @@ class CamundaLibrary:
                                                 external_task_failure_dto=external_task_failure_dto)
                     self.drop_fetch_response()
                 except ApiException as e:
-                    logger.error("Exception when calling ExternalTaskApi->handle_failure: %s\n" % e)
+                    raise ApiException("Exception when calling ExternalTaskApi->handle_failure: %s\n" % e)
 
     @keyword("Get incidents")
     def get_incidents(self, **kwargs):
@@ -496,8 +491,7 @@ class CamundaLibrary:
             try:
                 response: List[IncidentDto] = api_instance.get_incidents(**kwargs)
             except ApiException as e:
-                logger.error(f'Failed to get incidents:\n{e}')
-                raise e
+                raise ApiException(f'Failed to get incidents:\n{e}')
 
         return [incident.to_dict() for incident in response]
 
@@ -508,7 +502,7 @@ class CamundaLibrary:
 
         *Requires `fetch workload` to run before this one, logs warning instead.*
 
-        Additonal variables can be provided as dictionary in _result_set_ .
+        Additional variables can be provided as dictionary in _result_set_ .
         Files can be provided as dictionary of filename and patch.
 
         Examples:
@@ -544,7 +538,7 @@ class CamundaLibrary:
                                                                  complete_external_task_dto=complete_task_dto)
                     self.drop_fetch_response()
                 except ApiException as e:
-                    logger.error(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
+                    raise ApiException(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
 
     @keyword("Download file from variable", tags=['task'])
     def download_file_from_variable(self, variable_name: str) -> str:
@@ -559,8 +553,7 @@ class CamundaLibrary:
                         id=self.FETCH_RESPONSE.process_instance_id, var_name=variable_name)
                     logger.debug(response)
                 except ApiException as e:
-                    logger.error(f"Exception when calling ExternalTaskApi->get_process_instance_variable_binary: {e}\n")
-                    raise e
+                    raise ApiException(f"Exception when calling ExternalTaskApi->get_process_instance_variable_binary: {e}\n")
                 return response
 
     @keyword("Unlock", tags=['task'])
@@ -577,7 +570,7 @@ class CamundaLibrary:
                     api_instance.unlock(self.FETCH_RESPONSE.id)
                     self.drop_fetch_response()
                 except ApiException as e:
-                    logger.error(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
+                    raise ApiException(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
 
     @keyword("Start process", tags=['process'])
     def start_process(self, process_key: str, variables: Dict = None, files: Dict = None,
@@ -629,8 +622,7 @@ class CamundaLibrary:
                     start_process_instance_dto=start_process_instance_dto
                 )
             except ApiException as e:
-                logger.error(f'Failed to start process {process_key}:\n{e}')
-                raise e
+                raise ApiException(f'Failed to start process {process_key}:\n{e}')
         logger.info(f'Response:\n{response}')
 
         return response.to_dict()
@@ -646,8 +638,7 @@ class CamundaLibrary:
             try:
                 response = api_instance.delete_process_instance(id=process_instance_id)
             except ApiException as e:
-                logger.error(f'Failed to delete process instance {process_instance_id}:\n{e}')
-                raise e
+                raise ApiException(f'Failed to delete process instance {process_instance_id}:\n{e}')
 
     @keyword("Get all active process instances", tags=['process'])
     def get_all_active_process_instances(self, process_definition_key):
@@ -711,8 +702,7 @@ class CamundaLibrary:
             try:
                 response: List[ProcessInstanceDto] = api_instance.get_process_instances(**kwargs)
             except ApiException as e:
-                logger.error(f'Failed to get process instances of process:\n{e}')
-                raise e
+                raise ApiException(f'Failed to get process instances of process:\n{e}')
 
         return [process_instance.to_dict() for process_instance in response]
 
@@ -745,8 +735,8 @@ class CamundaLibrary:
             try:
                 response = api_instance.get_process_definitions(**kwargs)
             except ApiException as e:
-                logger.error(f'Failed to get process definitions:\n{e}')
-                raise e
+                raise ApiException(f'Failed to get process definitions:\n{e}')
+
         return response
 
     @keyword("Get Activity Instance", tags=['process'])
@@ -765,8 +755,7 @@ class CamundaLibrary:
             try:
                 response: ActivityInstanceDto = api_instance.get_activity_instance_tree(id)
             except ApiException as e:
-                logger.error(f'failed to get activity tree for process instance with id {id}:\n{e}')
-                raise e
+                raise ApiException(f'failed to get activity tree for process instance with id {id}:\n{e}')
         return response.to_dict()
 
     @keyword("Get Process Instance Variable", tags=['process'])
@@ -794,7 +783,7 @@ class CamundaLibrary:
                 response = api_instance.get_process_instance_variable(
                     id=process_instance_id, var_name=variable_name)
             except ApiException as e:
-                logger.error(f'Failed to get variable {variable_name} from '
+                raise ApiException(f'Failed to get variable {variable_name} from '
                              f'process instance {process_instance_id}:\n{e}')
         return response
 
@@ -818,4 +807,4 @@ class CamundaLibrary:
                 return [CamundaResources.convert_openapi_variables_to_dict(r)
                         for r in response]
             except ApiException as e:
-                logger.error(f'Failed to evaluate decision {key}:\n{e}')
+                raise ApiException(f'Failed to evaluate decision {key}:\n{e}')
