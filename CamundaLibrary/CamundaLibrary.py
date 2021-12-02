@@ -410,8 +410,17 @@ class CamundaLibrary:
             return self.FETCH_RESPONSE.to_dict()
         return self.FETCH_RESPONSE
 
-    @keyword("Drop fetch response", tags=['task'])
+    @keyword("Drop fetch response", tags=['task', 'deprecated'])
     def drop_fetch_response(self):
+        """
+        Removes last process instance from cache.
+
+        *DEPRECATED*
+
+        Actually this keyword does not seem to make sense. Do you have a use case for this? Then contact the project on
+        GitHub, otherwise the keyword will be removed.
+        """
+        logger.warn('DEPRECATED. If you happen to have a use case for this keyword, save the keyword from deletion by contacting the project on GitHub:\thttps://github.com/MarketSquare/robotframework-camunda/issues>')
         self.FETCH_RESPONSE = {}
 
     @keyword("Throw BPMN Error", tags=['task'])
