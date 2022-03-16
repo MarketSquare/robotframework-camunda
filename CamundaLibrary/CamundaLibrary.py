@@ -790,11 +790,11 @@ class CamundaLibrary:
 
             try:
                 response = api_instance.get_process_instance_variable(
-                    id=process_instance_id, var_name=variable_name)
+                    id=process_instance_id, var_name=variable_name, deserialize_value=False)
             except ApiException as e:
                 raise ApiException(f'Failed to get variable {variable_name} from '
                              f'process instance {process_instance_id}:\n{e}')
-        return response
+        return CamundaResources.convert_variable_dto(response) 
 
     @keyword("Evaluate Decision", tags=['decision'])
     def evaluate_decision(self, key: str, variables: dict) -> list:
