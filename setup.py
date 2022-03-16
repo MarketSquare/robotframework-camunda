@@ -7,7 +7,7 @@ import os
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-name = "Deutsche Post Adress GmbH & Co. KG"
+name = "Markus Stahl"
 
 version_regex = r"^v(?P<version>\d*\.\d*\.\d*$)"
 version = os.environ.get('CI_COMMIT_TAG', f'2.{os.environ.get("CI_COMMIT_REF_NAME","0.0")}')
