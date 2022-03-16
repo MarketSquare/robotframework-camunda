@@ -795,7 +795,7 @@ class CamundaLibrary:
             except ApiException as e:
                 raise ApiException(f'Failed to get variable {variable_name} from '
                              f'process instance {process_instance_id}:\n{e}')
-        if automated_type_conversion:
+        if auto_type_conversion:
             return CamundaResources.convert_variable_dto(response) 
         return response
 
