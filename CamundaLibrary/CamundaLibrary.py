@@ -768,7 +768,7 @@ class CamundaLibrary:
         return response.to_dict()
 
     @keyword("Get Process Instance Variable", tags=['process'])
-    def get_process_instance_variable(self, process_instance_id: str, variable_name: str):
+    def get_process_instance_variable(self, process_instance_id: str, variable_name: str, auto_type_conversion: bool = True):
         """
         Returns the variable with the given name from the process instance with
         the given process_instance_id.
@@ -776,6 +776,7 @@ class CamundaLibrary:
         Parameters:
             - ``process_instance_id``: ID of the target process instance
             - ``variable_name``: name of the variable to read
+            - ``auto_type_conversion``: Converts JSON structures automatically in to python data structures. Default: True. When False, values are not retrieved for JSON variables, but metadata is. Only useful when you want to verify that Camunda holds certain data types.%
 
         == Example ==
         | ${variable} | Get Process Instance Variable |
@@ -783,18 +784,20 @@ class CamundaLibrary:
         | ...         | variable_name=foo |
 
         See also:
-        https://docs.camunda.org/manual/7.5/reference/rest/process-instance/variables/get-single-variable/
+        https://docs.camunda.org/manual/latest/reference/rest/process-instance/variables/get-single-variable/
         """
         with self._shared_resources.api_client as api_client:
             api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(api_client)
 
             try:
                 response = api_instance.get_process_instance_variable(
-                    id=process_instance_id, var_name=variable_name, deserialize_value=False)
+                    id=process_instance_id, var_name=variable_name, deserialize_value=not auto_type_conversion)
             except ApiException as e:
                 raise ApiException(f'Failed to get variable {variable_name} from '
                              f'process instance {process_instance_id}:\n{e}')
-        return CamundaResources.convert_variable_dto(response) 
+        if automated_type_conversion:
+            return CamundaResources.convert_variable_dto(response) 
+        return response
 
     @keyword("Evaluate Decision", tags=['decision'])
     def evaluate_decision(self, key: str, variables: dict) -> list:

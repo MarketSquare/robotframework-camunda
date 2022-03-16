@@ -35,6 +35,7 @@ Dictionary variable is of type JSON in camunda
     ${variable_instance}    Get Process Instance Variable
     ...    process_instance_id=${process_instance}[id]
     ...    variable_name=map
+    ...    automated_type_conversion=${False}
 
     Should Be Equal    Json    ${variable_instance.type}    Datatype for dictionary was supposed to be Json
 
