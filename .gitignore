@@ -7,7 +7,7 @@ tmp/
 .idea/
 public/
 lsp/
-.vscode/
+__pycache__/
 
 *.log
 *.zip

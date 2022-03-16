@@ -1,0 +1,24 @@
+{
+    // Verwendet IntelliSense zum Ermitteln möglicher Attribute.
+    // Zeigen Sie auf vorhandene Attribute, um die zugehörigen Beschreibungen anzuzeigen.
+    // Weitere Informationen finden Sie unter https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "robotframework-lsp",
+            "name": "Robot Framework: Launch template",
+            "request": "launch",
+            "args": ["-V","tests/robot/config.py","-d","logs","-b","debug.log"]
+        },
+        {
+            "type": "robotframework-lsp",
+            "name": "Robot Framework: Launch .robot file",
+            "request": "launch",
+            "cwd": "^\"\\${workspaceFolder}\"",
+            "target": "^\"\\${file}\"",
+            "terminal": "integrated",
+            "env": {},
+            "args": ["-V","tests/robot/config.py","-d","logs","-b","debug.log"]
+        }
+    ]
+}
