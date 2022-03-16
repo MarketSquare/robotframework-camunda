@@ -661,49 +661,50 @@ class CamundaLibrary:
         """
         Queries Camunda for process instances that match certain criteria.
 
-        Be aware, that boolean value must be strings either 'true' or 'false'
+        *Be aware, that boolean value must be strings either 'true' or 'false'*
 
-         async_req: execute request asynchronously
-         sort_by: Sort the results lexicographically by a given criterion. Must be used in conjunction with the sortOrder parameter.
-         sort_order: Sort the results in a given order. Values may be asc for ascending order or desc for descending order. Must be used in conjunction with the sortBy parameter.
-         first_result: Pagination of results. Specifies the index of the first result to return.
-         max_results: Pagination of results. Specifies the maximum number of results to return. Will return less results if there are no more results left.
-         process_instance_ids: Filter by a comma-separated list of process instance ids.
-         business_key: Filter by process instance business key.
-         business_key_like: Filter by process instance business key that the parameter is a substring of.
-         case_instance_id: Filter by case instance id.
-         process_definition_id: Filter by the deployment the id belongs to.
-         process_definition_key: Filter by the key of the process definition the instances run on.
-         process_definition_key_in: Filter by a comma-separated list of process definition keys. A process instance must have one of the given process definition keys.
-         process_definition_key_not_in: Exclude instances by a comma-separated list of process definition keys. A process instance must not have one of the given process definition keys.
-         deployment_id: Filter by the deployment the id belongs to.
-         super_process_instance: Restrict query to all process instances that are sub process instances of the given process instance. Takes a process instance id.
-         sub_process_instance: Restrict query to all process instances that have the given process instance as a sub process instance. Takes a process instance id.
-         super_case_instance: Restrict query to all process instances that are sub process instances of the given case instance. Takes a case instance id.
-         sub_case_instance: Restrict query to all process instances that have the given case instance as a sub case instance. Takes a case instance id.
-         active: Only include active process instances. Value may only be true, as false is the default behavior.
-         suspended: Only include suspended process instances. Value may only be true, as false is the default behavior.
-         with_incident: Filter by presence of incidents. Selects only process instances that have an incident.
-         incident_id: Filter by the incident id.
-         incident_type: Filter by the incident type. See the [User Guide](https://docs.camunda.org/manual/7.15/user-guide/process-engine/incidents/#incident-types) for a list of incident types.
-         incident_message: Filter by the incident message. Exact match.
-         incident_message_like: Filter by the incident message that the parameter is a substring of.
-         tenant_id_in: Filter by a comma-separated list of tenant ids. A process instance must have one of the given tenant ids.
-         without_tenant_id: Only include process instances which belong to no tenant.
-         process_definition_without_tenant_id: Only include process instances which process definition has no tenant id.
-         activity_id_in: Filter by a comma-separated list of activity ids. A process instance must currently wait in a leaf activity with one of the given activity ids.
-         root_process_instances: Restrict the query to all process instances that are top level process instances.
-         leaf_process_instances: Restrict the query to all process instances that are leaf instances. (i.e. don't have any sub instances).
-         variables: Only include process instances that have variables with certain values. Variable filtering expressions are comma-separated and are structured as follows:  A valid parameter value has the form `key_operator_value`. `key` is the variable name, `operator` is the comparison operator to be used and `value` the variable value.  **Note**: Values are always treated as String objects on server side.  Valid `operator` values are: `eq` - equal to; `neq` - not equal to; `gt` - greater than; `gteq` - greater than or equal to; `lt` - lower than; `lteq` - lower than or equal to; `like`. `key` and `value` may not contain underscore or comma characters.
-         variable_names_ignore_case: Match all variable names in this query case-insensitively. If set to true variableName and variablename are treated as equal.
-         variable_values_ignore_case: Match all variable values in this query case-insensitively. If set to true variableValue and variablevalue are treated as equal.
-         _preload_content: if False, the urllib3.HTTPResponse object will
+        == Arguments ==
+        | async_req | execute request asynchronously | 
+        | sort_by | Sort the results lexicographically by a given criterion. Must be used in conjunction with the sortOrder parameter. | 
+        | sort_order | Sort the results in a given order. Values may be asc for ascending order or desc for descending order. Must be used in conjunction with the sortBy parameter. | 
+        | first_result | Pagination of results. Specifies the index of the first result to return. | 
+        | max_results | Pagination of results. Specifies the maximum number of results to return. Will return less results if there are no more results left. | 
+        | process_instance_ids | Filter by a comma-separated list of process instance ids. | 
+        | business_key | Filter by process instance business key. | 
+        | business_key_like | Filter by process instance business key that the parameter is a substring of. | 
+        | case_instance_id | Filter by case instance id. | 
+        | process_definition_id | Filter by the deployment the id belongs to. | 
+        | process_definition_key | Filter by the key of the process definition the instances run on. | 
+        | process_definition_key_in | Filter by a comma-separated list of process definition keys. A process instance must have one of the given process definition keys. | 
+        | process_definition_key_not_in | Exclude instances by a comma-separated list of process definition keys. A process instance must not have one of the given process definition keys. | 
+        | deployment_id | Filter by the deployment the id belongs to. | 
+        | super_process_instance | Restrict query to all process instances that are sub process instances of the given process instance. Takes a process instance id. | 
+        | sub_process_instance | Restrict query to all process instances that have the given process instance as a sub process instance. Takes a process instance id. | 
+        | super_case_instance | Restrict query to all process instances that are sub process instances of the given case instance. Takes a case instance id. | 
+        | sub_case_instance | Restrict query to all process instances that have the given case instance as a sub case instance. Takes a case instance id. | 
+        | active | Only include active process instances. Value may only be true, as false is the default behavior. | 
+        | suspended | Only include suspended process instances. Value may only be true, as false is the default behavior. | 
+        | with_incident | Filter by presence of incidents. Selects only process instances that have an incident. | 
+        | incident_id | Filter by the incident id. | 
+        | incident_type | Filter by the incident type. See the [User Guide](https://docs.camunda.org/manual/latest/user-guide/process-engine/incidents/#incident-types) for a list of incident types. | 
+        | incident_message | Filter by the incident message. Exact match. | 
+        | incident_message_like | Filter by the incident message that the parameter is a substring of. | 
+        | tenant_id_in | Filter by a comma-separated list of tenant ids. A process instance must have one of the given tenant ids. | 
+        | without_tenant_id | Only include process instances which belong to no tenant. | 
+        | process_definition_without_tenant_id | Only include process instances which process definition has no tenant id. | 
+        | activity_id_in | Filter by a comma-separated list of activity ids. A process instance must currently wait in a leaf activity with one of the given activity ids. | 
+        | root_process_instances | Restrict the query to all process instances that are top level process instances. | 
+        | leaf_process_instances | Restrict the query to all process instances that are leaf instances. (i.e. don't have any sub instances). | 
+        | variables | Only include process instances that have variables with certain values. Variable filtering expressions are comma-separated and are structured as follows:  A valid parameter value has the form `key_operator_value`. `key` is the variable name, `operator` is the comparison operator to be used and `value` the variable value.  **Note**: Values are always treated as String objects on server side.  Valid `operator` values are: `eq` - equal to; `neq` - not equal to; `gt` - greater than; `gteq` - greater than or equal to; `lt` - lower than; `lteq` - lower than or equal to; `like`. `key` and `value` may not contain underscore or comma characters. | 
+        | variable_names_ignore_case | Match all variable names in this query case-insensitively. If set to true variableName and variablename are treated as equal. | 
+        | variable_values_ignore_case | Match all variable values in this query case-insensitively. If set to true variableValue and variablevalue are treated as equal. | 
+        | _preload_content | if False, the urllib3.HTTPResponse object will
                                  be returned without reading/decoding response
-                                 data. Default is True.
-         _request_timeout: timeout setting for this request. If one
+                                 data. Default is True. | 
+        | _request_timeout | timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts.
+                                 (connection, read) timeouts. | 
         """
         with self._shared_resources.api_client as api_client:
             api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(api_client)
