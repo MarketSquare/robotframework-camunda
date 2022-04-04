@@ -410,17 +410,17 @@ class CamundaLibrary:
             return self.FETCH_RESPONSE.to_dict()
         return self.FETCH_RESPONSE
 
-    @keyword("Drop fetch response", tags=['task', 'deprecated'])
+    @keyword("Drop fetch response", tags=['task'])
     def drop_fetch_response(self):
         """
         Removes last process instance from cache.
 
-        *DEPRECATED*
+        When you use common keywords like `complete task` or `unlock` or any other keyword finishing execution of a task,
+        you do not need to call this keyword, as it is called implicitly.
 
-        Actually this keyword does not seem to make sense. Do you have a use case for this? Then contact the project on
-        GitHub, otherwise the keyword will be removed.
+        This keyword is handy, when you mix CamundaLibrary keywords and custom REST calls to Camunda API. In such
+        scenarios you might want to empty the cache.
         """
-        logger.warn('DEPRECATED. If you happen to have a use case for this keyword, save the keyword from deletion by contacting the project on GitHub:\thttps://github.com/MarketSquare/robotframework-camunda/issues>')
         self.FETCH_RESPONSE = {}
 
     @keyword("Throw BPMN Error", tags=['task'])
