@@ -283,7 +283,7 @@ class CamundaLibrary:
         return [DotDict(r.to_dict()) for r in response]
 
     @keyword(tags=['message'])
-    def deliver_message(self, message_name, **kwargs) -> DotDict:
+    def deliver_message(self, message_name, **kwargs) -> Any:
         """
         Delivers a message using Camunda REST API: https://docs.camunda.org/manual/latest/reference/rest/message/post-message/
 
@@ -322,7 +322,7 @@ class CamundaLibrary:
         if correlation_message.result_enabled:
             json = response.json()
             logger.debug(json)
-            return DotDict(json)
+            return [DotDict(d) for d in json]
         else:
             return DotDict()
 
@@ -388,7 +388,7 @@ class CamundaLibrary:
         self.FETCH_RESPONSE: LockedExternalTaskDto = work_items[0]
 
         variables: Dict[str, VariableValueDto] = self.FETCH_RESPONSE.variables
-        return DotDict(CamundaResources.convert_openapi_variables_to_dict(variables))
+        return CamundaResources.convert_openapi_variables_to_dict(variables)
 
     @keyword(tags=['task'])
     def get_fetch_response(self) -> DotDict:
@@ -806,7 +806,7 @@ class CamundaLibrary:
                 raise ApiException(f'Failed to get variable {variable_name} from '
                              f'process instance {process_instance_id}:\n{e}')
         if auto_type_conversion:
-            return DotDict(CamundaResources.convert_variable_dto(response))
+            return CamundaResources.convert_variable_dto(response)
         return response
 
     @keyword(tags=['decision'])

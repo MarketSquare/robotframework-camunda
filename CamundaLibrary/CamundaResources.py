@@ -3,6 +3,7 @@ import json
 import os
 from collections.abc import Collection
 from typing import Dict, Any
+from robot.utils import DotDict
 
 from generic_camunda_client import Configuration, ApiClient, VariableValueDto
 
@@ -77,8 +78,8 @@ class CamundaResources:
             {"var1": 1, "var2": True}
         """
         if not open_api_variables:
-            return {}
-        return {k: CamundaResources.convert_variable_dto(v) for k, v in open_api_variables.items()}
+            return DotDict()
+        return DotDict({k: CamundaResources.convert_variable_dto(v) for k, v in open_api_variables.items()})
 
     @staticmethod
     def convert_dict_to_openapi_variables(variabes: Dict[str, Any]) -> Dict[str, VariableValueDto]:
@@ -151,13 +152,13 @@ class CamundaResources:
     @staticmethod
     def convert_variable_dto(dto: VariableValueDto) -> Any:
         if dto.type == 'File':
-            return dto.to_dict()
+            return DotDict(dto.to_dict())
         if dto.type == 'Json':
             return json.loads(dto.value)
         return dto.value
 
     @staticmethod
-    def dict_to_camunda_json(d: dict) -> Any:
+    def dict_to_camunda_json(d: Dict[str, Any]) -> Dict[str, Dict]:
         """
         Example:
         >>> CamundaResources.dict_to_camunda_json({'a':1})
