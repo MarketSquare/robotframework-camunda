@@ -282,7 +282,7 @@ class CamundaLibrary:
     @keyword(tags=['message'])
     def deliver_message(self, message_name, **kwargs):
         """
-        Delivers a message using Camunda REST API: https://docs.camunda.org/manual/7.15/reference/rest/message/post-message/
+        Delivers a message using Camunda REST API: https://docs.camunda.org/manual/latest/reference/rest/message/post-message/
 
         Example:
             | ${result} | deliver message | msg_payment_received |
@@ -333,7 +333,7 @@ class CamundaLibrary:
         `Get Fetch Response`
 
         The only mandatory parameter for this keyword is *topic* which is the name of the topic to fetch workload from.
-        More parameters can be added from the Camunda documentation: https://docs.camunda.org/manual/7.14/reference/rest/external-task/fetch/
+        More parameters can be added from the Camunda documentation: https://docs.camunda.org/manual/latest/reference/rest/external-task/fetch/
 
         If not provided, this keyword will use a lock_duration of 60000 ms (10 minutes) and set {{deserialize_value=True}}
 
@@ -548,6 +548,15 @@ class CamundaLibrary:
 
     @keyword(tags=['task', 'variable', 'file'])
     def download_file_from_variable(self, variable_name: str) -> str:
+        """
+        For performance reasons, files are not retrieved automatically during `fetch workload`. If your task requires
+        a file that is attached to a process instance, you need to download the file explicitly.
+
+        Example:
+            | ${variables} | *fetch workload* | _first_task_in_demo_ |
+            | | *Dictionary Should Contain Key* | _${variables}_ | _my_file_ |
+            | ${file} | *Download File From Variable* | ${variables}[my_file] | |
+        """
         if not self.FETCH_RESPONSE:
             logger.warn('Could not download file for variable. Maybe you did not fetch and lock a workitem before?')
         else:
