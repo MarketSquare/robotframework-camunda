@@ -807,7 +807,7 @@ class CamundaLibrary:
                              f'process instance {process_instance_id}:\n{e}')
         if auto_type_conversion:
             return DotDict(CamundaResources.convert_variable_dto(response))
-        return DotDict(response)
+        return response
 
     @keyword(tags=['decision'])
     def evaluate_decision(self, key: str, variables: Dict) -> List[DotDict]:
