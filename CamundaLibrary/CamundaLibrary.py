@@ -99,7 +99,7 @@ class CamundaLibrary:
         self.set_camunda_configuration(configuration={'host': host})
         self.DEFAULT_LOCK_DURATION = self.reset_task_lock_duration()
 
-    @keyword
+    @keyword(tags=['configuration'])
     def set_camunda_configuration(self,configuration: dict):
         if 'host' not in configuration.keys():
             raise ValueError(f"Incomplete configuration. Configuration must include at least the Camunda host url:\t{configuration}")
@@ -124,7 +124,7 @@ class CamundaLibrary:
         logger.debug(f"New configuration for Camunda client:\t{camunda_config}")
         self._shared_resources.client_configuration = Configuration(**camunda_config)
 
-    @keyword("Set Camunda URL")
+    @keyword(tags=['configuration'])
     def set_camunda_url(self, url: str):
         """
         Sets url for camunda eninge. Only necessary when URL cannot be set during initialization of this library or
@@ -134,7 +134,7 @@ class CamundaLibrary:
             raise ValueError('Cannot set camunda engine url: no url given.')
         self._shared_resources.camunda_url = url_normalize(f'{url}/engine-rest')
 
-    @keyword("Set Task Lock Duration", tags=["task"])
+    @keyword(tags=['task', 'configuration'])
     def set_task_lock_duration(self, lock_duration: int):
         """
         Sets lock duration used as default when fetching. Camunda locks a process instance for the period. If the
@@ -148,7 +148,7 @@ class CamundaLibrary:
         except ValueError:
             logger.error(f'Failed to set lock duration. Value does not seem a valid integer:\t{lock_duration}')
 
-    @keyword("Reset Task Lock Duration", tags=["task"])
+    @keyword(tags=['task', 'configuration'])
     def reset_task_lock_duration(self):
         """
         Counter keyword for "Set Task Lock Duration". Resets lock duration to the default. The default is either
@@ -162,11 +162,11 @@ class CamundaLibrary:
             lock_duration = 600000
         return lock_duration
 
-    @keyword("Get Camunda URL")
+    @keyword(tags=['configuration'])
     def get_camunda_url(self) -> str:
         return self._shared_resources.camunda_url
 
-    @keyword("Get amount of workloads")
+    @keyword(tags=['task'])
     def get_amount_of_workloads(self, topic: str, **kwargs) -> int:
         """
         Retrieves count of tasks. By default expects a topic name, but all parameters from the original endpoint
@@ -183,8 +183,7 @@ class CamundaLibrary:
         logger.info(f'Amount of workloads for "{topic}":\t{response.count}')
         return response.count
 
-
-    @keyword(name='Deploy', tags=['deployment'])
+    @keyword(tags=['deployment'])
     def deploy(self, *args):
         """Creates a deployment from all given files and uploads them to camunda.
 
@@ -256,7 +255,7 @@ class CamundaLibrary:
 
         return json
 
-    @keyword(name='Get deployments', tags=['deployment'])
+    @keyword(tags=['deployment'])
     def get_deployments(self, deployment_id: str = None, **kwargs):
         """
         Retrieves all deployments that match given criteria. All parameters are available from https://docs.camunda.org/manual/latest/reference/rest/deployment/get-query/
@@ -280,7 +279,7 @@ class CamundaLibrary:
 
         return [r.to_dict() for r in response]
 
-    @keyword("Deliver Message", tags=["message"])
+    @keyword(tags=['message'])
     def deliver_message(self, message_name, **kwargs):
         """
         Delivers a message using Camunda REST API: https://docs.camunda.org/manual/7.15/reference/rest/message/post-message/
@@ -324,8 +323,7 @@ class CamundaLibrary:
         else:
             return {}
 
-
-    @keyword("Fetch Workload", tags=['task'])
+    @keyword(tags=['task'])
     def fetch_workload(self, topic: str, async_response_timeout=None, use_priority=None, **kwargs) -> Dict:
         """
         Locks and fetches workloads from camunda on a given topic. Returns a list of variable dictionary.
@@ -389,8 +387,7 @@ class CamundaLibrary:
         variables: Dict[str, VariableValueDto] = self.FETCH_RESPONSE.variables
         return CamundaResources.convert_openapi_variables_to_dict(variables)
 
-
-    @keyword("Get fetch response", tags=['task'])
+    @keyword(tags=['task'])
     def get_fetch_response(self):
         """Returns cached response from the last call of `fetch workload`.
 
@@ -423,9 +420,9 @@ class CamundaLibrary:
         """
         self.FETCH_RESPONSE = {}
 
-    @keyword("Throw BPMN Error", tags=['task'])
-    def bpmn_error(self, error_code: str, error_message: str = None, variables: Dict[str, Any] = None,
-                   files: Dict = None):
+    @keyword(tags=['task', 'complete'])
+    def throw_bpmn_error(self, error_code: str, error_message: str = None, variables: Dict[str, Any] = None,
+                         files: Dict = None):
         if not self.FETCH_RESPONSE:
             logger.warn('No task to complete. Maybe you did not fetch and lock a workitem before?')
         else:
@@ -446,7 +443,7 @@ class CamundaLibrary:
                 except ApiException as e:
                     raise ApiException(f"Exception when calling ExternalTaskApi->handle_external_task_bpmn_error: {e}\n")
 
-    @keyword("Notify failure", tags=["task"])
+    @keyword(tags=['task', 'complete'])
     def notify_failure(self, **kwargs):
         """
         Raises a failure to Camunda. When retry counter is less than 1, an incident is created by Camunda.
@@ -483,7 +480,7 @@ class CamundaLibrary:
                 except ApiException as e:
                     raise ApiException("Exception when calling ExternalTaskApi->handle_failure: %s\n" % e)
 
-    @keyword("Get incidents")
+    @keyword(tags=['incident'])
     def get_incidents(self, **kwargs):
         """
         Retrieves incidents matching given filter arguments.
@@ -504,8 +501,8 @@ class CamundaLibrary:
 
         return [incident.to_dict() for incident in response]
 
-    @keyword("Complete task", tags=['task'])
-    def complete(self, result_set: Dict[str, Any] = None, files: Dict = None):
+    @keyword(tags=['task', 'complete'])
+    def complete_task(self, result_set: Dict[str, Any] = None, files: Dict = None):
         """
         Completes the task that was fetched before with `fetch workload`.
 
@@ -549,7 +546,7 @@ class CamundaLibrary:
                 except ApiException as e:
                     raise ApiException(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
 
-    @keyword("Download file from variable", tags=['task'])
+    @keyword(tags=['task', 'variable', 'file'])
     def download_file_from_variable(self, variable_name: str) -> str:
         if not self.FETCH_RESPONSE:
             logger.warn('Could not download file for variable. Maybe you did not fetch and lock a workitem before?')
@@ -565,7 +562,7 @@ class CamundaLibrary:
                     raise ApiException(f"Exception when calling ExternalTaskApi->get_process_instance_variable_binary: {e}\n")
                 return response
 
-    @keyword("Unlock", tags=['task'])
+    @keyword(tags=['task', 'complete'])
     def unlock(self):
         """
         Unlocks recent task.
@@ -581,7 +578,7 @@ class CamundaLibrary:
                 except ApiException as e:
                     raise ApiException(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
 
-    @keyword("Start process", tags=['process'])
+    @keyword(tags=['process'])
     def start_process(self, process_key: str, variables: Dict = None, files: Dict = None,
                       before_activity_id: str = None, after_activity_id: str = None, **kwargs) -> Dict:
         """
@@ -636,7 +633,7 @@ class CamundaLibrary:
 
         return response.to_dict()
 
-    @keyword("Delete process instance", tags=['process'])
+    @keyword(tags=['process'])
     def delete_process_instance(self, process_instance_id):
         """
         USE WITH CARE: Deletes a process instance by id. All data in this process instance will be lost.
@@ -649,14 +646,14 @@ class CamundaLibrary:
             except ApiException as e:
                 raise ApiException(f'Failed to delete process instance {process_instance_id}:\n{e}')
 
-    @keyword("Get all active process instances", tags=['process'])
+    @keyword(tags=['process'])
     def get_all_active_process_instances(self, process_definition_key):
         """
         Returns a list of process instances that are active for a certain process definition identified by key.
         """
         return self.get_process_instances(process_definition_key=process_definition_key, active='true')
 
-    @keyword("Get process instances")
+    @keyword(tags=['process'])
     def get_process_instances(self, **kwargs):
         """
         Queries Camunda for process instances that match certain criteria.
@@ -716,7 +713,7 @@ class CamundaLibrary:
 
         return [process_instance.to_dict() for process_instance in response]
 
-    @keyword("Get Version", tags=['version'])
+    @keyword(tags=['version'])
     def get_version(self):
         """
         Returns Version of Camunda.
@@ -729,7 +726,7 @@ class CamundaLibrary:
             api_instance: VersionApi = openapi_client.VersionApi(api_client)
             return api_instance.get_rest_api_version()
 
-    @keyword("Get Process Definitions", tags=['process'])
+    @keyword(tags=['process'])
     def get_process_definitions(self, **kwargs):
         """
         Returns a list of process definitions that fulfill given parameters.
@@ -749,7 +746,7 @@ class CamundaLibrary:
 
         return response
 
-    @keyword("Get Activity Instance", tags=['process'])
+    @keyword(tags=['process'])
     def get_activity_instance(self, id: str):
         """
         Returns an Activity Instance (Tree) for a given process instance.
@@ -768,7 +765,7 @@ class CamundaLibrary:
                 raise ApiException(f'failed to get activity tree for process instance with id {id}:\n{e}')
         return response.to_dict()
 
-    @keyword("Get Process Instance Variable", tags=['process'])
+    @keyword(tags=['process'])
     def get_process_instance_variable(self, process_instance_id: str, variable_name: str, auto_type_conversion: bool = True):
         """
         Returns the variable with the given name from the process instance with
@@ -800,7 +797,7 @@ class CamundaLibrary:
             return CamundaResources.convert_variable_dto(response) 
         return response
 
-    @keyword("Evaluate Decision", tags=['decision'])
+    @keyword(tags=['decision'])
     def evaluate_decision(self, key: str, variables: dict) -> list:
         """
         Evaluates a given decision and returns the result.
