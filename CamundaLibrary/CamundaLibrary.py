@@ -3,6 +3,7 @@
 from generic_camunda_client.configuration import Configuration
 from robot.api.deco import library, keyword
 from robot.api.logger import librarylogger as logger
+from robot.utils import DotDict
 
 # requests import
 from requests import HTTPError
@@ -92,7 +93,7 @@ class CamundaLibrary:
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str, Dict[str, Any]] = {}
     FETCH_RESPONSE: LockedExternalTaskDto = {}
-    DEFAULT_LOCK_DURATION = None
+    DEFAULT_LOCK_DURATION: int = None
 
     def __init__(self,  host="http://localhost:8080"):
         self._shared_resources = CamundaResources()
@@ -149,10 +150,12 @@ class CamundaLibrary:
             logger.error(f'Failed to set lock duration. Value does not seem a valid integer:\t{lock_duration}')
 
     @keyword(tags=['task', 'configuration'])
-    def reset_task_lock_duration(self):
+    def reset_task_lock_duration(self) -> int:
         """
         Counter keyword for "Set Task Lock Duration". Resets lock duration to the default. The default is either
         environment variable CAMUNDA_TASK_LOCK_DURATION or 600000 (10 minutes).
+
+        Returns value of reseted lock duration.
         """
         try:
             lock_duration = int(os.environ.get('CAMUNDA_TASK_LOCK_DURATION', 600000))
@@ -184,7 +187,7 @@ class CamundaLibrary:
         return response.count
 
     @keyword(tags=['deployment'])
-    def deploy(self, *args):
+    def deploy(self, *args) -> DotDict:
         """Creates a deployment from all given files and uploads them to camunda.
 
         Return response from camunda rest api as dictionary.
@@ -219,7 +222,7 @@ class CamundaLibrary:
             except ApiException as e:
                 raise ApiException(f'Failed to upload {filename}:\n{e}')
 
-        return response.to_dict()
+        return DotDict(response.to_dict())
 
     def deploy_multiple_files(self, *args):
         """
@@ -256,7 +259,7 @@ class CamundaLibrary:
         return json
 
     @keyword(tags=['deployment'])
-    def get_deployments(self, deployment_id: str = None, **kwargs):
+    def get_deployments(self, deployment_id: str = None, **kwargs) -> List[DotDict]:
         """
         Retrieves all deployments that match given criteria. All parameters are available from https://docs.camunda.org/manual/latest/reference/rest/deployment/get-query/
 
@@ -277,10 +280,10 @@ class CamundaLibrary:
             except ApiException as e:
                 raise ApiException(f'Failed get deployments:\n{e}')
 
-        return [r.to_dict() for r in response]
+        return [DotDict(r.to_dict()) for r in response]
 
     @keyword(tags=['message'])
-    def deliver_message(self, message_name, **kwargs):
+    def deliver_message(self, message_name, **kwargs) -> DotDict:
         """
         Delivers a message using Camunda REST API: https://docs.camunda.org/manual/latest/reference/rest/message/post-message/
 
@@ -319,9 +322,9 @@ class CamundaLibrary:
         if correlation_message.result_enabled:
             json = response.json()
             logger.debug(json)
-            return json
+            return DotDict(json)
         else:
-            return {}
+            return DotDict()
 
     @keyword(tags=['task'])
     def fetch_workload(self, topic: str, async_response_timeout=None, use_priority=None, **kwargs) -> Dict:
@@ -380,15 +383,15 @@ class CamundaLibrary:
             logger.debug(f'Received no work items from camunda engine for topic:\t{topic}')
 
         if not work_items:
-            return {}
+            return DotDict()
 
-        self.FETCH_RESPONSE = work_items[0]
+        self.FETCH_RESPONSE: LockedExternalTaskDto = work_items[0]
 
         variables: Dict[str, VariableValueDto] = self.FETCH_RESPONSE.variables
-        return CamundaResources.convert_openapi_variables_to_dict(variables)
+        return DotDict(CamundaResources.convert_openapi_variables_to_dict(variables))
 
     @keyword(tags=['task'])
-    def get_fetch_response(self):
+    def get_fetch_response(self) -> DotDict:
         """Returns cached response from the last call of `fetch workload`.
 
         The response contains all kind of data that is required for custom REST Calls.
@@ -404,7 +407,7 @@ class CamundaLibrary:
             | | *POST On Session* | _camunda_ | _engine-rest/external-task/${fetch_response}[id]/complete_ | _json=${{ {'workerId': '${fetch_response}[worker_id]'} }}_ |
         """
         if self.FETCH_RESPONSE:
-            return self.FETCH_RESPONSE.to_dict()
+            return DotDict(self.FETCH_RESPONSE.to_dict())
         return self.FETCH_RESPONSE
 
     @keyword("Drop fetch response", tags=['task'])
@@ -481,7 +484,7 @@ class CamundaLibrary:
                     raise ApiException("Exception when calling ExternalTaskApi->handle_failure: %s\n" % e)
 
     @keyword(tags=['incident'])
-    def get_incidents(self, **kwargs):
+    def get_incidents(self, **kwargs) -> List[DotDict]:
         """
         Retrieves incidents matching given filter arguments.
 
@@ -499,7 +502,7 @@ class CamundaLibrary:
             except ApiException as e:
                 raise ApiException(f'Failed to get incidents:\n{e}')
 
-        return [incident.to_dict() for incident in response]
+        return [DotDict(incident.to_dict()) for incident in response]
 
     @keyword(tags=['task', 'complete'])
     def complete_task(self, result_set: Dict[str, Any] = None, files: Dict = None):
@@ -589,7 +592,7 @@ class CamundaLibrary:
 
     @keyword(tags=['process'])
     def start_process(self, process_key: str, variables: Dict = None, files: Dict = None,
-                      before_activity_id: str = None, after_activity_id: str = None, **kwargs) -> Dict:
+                      before_activity_id: str = None, after_activity_id: str = None, **kwargs) -> DotDict:
         """
         Starts a new process instance from a process definition with given key.
 
@@ -640,7 +643,7 @@ class CamundaLibrary:
                 raise ApiException(f'Failed to start process {process_key}:\n{e}')
         logger.info(f'Response:\n{response}')
 
-        return response.to_dict()
+        return DotDict(response.to_dict())
 
     @keyword(tags=['process'])
     def delete_process_instance(self, process_instance_id):
@@ -656,14 +659,14 @@ class CamundaLibrary:
                 raise ApiException(f'Failed to delete process instance {process_instance_id}:\n{e}')
 
     @keyword(tags=['process'])
-    def get_all_active_process_instances(self, process_definition_key):
+    def get_all_active_process_instances(self, process_definition_key) -> List[DotDict]:
         """
         Returns a list of process instances that are active for a certain process definition identified by key.
         """
         return self.get_process_instances(process_definition_key=process_definition_key, active='true')
 
     @keyword(tags=['process'])
-    def get_process_instances(self, **kwargs):
+    def get_process_instances(self, **kwargs) -> List[DotDict]:
         """
         Queries Camunda for process instances that match certain criteria.
 
@@ -720,10 +723,10 @@ class CamundaLibrary:
             except ApiException as e:
                 raise ApiException(f'Failed to get process instances of process:\n{e}')
 
-        return [process_instance.to_dict() for process_instance in response]
+        return [DotDict(process_instance.to_dict()) for process_instance in response]
 
     @keyword(tags=['version'])
-    def get_version(self):
+    def get_version(self) -> str:
         """
         Returns Version of Camunda.
 
@@ -756,7 +759,7 @@ class CamundaLibrary:
         return response
 
     @keyword(tags=['process'])
-    def get_activity_instance(self, id: str):
+    def get_activity_instance(self, id: str) -> DotDict:
         """
         Returns an Activity Instance (Tree) for a given process instance.
 
@@ -772,10 +775,10 @@ class CamundaLibrary:
                 response: ActivityInstanceDto = api_instance.get_activity_instance_tree(id)
             except ApiException as e:
                 raise ApiException(f'failed to get activity tree for process instance with id {id}:\n{e}')
-        return response.to_dict()
+        return DotDict(response.to_dict())
 
     @keyword(tags=['process'])
-    def get_process_instance_variable(self, process_instance_id: str, variable_name: str, auto_type_conversion: bool = True):
+    def get_process_instance_variable(self, process_instance_id: str, variable_name: str, auto_type_conversion: bool = True) -> DotDict:
         """
         Returns the variable with the given name from the process instance with
         the given process_instance_id.
@@ -803,11 +806,11 @@ class CamundaLibrary:
                 raise ApiException(f'Failed to get variable {variable_name} from '
                              f'process instance {process_instance_id}:\n{e}')
         if auto_type_conversion:
-            return CamundaResources.convert_variable_dto(response) 
-        return response
+            return DotDict(CamundaResources.convert_variable_dto(response))
+        return DotDict(response)
 
     @keyword(tags=['decision'])
-    def evaluate_decision(self, key: str, variables: dict) -> list:
+    def evaluate_decision(self, key: str, variables: Dict) -> List[DotDict]:
         """
         Evaluates a given decision and returns the result.
         The input values of the decision have to be supplied with `variables`.
@@ -823,7 +826,7 @@ class CamundaLibrary:
                 response = api_instance.evaluate_decision_by_key(
                     key=key,
                     evaluate_decision_dto=openapi_client.EvaluateDecisionDto(dto))
-                return [CamundaResources.convert_openapi_variables_to_dict(r)
+                return [DotDict(CamundaResources.convert_openapi_variables_to_dict(r))
                         for r in response]
             except ApiException as e:
                 raise ApiException(f'Failed to evaluate decision {key}:\n{e}')

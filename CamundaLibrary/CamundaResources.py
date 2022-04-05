@@ -68,7 +68,7 @@ class CamundaResources:
         return client
 
     @staticmethod
-    def convert_openapi_variables_to_dict(open_api_variables: Dict[str, VariableValueDto]) -> Dict:
+    def convert_openapi_variables_to_dict(open_api_variables: Dict[str, VariableValueDto]) -> Dict[str, Any]:
         """
         Converts the variables to a simple dictionary
         :return: dict
@@ -81,7 +81,7 @@ class CamundaResources:
         return {k: CamundaResources.convert_variable_dto(v) for k, v in open_api_variables.items()}
 
     @staticmethod
-    def convert_dict_to_openapi_variables(variabes: dict) -> Dict[str, VariableValueDto]:
+    def convert_dict_to_openapi_variables(variabes: Dict[str, Any]) -> Dict[str, VariableValueDto]:
         """
         Converts the variables to a simple dictionary
         :return: dict
