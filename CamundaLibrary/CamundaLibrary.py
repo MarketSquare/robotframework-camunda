@@ -594,7 +594,7 @@ class CamundaLibrary:
 
         Starts a new process instance from a process definition with given key.
         """
-        self.start_process_instance(process_key, variables, files, before_activity_id, after_activity_id, **kwargs)
+        return self.start_process_instance(process_key, variables, files, before_activity_id, after_activity_id, **kwargs)
 
     @keyword(tags=['process'])
     def start_process_instance(self, process_key: str, variables: Dict = None, files: Dict = None,
