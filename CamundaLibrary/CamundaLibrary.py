@@ -587,8 +587,17 @@ class CamundaLibrary:
                 except ApiException as e:
                     raise ApiException(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
 
-    @keyword(tags=['process'])
+    @keyword(tags=['process', 'deprecated'])
     def start_process(self, process_key: str, variables: Dict = None, files: Dict = None,
+                      before_activity_id: str = None, after_activity_id: str = None, **kwargs) -> Dict:
+        """*DEPRECATED!!* Use keyword `Start Process Instance` instead.
+
+        Starts a new process instance from a process definition with given key.
+        """
+        return self.start_process_instance(process_key, variables, files, before_activity_id, after_activity_id, **kwargs)
+
+    @keyword(tags=['process'])
+    def start_process_instance(self, process_key: str, variables: Dict = None, files: Dict = None,
                       before_activity_id: str = None, after_activity_id: str = None, **kwargs) -> Dict:
         """
         Starts a new process instance from a process definition with given key.
