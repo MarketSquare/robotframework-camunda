@@ -14,7 +14,7 @@ ${PROCESS_DEFINITION_KEY}    demo_for_robot
 *** Test Cases ***
 Test starting process
     # WHEN
-    ${process_instance}    start process    ${PROCESS_DEFINITION_KEY}
+    ${process_instance}    Start Process Instance    ${PROCESS_DEFINITION_KEY}
 
     [Teardown]    delete process instance    ${process_instance}[id]
 
@@ -28,7 +28,7 @@ Test starting process with variables
     ${variables}    Create Dictionary    ${variable1_key}=${variable1_value}
 
     # WHEN
-    start process    ${PROCESS_DEFINITION_KEY}   ${variables}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}   ${variables}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}
@@ -50,7 +50,7 @@ Test starting process with business key
     ${expected_business_key}    Set Variable    business 1
 
     # WHEN
-    start process    ${PROCESS_DEFINITION_KEY}   business_key=${expected_business_key}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}   business_key=${expected_business_key}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}    async_response_timeout=100
@@ -76,7 +76,7 @@ Test starting process with variables after activity
     ${after_activity_id}    Set Variable    Activity_process_element
 
     # WHEN
-    start process    ${PROCESS_DEFINITION_KEY}   ${variables}    after_activity_id=${after_activity_id}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}   ${variables}    after_activity_id=${after_activity_id}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}
@@ -97,7 +97,7 @@ Test starting process with variables before activity
     ${before_activity_id}    Set Variable    Activity_process_element
 
     # WHEN
-    start process    ${PROCESS_DEFINITION_KEY}   ${variables}    before_activity_id=${before_activity_id}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}   ${variables}    before_activity_id=${before_activity_id}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}
@@ -121,7 +121,7 @@ Test starting process with dict variables
     ${variables}    Create Dictionary    variables1=${variables1}
 
     # WHEN
-    start process    ${PROCESS_DEFINITION_KEY}   ${variables}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}   ${variables}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}
@@ -143,7 +143,7 @@ Test starting process with file variables
     ${files}    Create Dictionary    my_file=tests/resources/rf-logo.png
 
     # WHEN
-    start process    ${PROCESS_DEFINITION_KEY}   files=${files}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}   files=${files}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}
@@ -168,7 +168,7 @@ Test file content from starting process variable
     ${files}    Create Dictionary    my_file=${testfile}
 
     # WHEN
-    start process    ${PROCESS_DEFINITION_KEY}   files=${files}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}   files=${files}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}
@@ -194,7 +194,7 @@ Test starting process with file variables
     ${files}    Create Dictionary    my_file=tests/resources/rf-logo.png
 
     # WHEN
-    start process    ${process_definition_key}   files=${files}
+    Start Process Instance    ${process_definition_key}   files=${files}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}
@@ -220,7 +220,7 @@ Test file content from starting process variable
     ${files}    Create Dictionary    my_file=${testfile}
 
     # WHEN
-    start process    ${process_definition_key}   files=${files}
+    Start Process Instance    ${process_definition_key}   files=${files}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}
@@ -246,7 +246,7 @@ Test starting process with file variables
     ${files}    Create Dictionary    my_file=tests/resources/rf-logo.png
 
     # WHEN
-    start process    ${process_definition_key}   files=${files}
+    Start Process Instance    ${process_definition_key}   files=${files}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}
@@ -272,7 +272,7 @@ Test file content from starting process variable
     ${files}    Create Dictionary    my_file=${testfile}
 
     # WHEN
-    start process    ${process_definition_key}   files=${files}
+    Start Process Instance    ${process_definition_key}   files=${files}
 
     # AND
     ${first_workload}     fetch workload   topic=${existing_topic}

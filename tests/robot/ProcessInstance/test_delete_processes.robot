@@ -12,7 +12,7 @@ Get all instances
     # Given
     Upload process
     ${process_instances_before}    get all active process instances    ${PROCESS_NAME}
-    start process    ${PROCESS_NAME}
+    Start Process Instance    ${PROCESS_NAME}
     ${process_instances_after}    get all active process instances    ${PROCESS_NAME}
 
     # EXPECT

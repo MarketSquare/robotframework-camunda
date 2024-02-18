@@ -20,7 +20,7 @@ BPMN error without task does not fail
 Test 'throw bpmn error' for existing topic
     [Setup]    set camunda url    ${CAMUNDA_HOST}
     # GIVEN
-    Start process    ${PROCESS_DEFINITION_KEY}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}
     ${variables}    Create Dictionary    text=Manna Manna
 
     # AND

@@ -15,7 +15,7 @@ Get all instances
     ${process_instances_before}    get all active process instances    ${PROCESS_NAME}
 
     # WHEN
-    start process    ${PROCESS_NAME}
+    Start Process Instance    ${PROCESS_NAME}
     ${process_instances_after}    get all active process instances    ${PROCESS_NAME}
 
     # THEN

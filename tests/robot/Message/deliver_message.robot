@@ -126,7 +126,7 @@ Prepare Test Suite
 Prepare testcase
     Delete all instances from process '${PROCESS_DEFINITION_KEY_SEND_MESSAGE}'
     Delete all instances from process '${PROCESS_DEFINITION_KEY_RECEIVE_MESSAGE}'
-    Start process    ${PROCESS_DEFINITION_KEY_SEND_MESSAGE}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY_SEND_MESSAGE}
 
 
 Get workload from topic '${topic}'
