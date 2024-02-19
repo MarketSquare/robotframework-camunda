@@ -19,14 +19,14 @@ jobs:
         env:
           camunda.bpm.run.auth.enabled: ${{ matrix.auth_enabled }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Test with robot
       run: |
         pip install .
         sleep 10
         robot -d logs -b debug.log -x xunit.xml -L DEBUG -V tests/robot/config_cicd.py -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/*.robot
     - name: Archive production artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: robot logs
@@ -42,7 +42,7 @@ jobs:
 
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
         with:
            name: robot logs
 
