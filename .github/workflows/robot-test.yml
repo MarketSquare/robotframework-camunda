@@ -29,13 +29,13 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: robot logs-${camunda_version}-${auth_enabled}
+        name: robot logs-${matrix.camunda_version}-${matrix.auth_enabled}
         path: |
-          logs-${camunda_version}-${auth_enabled}
+          logs
     - name: Download Artifacts
       uses: actions/download-artifact@v4
       with:
-          name: robot logs-${camunda_version}-${auth_enabled}
+          name: robot logs-${matrix.camunda_version}-${matrix.auth_enabled}
 
     - name: Publish Unit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v1
