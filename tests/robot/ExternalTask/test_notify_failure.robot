@@ -51,7 +51,7 @@ Test 'Notify failure' with retries countdown
 
 *** Keywords ***
 A new process instance
-    Start process    ${PROCESS_DEFINITION_KEY}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}
     ${variables}    Create Dictionary    text=Manna Manna
 
 process instance fetched

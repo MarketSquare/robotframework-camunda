@@ -43,7 +43,7 @@ A value
 
 Process Instance Is Present
     ${variable}    Create Dictionary    foo=${value}
-    ${response}   Start Process    demo_for_robot    variables=${variable}
+    ${response}   Start Process Instance    demo_for_robot    variables=${variable}
     Set Global Variable    ${PROCESS_INSTANCE_ID}    ${response}[id]
 
 Camunda Is Requested For Variable Of The Process Instance

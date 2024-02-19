@@ -10,10 +10,12 @@ with open("README.md", "r") as fh:
 name = "Markus Stahl"
 
 version_regex = r"^v(?P<version>\d*\.\d*\.\d*$)"
-version = os.environ.get('CI_COMMIT_TAG', f'2.{os.environ.get("CI_COMMIT_REF_NAME","0.0")}')
+version = os.environ.get(
+    "CI_COMMIT_TAG", f'2.{os.environ.get("CI_COMMIT_REF_NAME","0.0")}'
+)
 full_version_match = re.fullmatch(version_regex, version)
 if full_version_match:
-    version = full_version_match.group('version')
+    version = full_version_match.group("version")
 
 setup(
     name="robotframework-camunda",
@@ -28,7 +30,11 @@ setup(
     classifiers=[
         "Intended Audience :: Developers",
         "Natural Language :: English",
-        "Programming Language :: Python :: 3",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
         "Topic :: Software Development",
         "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
@@ -36,6 +42,13 @@ setup(
         "Framework :: Robot Framework",
     ],
     license="Apache License, Version 2.0",
-    install_requires=["robotframework>=3.2", "requests", "frozendict", 'generic-camunda-client>=7.15.0','requests_toolbelt','url-normalize'],
+    install_requires=[
+        "robotframework>=3.2",
+        "requests",
+        "frozendict",
+        "generic-camunda-client>=7.15.0",
+        "requests_toolbelt",
+        "url-normalize",
+    ],
     include_package_data=True,
 )

@@ -11,6 +11,7 @@ class CamundaResources:
     """
     Singleton containing resources shared by Camunda sub libraries
     """
+
     _instance = None
 
     _client_configuration: Configuration = None
@@ -19,7 +20,7 @@ class CamundaResources:
 
     def __new__(cls):
         if cls._instance is None:
-            print('Creating the object')
+            print("Creating the object")
             cls._instance = super(CamundaResources, cls).__new__(cls)
             # Put any initialization here.
         return cls._instance
@@ -54,21 +55,30 @@ class CamundaResources:
 
     def _create_task_client(self) -> ApiClient:
         if not self.client_configuration:
-            raise ValueError('No URL to camunda set. Please initialize Library with url or use keyword '
-                             '"Set Camunda URL" first.')
+            raise ValueError(
+                "No URL to camunda set. Please initialize Library with url or use keyword "
+                '"Set Camunda URL" first.'
+            )
 
         # the generated client for camunda ignores auth parameters from the configuration. Therefore we must set default headers here:
         client = ApiClient(self.client_configuration)
         if self.client_configuration.username:
-            client.set_default_header('Authorization',self.client_configuration.get_basic_auth_token())
+            client.set_default_header(
+                "Authorization", self.client_configuration.get_basic_auth_token()
+            )
         elif self.client_configuration.api_key:
             identifier = list(self.client_configuration.api_key.keys())[0]
-            client.set_default_header('Authorization', self.client_configuration.get_api_key_with_prefix(identifier))
+            client.set_default_header(
+                "Authorization",
+                self.client_configuration.get_api_key_with_prefix(identifier),
+            )
 
         return client
 
     @staticmethod
-    def convert_openapi_variables_to_dict(open_api_variables: Dict[str, VariableValueDto]) -> Dict:
+    def convert_openapi_variables_to_dict(
+        open_api_variables: Dict[str, VariableValueDto]
+    ) -> Dict:
         """
         Converts the variables to a simple dictionary
         :return: dict
@@ -78,10 +88,15 @@ class CamundaResources:
         """
         if not open_api_variables:
             return {}
-        return {k: CamundaResources.convert_variable_dto(v) for k, v in open_api_variables.items()}
+        return {
+            k: CamundaResources.convert_variable_dto(v)
+            for k, v in open_api_variables.items()
+        }
 
     @staticmethod
-    def convert_dict_to_openapi_variables(variabes: dict) -> Dict[str, VariableValueDto]:
+    def convert_dict_to_openapi_variables(
+        variabes: dict,
+    ) -> Dict[str, VariableValueDto]:
         """
         Converts the variables to a simple dictionary
         :return: dict
@@ -98,10 +113,14 @@ class CamundaResources:
         """
         if not variabes:
             return {}
-        return {k: CamundaResources.convert_to_variable_dto(v) for k, v in variabes.items()}
+        return {
+            k: CamundaResources.convert_to_variable_dto(v) for k, v in variabes.items()
+        }
 
     @staticmethod
-    def convert_file_dict_to_openapi_variables(files: Dict[str, str]) -> Dict[str, VariableValueDto]:
+    def convert_file_dict_to_openapi_variables(
+        files: Dict[str, str]
+    ) -> Dict[str, VariableValueDto]:
         """
         Example:
         >>> CamundaResources.convert_file_dict_to_openapi_variables({'testfile': 'tests/resources/test.txt'})
@@ -119,40 +138,48 @@ class CamundaResources:
     @staticmethod
     def convert_file_to_dto(path: str) -> VariableValueDto:
         if not path:
-            raise FileNotFoundError('Cannot create DTO from file, because no file provided')
+            raise FileNotFoundError(
+                "Cannot create DTO from file, because no file provided"
+            )
 
-        with open(path, 'r+b') as file:
-            file_content = base64.standard_b64encode(file.read()).decode('utf-8')
+        with open(path, "r+b") as file:
+            file_content = base64.standard_b64encode(file.read()).decode("utf-8")
 
         base = os.path.basename(path)
         file_name, file_ext = os.path.splitext(base)
 
-        if file_ext.lower() in ['.jpg', '.jpeg', '.jpe']:
-            mimetype = 'image/jpeg'
-        elif file_ext.lower() in ['.png']:
-            mimetype = 'image/png'
-        elif file_ext.lower() in ['.pdf']:
-            mimetype = 'application/pdf'
-        elif file_ext.lower() in ['.txt']:
-            mimetype = 'text/plain'
+        if file_ext.lower() in [".jpg", ".jpeg", ".jpe"]:
+            mimetype = "image/jpeg"
+        elif file_ext.lower() in [".png"]:
+            mimetype = "image/png"
+        elif file_ext.lower() in [".pdf"]:
+            mimetype = "application/pdf"
+        elif file_ext.lower() in [".txt"]:
+            mimetype = "text/plain"
         else:
-            mimetype = 'application/octet-stream'
-        return VariableValueDto(value=file_content, type='File', value_info={'filename': base, 'mimetype': mimetype})
+            mimetype = "application/octet-stream"
+        return VariableValueDto(
+            value=file_content,
+            type="File",
+            value_info={"filename": base, "mimetype": mimetype},
+        )
 
     @staticmethod
     def convert_to_variable_dto(value: Any) -> VariableValueDto:
         if isinstance(value, str):
             return VariableValueDto(value=value)
-        elif isinstance(value, Collection):  # String is also a collection and must be filtered before Collection.
-            return VariableValueDto(value=json.dumps(value), type='Json')
+        elif isinstance(
+            value, Collection
+        ):  # String is also a collection and must be filtered before Collection.
+            return VariableValueDto(value=json.dumps(value), type="Json")
         else:
             return VariableValueDto(value=value)
 
     @staticmethod
     def convert_variable_dto(dto: VariableValueDto) -> Any:
-        if dto.type == 'File':
+        if dto.type == "File":
             return dto.to_dict()
-        if dto.type == 'Json':
+        if dto.type == "Json":
             return json.loads(dto.value)
         return dto.value
 
@@ -172,13 +199,17 @@ class CamundaResources:
         >>> CamundaResources.dict_to_camunda_json({'person': {'age': 25, 'languages': ['English', 'Suomi']}})
         {'person': {'value': '{"age": 25, "languages": ["English", "Suomi"]}', 'type': 'Json'}}
         """
-        return {k: {'value': json.dumps(v), 'type': 'Json'} if isinstance(v, Collection) else {'value': v}
-                for k, v in d.items()}
+        return {
+            k: (
+                {"value": json.dumps(v), "type": "Json"}
+                if isinstance(v, Collection)
+                else {"value": v}
+            )
+            for k, v in d.items()
+        }
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import doctest
-    import xmlrunner
 
-    suite = doctest.DocTestSuite()
-    xmlrunner.XMLTestRunner(output='logs').run(suite)
+    doctest.testmod()

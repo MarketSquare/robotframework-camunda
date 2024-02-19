@@ -14,7 +14,7 @@ ${EXISTING_TOPIC}    process_demo_element
 *** Test Cases ***
 Test 'fetch and lock' for existing topic
     #GIVEN
-    start process    ${PROCESS_DEFINITION_KEY}    ${{{'variable_1': 1}}}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}    ${{{'variable_1': 1}}}
     #WHEN
     ${variables}    fetch workload    ${EXISTING_TOPIC}
     #THEN
@@ -29,7 +29,7 @@ Test 'fetch and lock' with only specific variables
     ${input_variables}    Create Dictionary
     ...    ${variable_name1}=1
     ...    ${variable_name2}=2
-    start process   ${PROCESS_DEFINITION_KEY}    ${input_variables}
+    Start Process Instance   ${PROCESS_DEFINITION_KEY}    ${input_variables}
 
     #WHEN
     ${variables}    fetch workload    ${EXISTING_TOPIC}    variables=${{['${variable_name1}']}}

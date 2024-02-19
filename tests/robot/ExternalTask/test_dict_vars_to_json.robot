@@ -70,13 +70,13 @@ List variable is of type JSON in camunda
 Process with dictionary variable
     ${my_dict}    Create Dictionary    a=1    b=2
     ${variables}    Create Dictionary    map=${my_dict}
-    ${process_instance}    start process    ${PROCESS_DEFINITION_KEY}    variables=${variables}
+    ${process_instance}    Start Process Instance    ${PROCESS_DEFINITION_KEY}    variables=${variables}
     [Return]    ${variables}
 
 Process with list variable
     ${my_dict}    Create list    1    2
     ${variables}    Create Dictionary    map=${my_dict}
-    ${process_instance}    start process    ${PROCESS_DEFINITION_KEY}    variables=${variables}
+    ${process_instance}    Start Process Instance    ${PROCESS_DEFINITION_KEY}    variables=${variables}
     [Return]    ${variables}
 
 Workload is fetched
@@ -86,11 +86,11 @@ Workload is fetched
 Process with dictionary variable is started
     ${my_dict}    Create Dictionary    a=1    b=2
     ${variables}    Create Dictionary    map=${my_dict}
-    ${process_instance}    start process    ${PROCESS_DEFINITION_KEY}    variables=${variables}
+    ${process_instance}    Start Process Instance    ${PROCESS_DEFINITION_KEY}    variables=${variables}
     [Return]    ${process_instance}
 
 Process with list variable is started
     ${my_dict}    Create Dictionary    a=1    b=2
     ${variables}    Create Dictionary    map=${my_dict}
-    ${process_instance}    start process    ${PROCESS_DEFINITION_KEY}    variables=${variables}
+    ${process_instance}    Start Process Instance    ${PROCESS_DEFINITION_KEY}    variables=${variables}
     [Return]    ${process_instance}
