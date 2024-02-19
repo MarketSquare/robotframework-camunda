@@ -38,6 +38,6 @@ jobs:
           name: robot logs-${{matrix.camunda_version}}-${{matrix.auth_enabled}}
 
     - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1
+      uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         files: xunit.xml
