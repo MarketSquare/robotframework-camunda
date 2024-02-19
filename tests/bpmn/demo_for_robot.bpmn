@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0qiqts0" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="4.9.0">
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" id="Definitions_0qiqts0" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.17.0">
   <bpmn:collaboration id="Collaboration_0p8xj2y">
     <bpmn:participant id="Participant_0sda6b4" name="Demo Robot" processRef="demo_for_robot" />
   </bpmn:collaboration>
-  <bpmn:process id="demo_for_robot" name="Demo Prozess für Robot Framework library" isExecutable="true" camunda:versionTag="0.1">
+  <bpmn:process id="demo_for_robot" name="Demo Prozess für Robot Framework library" isExecutable="true" camunda:versionTag="0.1" camunda:historyTimeToLive="30">
     <bpmn:startEvent id="StartEvent_1" name="Trigger received">
       <bpmn:outgoing>Flow_0xskn85</bpmn:outgoing>
     </bpmn:startEvent>
@@ -39,29 +39,6 @@
       <bpmndi:BPMNShape id="Participant_0sda6b4_di" bpmnElement="Participant_0sda6b4" isHorizontal="true">
         <dc:Bounds x="129" y="57" width="661" height="393" />
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge id="Flow_0thahmr_di" bpmnElement="Flow_0thahmr">
-        <di:waypoint x="560" y="170" />
-        <di:waypoint x="622" y="170" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_1m77rg0_di" bpmnElement="Flow_1m77rg0">
-        <di:waypoint x="400" y="170" />
-        <di:waypoint x="460" y="170" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0xskn85_di" bpmnElement="Flow_0xskn85">
-        <di:waypoint x="245" y="170" />
-        <di:waypoint x="300" y="170" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0jgdhq6_di" bpmnElement="Flow_0jgdhq6">
-        <di:waypoint x="350" y="228" />
-        <di:waypoint x="350" y="320" />
-        <di:waypoint x="460" y="320" />
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="Flow_0uflgxn_di" bpmnElement="Flow_0uflgxn">
-        <di:waypoint x="560" y="320" />
-        <di:waypoint x="591" y="320" />
-        <di:waypoint x="591" y="170" />
-        <di:waypoint x="622" y="170" />
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
         <dc:Bounds x="209" y="152" width="36" height="36" />
         <bpmndi:BPMNLabel>
@@ -86,6 +63,29 @@
           <dc:Bounds x="258" y="247" width="83" height="14" />
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_0xskn85_di" bpmnElement="Flow_0xskn85">
+        <di:waypoint x="245" y="170" />
+        <di:waypoint x="300" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1m77rg0_di" bpmnElement="Flow_1m77rg0">
+        <di:waypoint x="400" y="170" />
+        <di:waypoint x="460" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0thahmr_di" bpmnElement="Flow_0thahmr">
+        <di:waypoint x="560" y="170" />
+        <di:waypoint x="622" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0jgdhq6_di" bpmnElement="Flow_0jgdhq6">
+        <di:waypoint x="350" y="228" />
+        <di:waypoint x="350" y="320" />
+        <di:waypoint x="460" y="320" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uflgxn_di" bpmnElement="Flow_0uflgxn">
+        <di:waypoint x="560" y="320" />
+        <di:waypoint x="591" y="320" />
+        <di:waypoint x="591" y="170" />
+        <di:waypoint x="622" y="170" />
+      </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
 </bpmn:definitions>
