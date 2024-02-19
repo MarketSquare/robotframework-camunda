@@ -4,11 +4,14 @@ logs/
 log/
 temp/
 tmp/
+build/
 .idea/
 public/
 lsp/
 __pycache__/
+.vscode/
 
+*.egg-info
 *.log
 *.zip
 .robocop
