@@ -8,6 +8,10 @@ can be found [here](https://docs.camunda.org/manual/7.14/reference/rest/).
 **Please review [issue board](https://github.com/MarketSquare/robotframework-camunda/issues) for 
 known issues or report one yourself. You are invited to contribute pull requests.**
 
+Supporting:
+- Python >= 3.8
+- Camunda 7 >= 7.14.0
+
 ## Documentation
 
 Keyword documentation is provided [here](https://robotframework-camunda-demos.gitlab.io/robotframework-camunda-mirror/latest/keywords/camundalibrary)
