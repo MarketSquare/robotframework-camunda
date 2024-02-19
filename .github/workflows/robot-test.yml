@@ -24,29 +24,20 @@ jobs:
       run: |
         pip install .
         sleep 10
-        robot -d logs-${camunda_version}-${auth_enabled} -b debug.log -x xunit.xml -L DEBUG -V tests/robot/config_cicd.py -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/*.robot
+        robot -d logs -b debug.log -x xunit.xml -L DEBUG -V tests/robot/config_cicd.py -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/*.robot
     - name: Archive production artifacts
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: robot logs
+        name: robot logs-${camunda_version}-${auth_enabled}
         path: |
-          logs-${camunda_version}-${auth_enabled}/
+          logs
+    - name: Download Artifacts
+      uses: actions/download-artifact@v4
+      with:
+          name: robot logs-${camunda_version}-${auth_enabled}
 
-  publish-test-results:
-    name: "Publish Unit Tests Results"
-    needs: integrationtest
-    runs-on: ubuntu-latest
-    # the build-and-test job might be skipped, we don't need to run this job then
-    if: success() || failure()
-
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v4
-        with:
-           name: robot logs
-
-      - name: Publish Unit Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v1
-        with:
-          files: xunit.xml
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v1
+      with:
+        files: xunit.xml
