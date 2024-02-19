@@ -1,7 +1,7 @@
 *** Settings ***
 Library    CamundaLibrary   ${CAMUNDA_HOST}
 
-*** Variable ***
+*** Variables ***
 ${CAMUNDA_HOST}    http://localhost:8080
 
 *** Keywords ***
