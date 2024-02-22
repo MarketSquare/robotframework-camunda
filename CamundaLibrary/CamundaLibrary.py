@@ -16,13 +16,31 @@ import os
 from typing import List, Dict, Any
 import time
 
-from generic_camunda_client import ApiException, CountResultDto, DeploymentWithDefinitionsDto, DeploymentDto, \
-    LockedExternalTaskDto, \
-    VariableValueDto, FetchExternalTasksDto, FetchExternalTaskTopicDto, ProcessDefinitionApi, \
-    ProcessInstanceWithVariablesDto, StartProcessInstanceDto, ProcessInstanceModificationInstructionDto, \
-    ProcessInstanceApi, ProcessInstanceDto, VersionApi, EvaluateDecisionDto, MessageApi, \
-    MessageCorrelationResultWithVariableDto, CorrelationMessageDto, ActivityInstanceDto, ExternalTaskFailureDto, \
-    IncidentApi, IncidentDto
+from generic_camunda_client import (
+    ApiException,
+    CountResultDto,
+    DeploymentWithDefinitionsDto,
+    DeploymentDto,
+    LockedExternalTaskDto,
+    VariableValueDto,
+    FetchExternalTasksDto,
+    FetchExternalTaskTopicDto,
+    ProcessDefinitionApi,
+    ProcessInstanceWithVariablesDto,
+    StartProcessInstanceDto,
+    ProcessInstanceModificationInstructionDto,
+    ProcessInstanceApi,
+    ProcessInstanceDto,
+    VersionApi,
+    EvaluateDecisionDto,
+    MessageApi,
+    MessageCorrelationResultWithVariableDto,
+    CorrelationMessageDto,
+    ActivityInstanceDto,
+    ExternalTaskFailureDto,
+    IncidentApi,
+    IncidentDto,
+)
 
 import generic_camunda_client as openapi_client
 
@@ -30,7 +48,7 @@ import generic_camunda_client as openapi_client
 from .CamundaResources import CamundaResources
 
 
-@library(scope='SUITE')
+@library(scope="SUITE")
 class CamundaLibrary:
     """
     Library for Camunda integration in Robot Framework
@@ -87,54 +105,52 @@ class CamundaLibrary:
     requests. You are welcome to participating in any way at the [https://github.com/MarketSquare/robotframework-camunda|GitHub project of CamundaLibrary].
     """
 
-    WORKER_ID = f'robotframework-camundalibrary-{time.time()}'
+    WORKER_ID = f"robotframework-camundalibrary-{time.time()}"
 
     EMPTY_STRING = ""
     KNOWN_TOPICS: Dict[str, Dict[str, Any]] = {}
     FETCH_RESPONSE: LockedExternalTaskDto = {}
     DEFAULT_LOCK_DURATION = None
 
-    def __init__(self,  host="http://localhost:8080"):
+    def __init__(self, host="http://localhost:8080"):
         self._shared_resources = CamundaResources()
-        self.set_camunda_configuration(configuration={'host': host})
+        self.set_camunda_configuration(configuration={"host": host})
         self.DEFAULT_LOCK_DURATION = self.reset_task_lock_duration()
 
-    @keyword(tags=['configuration'])
-    def set_camunda_configuration(self,configuration: dict):
-        if 'host' not in configuration.keys():
-            raise ValueError(f"Incomplete configuration. Configuration must include at least the Camunda host url:\t{configuration}")
+    @keyword(tags=["configuration"])
+    def set_camunda_configuration(self, configuration: dict):
+        if "host" not in configuration.keys():
+            raise ValueError(
+                f"Incomplete configuration. Configuration must include at least the Camunda host url:\t{configuration}"
+            )
 
         # weird things happen when dictionary is not copied and keyword is called repeatedly. Somehow robot or python remember the configuration from the previous call
         camunda_config = configuration.copy()
 
-        host = configuration['host']
-        camunda_config['host'] = url_normalize(f'{host}/engine-rest')
+        host = configuration["host"]
+        camunda_config["host"] = url_normalize(f"{host}/engine-rest")
 
-        if 'api_key' in configuration.keys():
-            api_key = configuration['api_key']
-            camunda_config['api_key'] = {
-                'default': api_key
-            }
-            if 'api_key_prefix' in configuration.keys():
-                api_key_prefix = configuration['api_key_prefix']
-                camunda_config['api_key_prefix'] = {
-                'default': api_key_prefix
-            }
+        if "api_key" in configuration.keys():
+            api_key = configuration["api_key"]
+            camunda_config["api_key"] = {"default": api_key}
+            if "api_key_prefix" in configuration.keys():
+                api_key_prefix = configuration["api_key_prefix"]
+                camunda_config["api_key_prefix"] = {"default": api_key_prefix}
 
         logger.debug(f"New configuration for Camunda client:\t{camunda_config}")
         self._shared_resources.client_configuration = Configuration(**camunda_config)
 
-    @keyword(tags=['configuration'])
+    @keyword(tags=["configuration"])
     def set_camunda_url(self, url: str):
         """
         Sets url for camunda eninge. Only necessary when URL cannot be set during initialization of this library or
         you want to switch camunda url for some reason.
         """
         if not url:
-            raise ValueError('Cannot set camunda engine url: no url given.')
-        self._shared_resources.camunda_url = url_normalize(f'{url}/engine-rest')
+            raise ValueError("Cannot set camunda engine url: no url given.")
+        self._shared_resources.camunda_url = url_normalize(f"{url}/engine-rest")
 
-    @keyword(tags=['task', 'configuration'])
+    @keyword(tags=["task", "configuration"])
     def set_task_lock_duration(self, lock_duration: int):
         """
         Sets lock duration used as default when fetching. Camunda locks a process instance for the period. If the
@@ -146,27 +162,30 @@ class CamundaLibrary:
         try:
             self.DEFAULT_LOCK_DURATION = int(lock_duration)
         except ValueError:
-            logger.error(f'Failed to set lock duration. Value does not seem a valid integer:\t{lock_duration}')
+            logger.error(
+                f"Failed to set lock duration. Value does not seem a valid integer:\t{lock_duration}"
+            )
 
-    @keyword(tags=['task', 'configuration'])
+    @keyword(tags=["task", "configuration"])
     def reset_task_lock_duration(self):
         """
         Counter keyword for "Set Task Lock Duration". Resets lock duration to the default. The default is either
         environment variable CAMUNDA_TASK_LOCK_DURATION or 600000 (10 minutes).
         """
         try:
-            lock_duration = int(os.environ.get('CAMUNDA_TASK_LOCK_DURATION', 600000))
+            lock_duration = int(os.environ.get("CAMUNDA_TASK_LOCK_DURATION", 600000))
         except ValueError as e:
             logger.warn(
-                f'Failed to interpret "CAMUNDA_TASK_LOCK_DURATION". Environment variable does not seem to contain a valid integer:\t{e}')
+                f'Failed to interpret "CAMUNDA_TASK_LOCK_DURATION". Environment variable does not seem to contain a valid integer:\t{e}'
+            )
             lock_duration = 600000
         return lock_duration
 
-    @keyword(tags=['configuration'])
+    @keyword(tags=["configuration"])
     def get_camunda_url(self) -> str:
         return self._shared_resources.camunda_url
 
-    @keyword(tags=['task'])
+    @keyword(tags=["task"])
     def get_amount_of_workloads(self, topic: str, **kwargs) -> int:
         """
         Retrieves count of tasks. By default expects a topic name, but all parameters from the original endpoint
@@ -176,14 +195,18 @@ class CamundaLibrary:
             api_instance = openapi_client.ExternalTaskApi(api_client)
 
             try:
-                response: CountResultDto = api_instance.get_external_tasks_count(topic_name=topic, **kwargs)
+                response: CountResultDto = api_instance.get_external_tasks_count(
+                    topic_name=topic, **kwargs
+                )
             except ApiException as e:
-                raise ApiException(f'Failed to count workload for topic "{topic}":\n{e}')
+                raise ApiException(
+                    f'Failed to count workload for topic "{topic}":\n{e}'
+                )
 
         logger.info(f'Amount of workloads for "{topic}":\t{response.count}')
         return response.count
 
-    @keyword(tags=['deployment'])
+    @keyword(tags=["deployment"])
     def deploy(self, *args):
         """Creates a deployment from all given files and uploads them to camunda.
 
@@ -194,10 +217,10 @@ class CamundaLibrary:
         the first file.
 
         Example:
-            | ${response} | *Deploy model from file* | _../bpmn/my_model.bpnm_ | _../forms/my_forms.html_ |
+            | ${response} | *Deploy* | _../bpmn/my_model.bpnm_ | _../forms/my_forms.html_ |
         """
         if not args:
-            raise ValueError('Failed deploying model, because no file provided.')
+            raise ValueError("Failed deploying model, because no file provided.")
 
         if len(args) > 1:
             # We have to use plain REST then when uploading more than 1 file.
@@ -211,13 +234,15 @@ class CamundaLibrary:
             deployment_name = filename
 
             try:
-                response: DeploymentWithDefinitionsDto = api_instance.create_deployment(deploy_changed_only=True,
-                                                                                        enable_duplicate_filtering=True,
-                                                                                        deployment_name=deployment_name,
-                                                                                        data=data)
-                logger.info(f'Response from camunda:\t{response}')
+                response: DeploymentWithDefinitionsDto = api_instance.create_deployment(
+                    deploy_changed_only=True,
+                    enable_duplicate_filtering=True,
+                    deployment_name=deployment_name,
+                    data=data,
+                )
+                logger.info(f"Response from camunda:\t{response}")
             except ApiException as e:
-                raise ApiException(f'Failed to upload {filename}:\n{e}')
+                raise ApiException(f"Failed to upload {filename}:\n{e}")
 
         return response.to_dict()
 
@@ -228,24 +253,29 @@ class CamundaLibrary:
         """
 
         fields = {
-            'deployment-name': f'{os.path.basename(args[0])}',
+            "deployment-name": f"{os.path.basename(args[0])}",
         }
 
         for file in args:
             filename = os.path.basename(file)
-            fields[f'{filename}'] = (filename, open(file, 'rb'), 'application/octet-stream')
+            fields[f"{filename}"] = (
+                filename,
+                open(file, "rb"),
+                "application/octet-stream",
+            )
 
-        multipart_data = MultipartEncoder(
-            fields=fields
-        )
+        multipart_data = MultipartEncoder(fields=fields)
 
-        headers=self._shared_resources.api_client.default_headers.copy()
-        headers['Content-Type'] =multipart_data.content_type
+        headers = self._shared_resources.api_client.default_headers.copy()
+        headers["Content-Type"] = multipart_data.content_type
 
         logger.debug(multipart_data.fields)
 
-        response = requests.post(f'{self._shared_resources.camunda_url}/deployment/create', data=multipart_data,
-                                 headers=headers)
+        response = requests.post(
+            f"{self._shared_resources.camunda_url}/deployment/create",
+            data=multipart_data,
+            headers=headers,
+        )
         json = response.json()
         try:
             response.raise_for_status()
@@ -255,7 +285,7 @@ class CamundaLibrary:
 
         return json
 
-    @keyword(tags=['deployment'])
+    @keyword(tags=["deployment"])
     def get_deployments(self, deployment_id: str = None, **kwargs):
         """
         Retrieves all deployments that match given criteria. All parameters are available from https://docs.camunda.org/manual/latest/reference/rest/deployment/get-query/
@@ -266,20 +296,20 @@ class CamundaLibrary:
             | ${list_of_deployments} | get deployments | after=2013-01-23T14:42:45.000+0200 |
         """
         if deployment_id:
-            kwargs['id'] = deployment_id
+            kwargs["id"] = deployment_id
 
         with self._shared_resources.api_client as api_client:
             api_instance = openapi_client.DeploymentApi(api_client)
 
             try:
                 response: List[DeploymentDto] = api_instance.get_deployments(**kwargs)
-                logger.info(f'Response from camunda:\t{response}')
+                logger.info(f"Response from camunda:\t{response}")
             except ApiException as e:
-                raise ApiException(f'Failed get deployments:\n{e}')
+                raise ApiException(f"Failed get deployments:\n{e}")
 
         return [r.to_dict() for r in response]
 
-    @keyword(tags=['message'])
+    @keyword(tags=["message"])
     def deliver_message(self, message_name, **kwargs):
         """
         Delivers a message using Camunda REST API: https://docs.camunda.org/manual/latest/reference/rest/message/post-message/
@@ -292,23 +322,29 @@ class CamundaLibrary:
         with self._shared_resources.api_client as api_client:
             correlation_message: CorrelationMessageDto = CorrelationMessageDto(**kwargs)
             correlation_message.message_name = message_name
-            if not 'result_enabled' in kwargs:
+            if not "result_enabled" in kwargs:
                 correlation_message.result_enabled = True
-            if 'process_variables' in kwargs:
-                correlation_message.process_variables = CamundaResources.dict_to_camunda_json(
-                    kwargs['process_variables'])
+            if "process_variables" in kwargs:
+                correlation_message.process_variables = (
+                    CamundaResources.dict_to_camunda_json(kwargs["process_variables"])
+                )
 
-            serialized_message = api_client.sanitize_for_serialization(correlation_message)
-            logger.debug(f'Message:\n{serialized_message}')
+            serialized_message = api_client.sanitize_for_serialization(
+                correlation_message
+            )
+            logger.debug(f"Message:\n{serialized_message}")
 
-            headers=self._shared_resources.api_client.default_headers.copy()
-            headers['Content-Type'] = 'application/json'
+            headers = self._shared_resources.api_client.default_headers.copy()
+            headers["Content-Type"] = "application/json"
 
             try:
-                response = requests.post(f'{self._shared_resources.camunda_url}/message', json=serialized_message,
-                                         headers=headers)
+                response = requests.post(
+                    f"{self._shared_resources.camunda_url}/message",
+                    json=serialized_message,
+                    headers=headers,
+                )
             except ApiException as e:
-                raise ApiException(f'Failed to deliver message:\n{e}')
+                raise ApiException(f"Failed to deliver message:\n{e}")
 
         try:
             response.raise_for_status()
@@ -323,8 +359,10 @@ class CamundaLibrary:
         else:
             return {}
 
-    @keyword(tags=['task'])
-    def fetch_workload(self, topic: str, async_response_timeout=None, use_priority=None, **kwargs) -> Dict:
+    @keyword(tags=["task"])
+    def fetch_workload(
+        self, topic: str, async_response_timeout=None, use_priority=None, **kwargs
+    ) -> Dict:
         """
         Locks and fetches workloads from camunda on a given topic. Returns a list of variable dictionary.
         Each dictionary representing 1 workload from a process instance.
@@ -357,27 +395,38 @@ class CamundaLibrary:
         with self._shared_resources.api_client as api_client:
             # Create an instance of the API class
             api_instance = openapi_client.ExternalTaskApi(api_client)
-            if 'lock_duration' not in kwargs:
-                kwargs['lock_duration'] = self.DEFAULT_LOCK_DURATION
-            if 'deserialize_values' not in kwargs:
-                kwargs['deserialize_values'] = False
+            if "lock_duration" not in kwargs:
+                kwargs["lock_duration"] = self.DEFAULT_LOCK_DURATION
+            if "deserialize_values" not in kwargs:
+                kwargs["deserialize_values"] = False
             topic_dto = FetchExternalTaskTopicDto(topic_name=topic, **kwargs)
-            fetch_external_tasks_dto = FetchExternalTasksDto(worker_id=self.WORKER_ID, max_tasks=1,
-                                                             async_response_timeout=async_response_timeout,
-                                                             use_priority=use_priority,
-                                                             topics=[topic_dto])
+            fetch_external_tasks_dto = FetchExternalTasksDto(
+                worker_id=self.WORKER_ID,
+                max_tasks=1,
+                async_response_timeout=async_response_timeout,
+                use_priority=use_priority,
+                topics=[topic_dto],
+            )
 
             try:
-                api_response = api_instance.fetch_and_lock(fetch_external_tasks_dto=fetch_external_tasks_dto)
+                api_response = api_instance.fetch_and_lock(
+                    fetch_external_tasks_dto=fetch_external_tasks_dto
+                )
                 logger.info(api_response)
             except ApiException as e:
-                raise ApiException("Exception when calling ExternalTaskApi->fetch_and_lock: %s\n" % e)
+                raise ApiException(
+                    "Exception when calling ExternalTaskApi->fetch_and_lock: %s\n" % e
+                )
 
         work_items: List[LockedExternalTaskDto] = api_response
         if work_items:
-            logger.debug(f'Received {len(work_items)} work_items from camunda engine for topic:\t{topic}')
+            logger.debug(
+                f"Received {len(work_items)} work_items from camunda engine for topic:\t{topic}"
+            )
         else:
-            logger.debug(f'Received no work items from camunda engine for topic:\t{topic}')
+            logger.debug(
+                f"Received no work items from camunda engine for topic:\t{topic}"
+            )
 
         if not work_items:
             return {}
@@ -387,7 +436,7 @@ class CamundaLibrary:
         variables: Dict[str, VariableValueDto] = self.FETCH_RESPONSE.variables
         return CamundaResources.convert_openapi_variables_to_dict(variables)
 
-    @keyword(tags=['task'])
+    @keyword(tags=["task"])
     def get_fetch_response(self):
         """Returns cached response from the last call of `fetch workload`.
 
@@ -407,7 +456,7 @@ class CamundaLibrary:
             return self.FETCH_RESPONSE.to_dict()
         return self.FETCH_RESPONSE
 
-    @keyword("Drop fetch response", tags=['task'])
+    @keyword("Drop fetch response", tags=["task"])
     def drop_fetch_response(self):
         """
         Removes last process instance from cache.
@@ -420,30 +469,46 @@ class CamundaLibrary:
         """
         self.FETCH_RESPONSE = {}
 
-    @keyword(tags=['task', 'complete'])
-    def throw_bpmn_error(self, error_code: str, error_message: str = None, variables: Dict[str, Any] = None,
-                         files: Dict = None):
+    @keyword(tags=["task", "complete"])
+    def throw_bpmn_error(
+        self,
+        error_code: str,
+        error_message: str = None,
+        variables: Dict[str, Any] = None,
+        files: Dict = None,
+    ):
         if not self.FETCH_RESPONSE:
-            logger.warn('No task to complete. Maybe you did not fetch and lock a workitem before?')
+            logger.warn(
+                "No task to complete. Maybe you did not fetch and lock a workitem before?"
+            )
         else:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ExternalTaskApi(api_client)
-                variables = CamundaResources.convert_dict_to_openapi_variables(variables)
-                openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(files)
+                variables = CamundaResources.convert_dict_to_openapi_variables(
+                    variables
+                )
+                openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(
+                    files
+                )
                 variables.update(openapi_files)
-                bpmn_error = openapi_client.ExternalTaskBpmnError(worker_id=self.WORKER_ID,
-                                                                  error_message=error_message,
-                                                                  error_code=error_code,
-                                                                  variables=variables)
+                bpmn_error = openapi_client.ExternalTaskBpmnError(
+                    worker_id=self.WORKER_ID,
+                    error_message=error_message,
+                    error_code=error_code,
+                    variables=variables,
+                )
                 try:
                     logger.debug(f"Sending BPMN error for task:\n{bpmn_error}")
-                    api_instance.handle_external_task_bpmn_error(self.FETCH_RESPONSE.id,
-                                                                 external_task_bpmn_error=bpmn_error)
+                    api_instance.handle_external_task_bpmn_error(
+                        self.FETCH_RESPONSE.id, external_task_bpmn_error=bpmn_error
+                    )
                     self.drop_fetch_response()
                 except ApiException as e:
-                    raise ApiException(f"Exception when calling ExternalTaskApi->handle_external_task_bpmn_error: {e}\n")
+                    raise ApiException(
+                        f"Exception when calling ExternalTaskApi->handle_external_task_bpmn_error: {e}\n"
+                    )
 
-    @keyword(tags=['task', 'complete'])
+    @keyword(tags=["task", "complete"])
     def notify_failure(self, **kwargs):
         """
         Raises a failure to Camunda. When retry counter is less than 1, an incident is created by Camunda.
@@ -461,26 +526,39 @@ class CamundaLibrary:
         """
         current_process_instance = self.FETCH_RESPONSE
         if not current_process_instance:
-            logger.warn('No task to notify failure for. Maybe you did not fetch and lock a workitem before?')
+            logger.warn(
+                "No task to notify failure for. Maybe you did not fetch and lock a workitem before?"
+            )
         else:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ExternalTaskApi(api_client)
-                if 'retry_timeout' not in kwargs or None is kwargs['retry_timeout'] or not kwargs['retry_timeout']:
-                    kwargs['retry_timeout'] = self.DEFAULT_LOCK_DURATION
+                if (
+                    "retry_timeout" not in kwargs
+                    or None is kwargs["retry_timeout"]
+                    or not kwargs["retry_timeout"]
+                ):
+                    kwargs["retry_timeout"] = self.DEFAULT_LOCK_DURATION
 
                 if None is not current_process_instance.retries:
-                    kwargs['retries'] = current_process_instance.retries - 1
+                    kwargs["retries"] = current_process_instance.retries - 1
 
-                external_task_failure_dto = ExternalTaskFailureDto(worker_id=self.WORKER_ID, **kwargs)
+                external_task_failure_dto = ExternalTaskFailureDto(
+                    worker_id=self.WORKER_ID, **kwargs
+                )
 
                 try:
-                    api_instance.handle_failure(id=current_process_instance.id,
-                                                external_task_failure_dto=external_task_failure_dto)
+                    api_instance.handle_failure(
+                        id=current_process_instance.id,
+                        external_task_failure_dto=external_task_failure_dto,
+                    )
                     self.drop_fetch_response()
                 except ApiException as e:
-                    raise ApiException("Exception when calling ExternalTaskApi->handle_failure: %s\n" % e)
+                    raise ApiException(
+                        "Exception when calling ExternalTaskApi->handle_failure: %s\n"
+                        % e
+                    )
 
-    @keyword(tags=['incident'])
+    @keyword(tags=["incident"])
     def get_incidents(self, **kwargs):
         """
         Retrieves incidents matching given filter arguments.
@@ -497,11 +575,11 @@ class CamundaLibrary:
             try:
                 response: List[IncidentDto] = api_instance.get_incidents(**kwargs)
             except ApiException as e:
-                raise ApiException(f'Failed to get incidents:\n{e}')
+                raise ApiException(f"Failed to get incidents:\n{e}")
 
         return [incident.to_dict() for incident in response]
 
-    @keyword(tags=['task', 'complete'])
+    @keyword(tags=["task", "complete"])
     def complete_task(self, result_set: Dict[str, Any] = None, files: Dict = None):
         """
         Completes the task that was fetched before with `fetch workload`.
@@ -529,24 +607,37 @@ class CamundaLibrary:
             | | *complete task* | _${return_values}_ | _${files}_ |
         """
         if not self.FETCH_RESPONSE:
-            logger.warn('No task to complete. Maybe you did not fetch and lock a workitem before?')
+            logger.warn(
+                "No task to complete. Maybe you did not fetch and lock a workitem before?"
+            )
         else:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ExternalTaskApi(api_client)
-                variables = CamundaResources.convert_dict_to_openapi_variables(result_set)
-                openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(files)
+                variables = CamundaResources.convert_dict_to_openapi_variables(
+                    result_set
+                )
+                openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(
+                    files
+                )
                 variables.update(openapi_files)
-                complete_task_dto = openapi_client.CompleteExternalTaskDto(worker_id=self.WORKER_ID,
-                                                                           variables=variables)
+                complete_task_dto = openapi_client.CompleteExternalTaskDto(
+                    worker_id=self.WORKER_ID, variables=variables
+                )
                 try:
-                    logger.debug(f"Sending to Camunda for completing Task:\n{complete_task_dto}")
-                    api_instance.complete_external_task_resource(self.FETCH_RESPONSE.id,
-                                                                 complete_external_task_dto=complete_task_dto)
+                    logger.debug(
+                        f"Sending to Camunda for completing Task:\n{complete_task_dto}"
+                    )
+                    api_instance.complete_external_task_resource(
+                        self.FETCH_RESPONSE.id,
+                        complete_external_task_dto=complete_task_dto,
+                    )
                     self.drop_fetch_response()
                 except ApiException as e:
-                    raise ApiException(f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n")
+                    raise ApiException(
+                        f"Exception when calling ExternalTaskApi->complete_external_task_resource: {e}\n"
+                    )
 
-    @keyword(tags=['task', 'variable', 'file'])
+    @keyword(tags=["task", "variable", "file"])
     def download_file_from_variable(self, variable_name: str) -> str:
         """
         For performance reasons, files are not retrieved automatically during `fetch workload`. If your task requires
@@ -558,26 +649,34 @@ class CamundaLibrary:
             | ${file} | *Download File From Variable* | ${variables}[my_file] | |
         """
         if not self.FETCH_RESPONSE:
-            logger.warn('Could not download file for variable. Maybe you did not fetch and lock a workitem before?')
+            logger.warn(
+                "Could not download file for variable. Maybe you did not fetch and lock a workitem before?"
+            )
         else:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ProcessInstanceApi(api_client)
 
                 try:
                     response = api_instance.get_process_instance_variable_binary(
-                        id=self.FETCH_RESPONSE.process_instance_id, var_name=variable_name)
+                        id=self.FETCH_RESPONSE.process_instance_id,
+                        var_name=variable_name,
+                    )
                     logger.debug(response)
                 except ApiException as e:
-                    raise ApiException(f"Exception when calling ExternalTaskApi->get_process_instance_variable_binary: {e}\n")
+                    raise ApiException(
+                        f"Exception when calling ExternalTaskApi->get_process_instance_variable_binary: {e}\n"
+                    )
                 return response
 
-    @keyword(tags=['task', 'complete'])
+    @keyword(tags=["task", "complete"])
     def unlock(self):
         """
         Unlocks recent task.
         """
         if not self.FETCH_RESPONSE:
-            logger.warn('No task to unlock. Maybe you did not fetch and lock a workitem before?')
+            logger.warn(
+                "No task to unlock. Maybe you did not fetch and lock a workitem before?"
+            )
         else:
             with self._shared_resources.api_client as api_client:
                 api_instance = openapi_client.ExternalTaskApi(api_client)
@@ -585,20 +684,43 @@ class CamundaLibrary:
                     api_instance.unlock(self.FETCH_RESPONSE.id)
                     self.drop_fetch_response()
                 except ApiException as e:
-                    raise ApiException(f"Exception when calling ExternalTaskApi->unlock: {e}\n")
+                    raise ApiException(
+                        f"Exception when calling ExternalTaskApi->unlock: {e}\n"
+                    )
 
-    @keyword(tags=['process', 'deprecated'])
-    def start_process(self, process_key: str, variables: Dict = None, files: Dict = None,
-                      before_activity_id: str = None, after_activity_id: str = None, **kwargs) -> Dict:
+    @keyword(tags=["process", "deprecated"])
+    def start_process(
+        self,
+        process_key: str,
+        variables: Dict = None,
+        files: Dict = None,
+        before_activity_id: str = None,
+        after_activity_id: str = None,
+        **kwargs,
+    ) -> Dict:
         """*DEPRECATED!!* Use keyword `Start Process Instance` instead.
 
         Starts a new process instance from a process definition with given key.
         """
-        return self.start_process_instance(process_key, variables, files, before_activity_id, after_activity_id, **kwargs)
+        return self.start_process_instance(
+            process_key,
+            variables,
+            files,
+            before_activity_id,
+            after_activity_id,
+            **kwargs,
+        )
 
-    @keyword(tags=['process'])
-    def start_process_instance(self, process_key: str, variables: Dict = None, files: Dict = None,
-                      before_activity_id: str = None, after_activity_id: str = None, **kwargs) -> Dict:
+    @keyword(tags=["process"])
+    def start_process_instance(
+        self,
+        process_key: str,
+        variables: Dict = None,
+        files: Dict = None,
+        before_activity_id: str = None,
+        after_activity_id: str = None,
+        **kwargs,
+    ) -> Dict:
         """
         Starts a new process instance from a process definition with given key.
 
@@ -617,41 +739,60 @@ class CamundaLibrary:
         | `start process` | apply for promotion | business_key=John again |
         """
         if not process_key:
-            raise ValueError('Error starting process. No process key provided.')
+            raise ValueError("Error starting process. No process key provided.")
 
         if before_activity_id and after_activity_id:
-            raise AssertionError('2 activity ids provided. Cannot start before and after an activity.')
+            raise AssertionError(
+                "2 activity ids provided. Cannot start before and after an activity."
+            )
 
         with self._shared_resources.api_client as api_client:
-            api_instance: ProcessDefinitionApi = openapi_client.ProcessDefinitionApi(api_client)
-            openapi_variables = CamundaResources.convert_dict_to_openapi_variables(variables)
-            openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(files)
+            api_instance: ProcessDefinitionApi = openapi_client.ProcessDefinitionApi(
+                api_client
+            )
+            openapi_variables = CamundaResources.convert_dict_to_openapi_variables(
+                variables
+            )
+            openapi_files = CamundaResources.convert_file_dict_to_openapi_variables(
+                files
+            )
             openapi_variables.update(openapi_files)
 
             if before_activity_id or after_activity_id:
-                instruction: ProcessInstanceModificationInstructionDto = ProcessInstanceModificationInstructionDto(
-                    type='startBeforeActivity' if before_activity_id else 'startAfterActivity',
-                    activity_id=before_activity_id if before_activity_id else after_activity_id,
+                instruction: ProcessInstanceModificationInstructionDto = (
+                    ProcessInstanceModificationInstructionDto(
+                        type=(
+                            "startBeforeActivity"
+                            if before_activity_id
+                            else "startAfterActivity"
+                        ),
+                        activity_id=(
+                            before_activity_id
+                            if before_activity_id
+                            else after_activity_id
+                        ),
+                    )
                 )
                 kwargs.update(start_instructions=[instruction])
 
-            start_process_instance_dto: StartProcessInstanceDto = StartProcessInstanceDto(
-                variables=openapi_variables,
-                **kwargs
+            start_process_instance_dto: StartProcessInstanceDto = (
+                StartProcessInstanceDto(variables=openapi_variables, **kwargs)
             )
 
             try:
-                response: ProcessInstanceWithVariablesDto = api_instance.start_process_instance_by_key(
-                    key=process_key,
-                    start_process_instance_dto=start_process_instance_dto
+                response: ProcessInstanceWithVariablesDto = (
+                    api_instance.start_process_instance_by_key(
+                        key=process_key,
+                        start_process_instance_dto=start_process_instance_dto,
+                    )
                 )
             except ApiException as e:
-                raise ApiException(f'Failed to start process {process_key}:\n{e}')
-        logger.info(f'Response:\n{response}')
+                raise ApiException(f"Failed to start process {process_key}:\n{e}")
+        logger.info(f"Response:\n{response}")
 
         return response.to_dict()
 
-    @keyword(tags=['process'])
+    @keyword(tags=["process"])
     def delete_process_instance(self, process_instance_id):
         """
         USE WITH CARE: Deletes a process instance by id. All data in this process instance will be lost.
@@ -662,16 +803,20 @@ class CamundaLibrary:
             try:
                 response = api_instance.delete_process_instance(id=process_instance_id)
             except ApiException as e:
-                raise ApiException(f'Failed to delete process instance {process_instance_id}:\n{e}')
+                raise ApiException(
+                    f"Failed to delete process instance {process_instance_id}:\n{e}"
+                )
 
-    @keyword(tags=['process'])
+    @keyword(tags=["process"])
     def get_all_active_process_instances(self, process_definition_key):
         """
         Returns a list of process instances that are active for a certain process definition identified by key.
         """
-        return self.get_process_instances(process_definition_key=process_definition_key, active='true')
+        return self.get_process_instances(
+            process_definition_key=process_definition_key, active="true"
+        )
 
-    @keyword(tags=['process'])
+    @keyword(tags=["process"])
     def get_process_instances(self, **kwargs):
         """
         Queries Camunda for process instances that match certain criteria.
@@ -679,59 +824,63 @@ class CamundaLibrary:
         *Be aware, that boolean value must be strings either 'true' or 'false'*
 
         == Arguments ==
-        | async_req | execute request asynchronously | 
-        | sort_by | Sort the results lexicographically by a given criterion. Must be used in conjunction with the sortOrder parameter. | 
-        | sort_order | Sort the results in a given order. Values may be asc for ascending order or desc for descending order. Must be used in conjunction with the sortBy parameter. | 
-        | first_result | Pagination of results. Specifies the index of the first result to return. | 
-        | max_results | Pagination of results. Specifies the maximum number of results to return. Will return less results if there are no more results left. | 
-        | process_instance_ids | Filter by a comma-separated list of process instance ids. | 
-        | business_key | Filter by process instance business key. | 
-        | business_key_like | Filter by process instance business key that the parameter is a substring of. | 
-        | case_instance_id | Filter by case instance id. | 
-        | process_definition_id | Filter by the deployment the id belongs to. | 
-        | process_definition_key | Filter by the key of the process definition the instances run on. | 
-        | process_definition_key_in | Filter by a comma-separated list of process definition keys. A process instance must have one of the given process definition keys. | 
-        | process_definition_key_not_in | Exclude instances by a comma-separated list of process definition keys. A process instance must not have one of the given process definition keys. | 
-        | deployment_id | Filter by the deployment the id belongs to. | 
-        | super_process_instance | Restrict query to all process instances that are sub process instances of the given process instance. Takes a process instance id. | 
-        | sub_process_instance | Restrict query to all process instances that have the given process instance as a sub process instance. Takes a process instance id. | 
-        | super_case_instance | Restrict query to all process instances that are sub process instances of the given case instance. Takes a case instance id. | 
-        | sub_case_instance | Restrict query to all process instances that have the given case instance as a sub case instance. Takes a case instance id. | 
-        | active | Only include active process instances. Value may only be true, as false is the default behavior. | 
-        | suspended | Only include suspended process instances. Value may only be true, as false is the default behavior. | 
-        | with_incident | Filter by presence of incidents. Selects only process instances that have an incident. | 
-        | incident_id | Filter by the incident id. | 
-        | incident_type | Filter by the incident type. See the [User Guide](https://docs.camunda.org/manual/latest/user-guide/process-engine/incidents/#incident-types) for a list of incident types. | 
-        | incident_message | Filter by the incident message. Exact match. | 
-        | incident_message_like | Filter by the incident message that the parameter is a substring of. | 
-        | tenant_id_in | Filter by a comma-separated list of tenant ids. A process instance must have one of the given tenant ids. | 
-        | without_tenant_id | Only include process instances which belong to no tenant. | 
-        | process_definition_without_tenant_id | Only include process instances which process definition has no tenant id. | 
-        | activity_id_in | Filter by a comma-separated list of activity ids. A process instance must currently wait in a leaf activity with one of the given activity ids. | 
-        | root_process_instances | Restrict the query to all process instances that are top level process instances. | 
-        | leaf_process_instances | Restrict the query to all process instances that are leaf instances. (i.e. don't have any sub instances). | 
-        | variables | Only include process instances that have variables with certain values. Variable filtering expressions are comma-separated and are structured as follows:  A valid parameter value has the form `key_operator_value`. `key` is the variable name, `operator` is the comparison operator to be used and `value` the variable value.  **Note**: Values are always treated as String objects on server side.  Valid `operator` values are: `eq` - equal to; `neq` - not equal to; `gt` - greater than; `gteq` - greater than or equal to; `lt` - lower than; `lteq` - lower than or equal to; `like`. `key` and `value` may not contain underscore or comma characters. | 
-        | variable_names_ignore_case | Match all variable names in this query case-insensitively. If set to true variableName and variablename are treated as equal. | 
-        | variable_values_ignore_case | Match all variable values in this query case-insensitively. If set to true variableValue and variablevalue are treated as equal. | 
+        | async_req | execute request asynchronously |
+        | sort_by | Sort the results lexicographically by a given criterion. Must be used in conjunction with the sortOrder parameter. |
+        | sort_order | Sort the results in a given order. Values may be asc for ascending order or desc for descending order. Must be used in conjunction with the sortBy parameter. |
+        | first_result | Pagination of results. Specifies the index of the first result to return. |
+        | max_results | Pagination of results. Specifies the maximum number of results to return. Will return less results if there are no more results left. |
+        | process_instance_ids | Filter by a comma-separated list of process instance ids. |
+        | business_key | Filter by process instance business key. |
+        | business_key_like | Filter by process instance business key that the parameter is a substring of. |
+        | case_instance_id | Filter by case instance id. |
+        | process_definition_id | Filter by the deployment the id belongs to. |
+        | process_definition_key | Filter by the key of the process definition the instances run on. |
+        | process_definition_key_in | Filter by a comma-separated list of process definition keys. A process instance must have one of the given process definition keys. |
+        | process_definition_key_not_in | Exclude instances by a comma-separated list of process definition keys. A process instance must not have one of the given process definition keys. |
+        | deployment_id | Filter by the deployment the id belongs to. |
+        | super_process_instance | Restrict query to all process instances that are sub process instances of the given process instance. Takes a process instance id. |
+        | sub_process_instance | Restrict query to all process instances that have the given process instance as a sub process instance. Takes a process instance id. |
+        | super_case_instance | Restrict query to all process instances that are sub process instances of the given case instance. Takes a case instance id. |
+        | sub_case_instance | Restrict query to all process instances that have the given case instance as a sub case instance. Takes a case instance id. |
+        | active | Only include active process instances. Value may only be true, as false is the default behavior. |
+        | suspended | Only include suspended process instances. Value may only be true, as false is the default behavior. |
+        | with_incident | Filter by presence of incidents. Selects only process instances that have an incident. |
+        | incident_id | Filter by the incident id. |
+        | incident_type | Filter by the incident type. See the [User Guide](https://docs.camunda.org/manual/latest/user-guide/process-engine/incidents/#incident-types) for a list of incident types. |
+        | incident_message | Filter by the incident message. Exact match. |
+        | incident_message_like | Filter by the incident message that the parameter is a substring of. |
+        | tenant_id_in | Filter by a comma-separated list of tenant ids. A process instance must have one of the given tenant ids. |
+        | without_tenant_id | Only include process instances which belong to no tenant. |
+        | process_definition_without_tenant_id | Only include process instances which process definition has no tenant id. |
+        | activity_id_in | Filter by a comma-separated list of activity ids. A process instance must currently wait in a leaf activity with one of the given activity ids. |
+        | root_process_instances | Restrict the query to all process instances that are top level process instances. |
+        | leaf_process_instances | Restrict the query to all process instances that are leaf instances. (i.e. don't have any sub instances). |
+        | variables | Only include process instances that have variables with certain values. Variable filtering expressions are comma-separated and are structured as follows:  A valid parameter value has the form `key_operator_value`. `key` is the variable name, `operator` is the comparison operator to be used and `value` the variable value.  **Note**: Values are always treated as String objects on server side.  Valid `operator` values are: `eq` - equal to; `neq` - not equal to; `gt` - greater than; `gteq` - greater than or equal to; `lt` - lower than; `lteq` - lower than or equal to; `like`. `key` and `value` may not contain underscore or comma characters. |
+        | variable_names_ignore_case | Match all variable names in this query case-insensitively. If set to true variableName and variablename are treated as equal. |
+        | variable_values_ignore_case | Match all variable values in this query case-insensitively. If set to true variableValue and variablevalue are treated as equal. |
         | _preload_content | if False, the urllib3.HTTPResponse object will
                                  be returned without reading/decoding response
-                                 data. Default is True. | 
+                                 data. Default is True. |
         | _request_timeout | timeout setting for this request. If one
                                  number provided, it will be total request
                                  timeout. It can also be a pair (tuple) of
-                                 (connection, read) timeouts. | 
+                                 (connection, read) timeouts. |
         """
         with self._shared_resources.api_client as api_client:
-            api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(api_client)
+            api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(
+                api_client
+            )
 
             try:
-                response: List[ProcessInstanceDto] = api_instance.get_process_instances(**kwargs)
+                response: List[ProcessInstanceDto] = api_instance.get_process_instances(
+                    **kwargs
+                )
             except ApiException as e:
-                raise ApiException(f'Failed to get process instances of process:\n{e}')
+                raise ApiException(f"Failed to get process instances of process:\n{e}")
 
         return [process_instance.to_dict() for process_instance in response]
 
-    @keyword(tags=['version'])
+    @keyword(tags=["version"])
     def get_version(self):
         """
         Returns Version of Camunda.
@@ -744,7 +893,7 @@ class CamundaLibrary:
             api_instance: VersionApi = openapi_client.VersionApi(api_client)
             return api_instance.get_rest_api_version()
 
-    @keyword(tags=['process'])
+    @keyword(tags=["process"])
     def get_process_definitions(self, **kwargs):
         """
         Returns a list of process definitions that fulfill given parameters.
@@ -755,16 +904,18 @@ class CamundaLibrary:
         | ${list} | Get Process Definitions | name=my_process_definition |
         """
         with self._shared_resources.api_client as api_client:
-            api_instance: ProcessDefinitionApi = openapi_client.ProcessDefinitionApi(api_client)
+            api_instance: ProcessDefinitionApi = openapi_client.ProcessDefinitionApi(
+                api_client
+            )
 
             try:
                 response = api_instance.get_process_definitions(**kwargs)
             except ApiException as e:
-                raise ApiException(f'Failed to get process definitions:\n{e}')
+                raise ApiException(f"Failed to get process definitions:\n{e}")
 
         return response
 
-    @keyword(tags=['process'])
+    @keyword(tags=["process"])
     def get_activity_instance(self, id: str):
         """
         Returns an Activity Instance (Tree) for a given process instance.
@@ -775,16 +926,27 @@ class CamundaLibrary:
         https://docs.camunda.org/manual/7.5/reference/rest/process-instance/get-activity-instances/
         """
         with self._shared_resources.api_client as api_client:
-            api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(api_client)
+            api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(
+                api_client
+            )
 
             try:
-                response: ActivityInstanceDto = api_instance.get_activity_instance_tree(id)
+                response: ActivityInstanceDto = api_instance.get_activity_instance_tree(
+                    id
+                )
             except ApiException as e:
-                raise ApiException(f'failed to get activity tree for process instance with id {id}:\n{e}')
+                raise ApiException(
+                    f"failed to get activity tree for process instance with id {id}:\n{e}"
+                )
         return response.to_dict()
 
-    @keyword(tags=['process'])
-    def get_process_instance_variable(self, process_instance_id: str, variable_name: str, auto_type_conversion: bool = True):
+    @keyword(tags=["process"])
+    def get_process_instance_variable(
+        self,
+        process_instance_id: str,
+        variable_name: str,
+        auto_type_conversion: bool = True,
+    ):
         """
         Returns the variable with the given name from the process instance with
         the given process_instance_id.
@@ -803,19 +965,26 @@ class CamundaLibrary:
         https://docs.camunda.org/manual/latest/reference/rest/process-instance/variables/get-single-variable/
         """
         with self._shared_resources.api_client as api_client:
-            api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(api_client)
+            api_instance: ProcessInstanceApi = openapi_client.ProcessInstanceApi(
+                api_client
+            )
 
             try:
                 response = api_instance.get_process_instance_variable(
-                    id=process_instance_id, var_name=variable_name, deserialize_value=not auto_type_conversion)
+                    id=process_instance_id,
+                    var_name=variable_name,
+                    deserialize_value=not auto_type_conversion,
+                )
             except ApiException as e:
-                raise ApiException(f'Failed to get variable {variable_name} from '
-                             f'process instance {process_instance_id}:\n{e}')
+                raise ApiException(
+                    f"Failed to get variable {variable_name} from "
+                    f"process instance {process_instance_id}:\n{e}"
+                )
         if auto_type_conversion:
-            return CamundaResources.convert_variable_dto(response) 
+            return CamundaResources.convert_variable_dto(response)
         return response
 
-    @keyword(tags=['decision'])
+    @keyword(tags=["decision"])
     def evaluate_decision(self, key: str, variables: dict) -> list:
         """
         Evaluates a given decision and returns the result.
@@ -831,8 +1000,11 @@ class CamundaLibrary:
             try:
                 response = api_instance.evaluate_decision_by_key(
                     key=key,
-                    evaluate_decision_dto=openapi_client.EvaluateDecisionDto(dto))
-                return [CamundaResources.convert_openapi_variables_to_dict(r)
-                        for r in response]
+                    evaluate_decision_dto=openapi_client.EvaluateDecisionDto(dto),
+                )
+                return [
+                    CamundaResources.convert_openapi_variables_to_dict(r)
+                    for r in response
+                ]
             except ApiException as e:
-                raise ApiException(f'Failed to evaluate decision {key}:\n{e}')
+                raise ApiException(f"Failed to evaluate decision {key}:\n{e}")
