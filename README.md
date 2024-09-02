@@ -1,5 +1,11 @@
 [![PyPI status](https://img.shields.io/pypi/status/robotframework-camunda.svg)](https://pypi.python.org/pypi/robotframework-camunda/) [![pipeline status](https://gitlab.com/robotframework-camunda-demos/robotframework-camunda-mirror/badges/master/pipeline.svg)](https://gitlab.com/robotframework-camunda-demos/robotframework-camunda-mirror/-/commits/master) [![PyPi license](https://badgen.net/pypi/license/robotframework-camunda/)](https://pypi.com/project/robotframework-camunda/) [![PyPi version](https://badgen.net/pypi/v/robotframework-camunda/)](https://pypi.org/project/robotframework-camunda) [![PyPI pyversions](https://img.shields.io/pypi/pyversions/robotframework-camunda.svg)](https://pypi.python.org/pypi/robotframework-camunda/) [![PyPI download month](https://img.shields.io/pypi/dm/robotframework-camunda.svg)](https://pypi.python.org/pypi/robotframework-camunda/) 
 
+# Camunda 7 vs Camunda 8
+Since it requested from time o time: No, this library won't support Camunda 8. C8 and it's API are completely different and C8 API has had backwards incompatible changes due to its relatively low maturity. This library supports to when:
+- You migrate to Camunda 7 based workflow engine and you want to validate your processes are still working.
+
+If you need to test C8, it is recommended to build a separate library. This had been the initial idea behind [Robot Framework Zeebe library](https://github.com/MarketSquare/robotframework-zeebe) which is looking for a maintainer.
+
 # Robot Framework Camunda
 
 This library provides keywords for accessing camunda workflow engine. Complete REST API reference of camunda 
