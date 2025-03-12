@@ -4,7 +4,7 @@
 Since it requested from time o time: No, this library won't support Camunda 8. C8 and it's API are completely different and C8 API has had backwards incompatible changes due to its relatively low maturity. This library supports to when:
 - You migrate to Camunda 7 based workflow engine and you want to validate your processes are still working.
 
-If you need to test C8, it is recommended to build a separate library. This had been the initial idea behind [Robot Framework Zeebe library](https://github.com/MarketSquare/robotframework-zeebe) which is looking for a maintainer.
+If you need to test C8, it is recommended to build a separate library.
 
 # Robot Framework Camunda
 
