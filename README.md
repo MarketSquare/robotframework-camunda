@@ -16,7 +16,7 @@ known issues or report one yourself. You are invited to contribute pull requests
 
 | Supported | Tested |
 | :----- | :----- |
-| Python >= 3.8 | 3.8, 3.9, 3.10, 3.11, 3.12 |
+| Python >= 3.9 | 3.9, 3.10, 3.11, 3.12 |
 | Camunda 7 >= 7.20 | 7.20 |
 
 ## Documentation
