@@ -8,7 +8,7 @@ version = "2.0.3"
 description = "Keywords for camunda rest api, leading open source workflow engine."
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "LICENSE" }
+license-files = ["LICENSE"]
 authors = [{ name = "Markus", email = "markus.i.sverige@googlemail.com" }]
 keywords = ["robotframework", "camunda", "automation", "testing", "bpm"]
 classifiers = [
