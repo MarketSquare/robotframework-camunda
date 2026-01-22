@@ -22,4 +22,4 @@ jobs:
         activate-environment: true
     - name: Execute doctests
       run: |
-        uv python CamundaLibrary/CamundaResources.py -v
+        uv run python CamundaLibrary/CamundaResources.py -v
