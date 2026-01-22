@@ -517,7 +517,7 @@ wheels = [
 [[package]]
 name = "robotframework-camunda"
 version = "2.0.3"
-source = { editable = "." }
+source = { virtual = "." }
 dependencies = [
     { name = "generic-camunda-client" },
     { name = "requests" },
