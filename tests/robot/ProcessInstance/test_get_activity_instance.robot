@@ -1,13 +1,13 @@
 *** Settings ***
-Library    CamundaLibrary
-Suite Setup    Set Camunda Configuration    ${configuration}
-Suite Teardown    Clean Up Process Instance
+Library             CamundaLibrary
+
+Suite Setup         Set Camunda Configuration    ${configuration}
+Suite Teardown      Clean Up Process Instance
 
 
 *** Variables ***
-${CAMUNDA_HOST}              http://localhost:8080
-${PROCESS_INSTANCE_ID}       ${EMPTY}
-${ACTIVITY_INSTANCE_TREE}    ${EMPTY}
+${PROCESS_INSTANCE_ID}          ${EMPTY}
+${ACTIVITY_INSTANCE_TREE}       ${EMPTY}
 
 
 *** Test Cases ***
@@ -24,7 +24,7 @@ Get Process Definitions
 
 *** Keywords ***
 Process Instance Is Present
-    ${response}   Start Process Instance    demo_for_robot
+    ${response}    Start Process Instance    demo_for_robot
     Set Global Variable    ${PROCESS_INSTANCE_ID}    ${response}[id]
 
 Camunda Is Requested For Activity Instances Of The Process Instance
@@ -38,5 +38,6 @@ Camunda Answered With An Activity Instance Tree
     Should Be Equal    Activity_process_element    ${activity_instances}[0][activity_id]
 
 Clean Up Process Instance
-    Run Keyword If    $PROCESS_INSTANCE_ID
-    ...    Delete Process Instance    ${PROCESS_INSTANCE_ID}
+    IF    $PROCESS_INSTANCE_ID
+        Delete Process Instance    ${PROCESS_INSTANCE_ID}
+    END

@@ -1,40 +1,42 @@
 *** Settings ***
-Library    CamundaLibrary
-Library    Collections
-Resource    ../cleanup.resource
-Suite Setup    Set Camunda Configuration    ${configuration}
-Test Setup    Delete all instances from process '${PROCESS_DEFINITION_KEY}'
-Test Teardown    Reset CamundaLibrary
+Library             CamundaLibrary
+Library             Collections
+Resource            ../cleanup.resource
+
+Suite Setup         Set Camunda Configuration    ${configuration}
+Test Setup          Delete all instances from process '${PROCESS_DEFINITION_KEY}'
+Test Teardown       Reset CamundaLibrary
+
 
 *** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
-${PROCESS_DEFINITION_KEY}    demo_for_robot
-${EXISTING_TOPIC}    process_demo_element
+${PROCESS_DEFINITION_KEY}       demo_for_robot
+${EXISTING_TOPIC}               process_demo_element
+
 
 *** Test Cases ***
 Test 'fetch and lock' for existing topic
-    #GIVEN
+    # GIVEN
     Start Process Instance    ${PROCESS_DEFINITION_KEY}    ${{{'variable_1': 1}}}
-    #WHEN
+    # WHEN
     ${variables}    fetch workload    ${EXISTING_TOPIC}
-    #THEN
+    # THEN
     Should Not Be Empty    ${variables}    Fetching failed. Expected workload at topic '${EXISTING_TOPIC}'
-    #AND
+    # AND
     Dictionary should contain key    ${variables}    variable_1
 
 Test 'fetch and lock' with only specific variables
-    #GIVEN
+    # GIVEN
     ${variable_name1}    Set Variable    variable1
     ${variable_name2}    Set Variable    variable2
     ${input_variables}    Create Dictionary
     ...    ${variable_name1}=1
     ...    ${variable_name2}=2
-    Start Process Instance   ${PROCESS_DEFINITION_KEY}    ${input_variables}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}    ${input_variables}
 
-    #WHEN
+    # WHEN
     ${variables}    fetch workload    ${EXISTING_TOPIC}    variables=${{['${variable_name1}']}}
 
-    #THEN
+    # THEN
     Dictionary Should Contain key    ${variables}    ${variable_name1}
     Dictionary Should Not Contain Key    ${variables}    ${variable_name2}
 
@@ -43,7 +45,7 @@ Test 'fetch and lock' for non existing topic
     ${non_existing_topic}    Set Variable    asdqeweasdwe
 
     # WHEN
-    ${work_items}    fetch workload   topic=${non_existing_topic}
+    ${work_items}    fetch workload    topic=${non_existing_topic}
 
     # THEN
     Should Be Empty    ${work_items}
@@ -59,6 +61,7 @@ Test 'fetch and lock' for inacurrate camunda url
     # THEN
     Should Be Equal    FAIL    ${pass_message}
     Should contain    ${error}    ConnectionError
+
 
 *** Keywords ***
 Reset CamundaLibrary

@@ -1,9 +1,8 @@
 *** Settings ***
-Library    CamundaLibrary
-Suite Setup    Set Camunda Configuration    ${configuration}
+Library         CamundaLibrary
 
-*** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
+Suite Setup     Set Camunda Configuration    ${configuration}
+
 
 *** Test Cases ***
 Test unlock without having fetched anything
@@ -15,7 +14,7 @@ Test 'fetch and lock' for non existing topic
     ${non_existing_topic}    Set Variable    asdqeweasdwe
 
     # AND
-    ${work_items}    fetch workload   topic=${non_existing_topic}
+    ${work_items}    fetch workload    topic=${non_existing_topic}
 
     # EXPECTED
     Should Be Empty    ${work_items}

@@ -1,9 +1,8 @@
 *** Settings ***
-Library    CamundaLibrary
-Suite Setup    Set Camunda Configuration    ${configuration}
+Library         CamundaLibrary
 
-*** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
+Suite Setup     Set Camunda Configuration    ${configuration}
+
 
 *** Test Cases ***
 Never write recent process instance id when no workitem is fetched
@@ -13,11 +12,14 @@ Never write recent process instance id when no workitem is fetched
     ${work_items}    fetch workload    topic=${not_existing_topic}
 
     # EXPECT
-    Should be Empty    ${work_items}    Did not expect to receive work items for not existing topic:\t${not_existing_topic}
+    Should be Empty
+    ...    ${work_items}
+    ...    Did not expect to receive work items for not existing topic:\t${not_existing_topic}
 
     # WHEN
     ${recent_task}    get fetch response
 
     # THEN
-    Should Be Empty    ${recent_task}    Should not have stored a recent task for none existing topic, but registered recent task id:\t${recent_task}
-
+    Should Be Empty
+    ...    ${recent_task}
+    ...    Should not have stored a recent task for none existing topic, but registered recent task id:\t${recent_task}

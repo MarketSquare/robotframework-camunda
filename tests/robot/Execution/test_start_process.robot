@@ -1,15 +1,16 @@
 *** Settings ***
-Library    CamundaLibrary
-Library    Collections
-Library    OperatingSystem
-Resource    ../cleanup.resource
-Suite Setup    Set Camunda Configuration    ${configuration}
-Test Setup    Delete all instances from process '${PROCESS_DEFINITION_KEY}'
+Library         CamundaLibrary
+Library         Collections
+Library         OperatingSystem
+Resource        ../cleanup.resource
+
+Suite Setup     Set Camunda Configuration    ${configuration}
+Test Setup      Delete all instances from process '${PROCESS_DEFINITION_KEY}'
 
 
 *** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
-${PROCESS_DEFINITION_KEY}    demo_for_robot
+${PROCESS_DEFINITION_KEY}       demo_for_robot
+
 
 *** Test Cases ***
 Test starting process
@@ -19,7 +20,7 @@ Test starting process
     [Teardown]    delete process instance    ${process_instance}[id]
 
 Test starting process with variables
-    #GIVEN
+    # GIVEN
     ${PROCESS_DEFINITION_KEY}    Set Variable    demo_for_robot
     ${existing_topic}    Set Variable    process_demo_element
 
@@ -28,10 +29,10 @@ Test starting process with variables
     ${variables}    Create Dictionary    ${variable1_key}=${variable1_value}
 
     # WHEN
-    Start Process Instance    ${PROCESS_DEFINITION_KEY}   ${variables}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}    ${variables}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}
+    ${first_workload}    fetch workload    topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -43,17 +44,17 @@ Test starting process with variables
     [Teardown]    complete task
 
 Test starting process with business key
-    #GIVEN
+    # GIVEN
     ${PROCESS_DEFINITION_KEY}    Set Variable    demo_for_robot
     ${existing_topic}    Set Variable    process_demo_element
 
     ${expected_business_key}    Set Variable    business 1
 
     # WHEN
-    Start Process Instance    ${PROCESS_DEFINITION_KEY}   business_key=${expected_business_key}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}    business_key=${expected_business_key}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}    async_response_timeout=100
+    ${first_workload}    fetch workload    topic=${existing_topic}    async_response_timeout=100
     ${response}    get fetch response
 
     # THEN
@@ -66,7 +67,7 @@ Test starting process with business key
     [Teardown]    complete task
 
 Test starting process with variables after activity
-    #GIVEN
+    # GIVEN
     ${existing_topic}    Set Variable    process_demo_element
 
     ${variable1_value}    Set Variable    After activity test
@@ -76,10 +77,10 @@ Test starting process with variables after activity
     ${after_activity_id}    Set Variable    Activity_process_element
 
     # WHEN
-    Start Process Instance    ${PROCESS_DEFINITION_KEY}   ${variables}    after_activity_id=${after_activity_id}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}    ${variables}    after_activity_id=${after_activity_id}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}
+    ${first_workload}    fetch workload    topic=${existing_topic}
 
     # THEN
     Should be empty    ${first_workload}
@@ -87,7 +88,7 @@ Test starting process with variables after activity
     [Teardown]    complete task
 
 Test starting process with variables before activity
-    #GIVEN
+    # GIVEN
     ${existing_topic}    Set Variable    process_demo_element
 
     ${variable1_value}    Set Variable    Before activity test
@@ -97,10 +98,10 @@ Test starting process with variables before activity
     ${before_activity_id}    Set Variable    Activity_process_element
 
     # WHEN
-    Start Process Instance    ${PROCESS_DEFINITION_KEY}   ${variables}    before_activity_id=${before_activity_id}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}    ${variables}    before_activity_id=${before_activity_id}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}
+    ${first_workload}    fetch workload    topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -112,7 +113,7 @@ Test starting process with variables before activity
     [Teardown]    complete task
 
 Test starting process with dict variables
-    #GIVEN
+    # GIVEN
     ${existing_topic}    Set Variable    process_demo_element
 
     ${variable1_value}    Set Variable    test1
@@ -121,10 +122,10 @@ Test starting process with dict variables
     ${variables}    Create Dictionary    variables1=${variables1}
 
     # WHEN
-    Start Process Instance    ${PROCESS_DEFINITION_KEY}   ${variables}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}    ${variables}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}
+    ${first_workload}    fetch workload    topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -137,16 +138,16 @@ Test starting process with dict variables
     [Teardown]    complete task
 
 Test starting process with file variables
-    #GIVEN
+    # GIVEN
     ${existing_topic}    Set Variable    process_demo_element
 
     ${files}    Create Dictionary    my_file=tests/resources/rf-logo.png
 
     # WHEN
-    Start Process Instance    ${PROCESS_DEFINITION_KEY}   files=${files}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}    files=${files}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}
+    ${first_workload}    fetch workload    topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -160,7 +161,7 @@ Test starting process with file variables
     [Teardown]    complete task
 
 Test file content from starting process variable
-    #GIVEN
+    # GIVEN
     ${existing_topic}    Set Variable    process_demo_element
     ${testfile}    Set Variable    tests/resources/test.txt
     ${testfile_content}    Get File    ${testfile}
@@ -168,10 +169,10 @@ Test file content from starting process variable
     ${files}    Create Dictionary    my_file=${testfile}
 
     # WHEN
-    Start Process Instance    ${PROCESS_DEFINITION_KEY}   files=${files}
+    Start Process Instance    ${PROCESS_DEFINITION_KEY}    files=${files}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}
+    ${first_workload}    fetch workload    topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -187,17 +188,17 @@ Test file content from starting process variable
     [Teardown]    complete task
 
 Test starting process with file variables
-    #GIVEN
+    # GIVEN
     ${process_definition_key}    Set Variable    demo_for_robot
     ${existing_topic}    Set Variable    process_demo_element
 
     ${files}    Create Dictionary    my_file=tests/resources/rf-logo.png
 
     # WHEN
-    Start Process Instance    ${process_definition_key}   files=${files}
+    Start Process Instance    ${process_definition_key}    files=${files}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}
+    ${first_workload}    fetch workload    topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -211,7 +212,7 @@ Test starting process with file variables
     [Teardown]    complete task
 
 Test file content from starting process variable
-    #GIVEN
+    # GIVEN
     ${process_definition_key}    Set Variable    demo_for_robot
     ${existing_topic}    Set Variable    process_demo_element
     ${testfile}    Set Variable    tests/resources/test.txt
@@ -220,10 +221,10 @@ Test file content from starting process variable
     ${files}    Create Dictionary    my_file=${testfile}
 
     # WHEN
-    Start Process Instance    ${process_definition_key}   files=${files}
+    Start Process Instance    ${process_definition_key}    files=${files}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}
+    ${first_workload}    fetch workload    topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -239,17 +240,17 @@ Test file content from starting process variable
     [Teardown]    complete task
 
 Test starting process with file variables
-    #GIVEN
+    # GIVEN
     ${process_definition_key}    Set Variable    demo_for_robot
     ${existing_topic}    Set Variable    process_demo_element
 
     ${files}    Create Dictionary    my_file=tests/resources/rf-logo.png
 
     # WHEN
-    Start Process Instance    ${process_definition_key}   files=${files}
+    Start Process Instance    ${process_definition_key}    files=${files}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}
+    ${first_workload}    fetch workload    topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}
@@ -263,7 +264,7 @@ Test starting process with file variables
     [Teardown]    complete task
 
 Test file content from starting process variable
-    #GIVEN
+    # GIVEN
     ${process_definition_key}    Set Variable    demo_for_robot
     ${existing_topic}    Set Variable    process_demo_element
     ${testfile}    Set Variable    tests/resources/test.txt
@@ -272,10 +273,10 @@ Test file content from starting process variable
     ${files}    Create Dictionary    my_file=${testfile}
 
     # WHEN
-    Start Process Instance    ${process_definition_key}   files=${files}
+    Start Process Instance    ${process_definition_key}    files=${files}
 
     # AND
-    ${first_workload}     fetch workload   topic=${existing_topic}
+    ${first_workload}    fetch workload    topic=${existing_topic}
 
     # THEN
     Should Not be empty    ${first_workload}

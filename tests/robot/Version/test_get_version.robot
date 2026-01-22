@@ -1,11 +1,8 @@
 *** Settings ***
-Library    CamundaLibrary
-Library    String
-Suite Setup    Set Camunda Configuration    ${configuration}
+Library         CamundaLibrary
+Library         String
 
-
-*** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
+Suite Setup     Set Camunda Configuration    ${configuration}
 
 
 *** Test Cases ***

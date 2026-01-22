@@ -1,10 +1,11 @@
 *** Settings ***
-Library    CamundaLibrary
-Suite Setup    Set Camunda Configuration    ${configuration}
+Library         CamundaLibrary
+
+Suite Setup     Set Camunda Configuration    ${configuration}
+
 
 *** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
-${PROCESS_NAME}    demo_for_robot
+${PROCESS_NAME}     demo_for_robot
 
 
 *** Test Cases ***
@@ -22,6 +23,7 @@ Get all instances
     FOR    ${process_instance}    IN    @{process_instances_after}
         delete process instance    ${process_instance}[id]
     END
+
 
 *** Keywords ***
 Upload process
