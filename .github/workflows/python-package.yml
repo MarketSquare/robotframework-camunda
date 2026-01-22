@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Install uv and set Python ${{ matrix.python-version }}
-      uses: astral-sh/setup-uv@v3  
+      uses: astral-sh/setup-uv@v7  
       with:
         python-version: ${{ matrix.python-version }}
         activate-environment: true
