@@ -14,10 +14,9 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Development Status :: 5 - Production/Stable",
-    "Framework :: Robot Framework",
+    "Framework :: Robot Framework :: Library",
 ]
 dependencies = [
     "robotframework>=3.2",
@@ -26,6 +25,10 @@ dependencies = [
     "requests_toolbelt",
     "url-normalize",
 ]
+
+[tool.setuptools.packages.find]
+include = ["CamundaLibrary"]
+exclude = ["tests*", "libdoc*"]
 
 [project.urls]
 Homepage = "https://github.com/MarketSquare/robotframework-camunda"

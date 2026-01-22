@@ -27,6 +27,7 @@ jobs:
     - name: Test with robot
       run: |
         uv sync --group ci
+        uv pip install .
         sleep 10
         uv run robotcode -p ci robot tests/robot/**/*.robot
     - name: Archive production artifacts
