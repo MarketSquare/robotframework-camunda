@@ -12,3 +12,6 @@ log-level = "DEBUG:WARN"
 
 [profiles.ci.variables]
 CAMUNDA_HOST = "http://camunda:8080"
+
+[profiles.dryrun]
+dry-run = true
