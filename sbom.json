@@ -1,0 +1,173 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "serialNumber": "urn:uuid:795033b6-822e-40b4-8f6f-e0d0e021bbe6",
+  "metadata": {
+    "timestamp": "2026-01-23T00:06:57.669003080Z",
+    "tools": [
+      {
+        "vendor": "Astral Software Inc.",
+        "name": "uv",
+        "version": "0.9.16"
+      }
+    ],
+    "component": {
+      "type": "library",
+      "bom-ref": "robotframework-camunda-1@2.0.3",
+      "name": "robotframework-camunda",
+      "version": "2.0.3"
+    }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "certifi-2@2026.1.4",
+      "name": "certifi",
+      "version": "2026.1.4",
+      "purl": "pkg:pypi/certifi@2026.1.4"
+    },
+    {
+      "type": "library",
+      "bom-ref": "charset-normalizer-3@3.4.4",
+      "name": "charset-normalizer",
+      "version": "3.4.4",
+      "purl": "pkg:pypi/charset-normalizer@3.4.4"
+    },
+    {
+      "type": "library",
+      "bom-ref": "generic-camunda-client-4@7.18.0",
+      "name": "generic-camunda-client",
+      "version": "7.18.0",
+      "purl": "pkg:pypi/generic-camunda-client@7.18.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "idna-5@3.11",
+      "name": "idna",
+      "version": "3.11",
+      "purl": "pkg:pypi/idna@3.11"
+    },
+    {
+      "type": "library",
+      "bom-ref": "python-dateutil-6@2.9.0.post0",
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "purl": "pkg:pypi/python-dateutil@2.9.0.post0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "requests-7@2.32.5",
+      "name": "requests",
+      "version": "2.32.5",
+      "purl": "pkg:pypi/requests@2.32.5"
+    },
+    {
+      "type": "library",
+      "bom-ref": "requests-toolbelt-8@1.0.0",
+      "name": "requests-toolbelt",
+      "version": "1.0.0",
+      "purl": "pkg:pypi/requests-toolbelt@1.0.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "robotframework-9@7.4.1",
+      "name": "robotframework",
+      "version": "7.4.1",
+      "purl": "pkg:pypi/robotframework@7.4.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "six-10@1.17.0",
+      "name": "six",
+      "version": "1.17.0",
+      "purl": "pkg:pypi/six@1.17.0"
+    },
+    {
+      "type": "library",
+      "bom-ref": "url-normalize-11@2.2.1",
+      "name": "url-normalize",
+      "version": "2.2.1",
+      "purl": "pkg:pypi/url-normalize@2.2.1"
+    },
+    {
+      "type": "library",
+      "bom-ref": "urllib3-12@2.6.3",
+      "name": "urllib3",
+      "version": "2.6.3",
+      "purl": "pkg:pypi/urllib3@2.6.3"
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "certifi-2@2026.1.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "charset-normalizer-3@3.4.4",
+      "dependsOn": []
+    },
+    {
+      "ref": "generic-camunda-client-4@7.18.0",
+      "dependsOn": [
+        "certifi-2@2026.1.4",
+        "python-dateutil-6@2.9.0.post0",
+        "six-10@1.17.0",
+        "urllib3-12@2.6.3"
+      ]
+    },
+    {
+      "ref": "idna-5@3.11",
+      "dependsOn": []
+    },
+    {
+      "ref": "python-dateutil-6@2.9.0.post0",
+      "dependsOn": [
+        "six-10@1.17.0"
+      ]
+    },
+    {
+      "ref": "requests-7@2.32.5",
+      "dependsOn": [
+        "certifi-2@2026.1.4",
+        "charset-normalizer-3@3.4.4",
+        "idna-5@3.11",
+        "urllib3-12@2.6.3"
+      ]
+    },
+    {
+      "ref": "requests-toolbelt-8@1.0.0",
+      "dependsOn": [
+        "requests-7@2.32.5"
+      ]
+    },
+    {
+      "ref": "robotframework-9@7.4.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "robotframework-camunda-1@2.0.3",
+      "dependsOn": [
+        "generic-camunda-client-4@7.18.0",
+        "requests-7@2.32.5",
+        "requests-toolbelt-8@1.0.0",
+        "robotframework-9@7.4.1",
+        "url-normalize-11@2.2.1"
+      ]
+    },
+    {
+      "ref": "six-10@1.17.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "url-normalize-11@2.2.1",
+      "dependsOn": [
+        "idna-5@3.11"
+      ]
+    },
+    {
+      "ref": "urllib3-12@2.6.3",
+      "dependsOn": []
+    }
+  ]
+}
