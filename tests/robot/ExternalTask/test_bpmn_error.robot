@@ -1,16 +1,15 @@
 *** Settings ***
-Library    CamundaLibrary
-Resource    ../cleanup.resource
-Suite Setup    Set Camunda Configuration    ${configuration}
-Test Setup    Delete all instances from process '${PROCESS_DEFINITION_KEY}'
+Library         CamundaLibrary
+Resource        ../cleanup.resource
+
+Suite Setup     Set Camunda Configuration    ${configuration}
+Test Setup      Delete all instances from process '${PROCESS_DEFINITION_KEY}'
+
 
 *** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
-${PROCESS_DEFINITION_KEY}    demo_for_robot
-${EXISTING_TOPIC}    process_demo_element
+${PROCESS_DEFINITION_KEY}       demo_for_robot
+${EXISTING_TOPIC}               process_demo_element
 
-*** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
 
 *** Test Cases ***
 BPMN error without task does not fail
@@ -24,7 +23,7 @@ Test 'throw bpmn error' for existing topic
     ${variables}    Create Dictionary    text=Manna Manna
 
     # AND
-    ${work_items}    fetch workload   topic=${existing_topic}
+    ${work_items}    fetch workload    topic=${existing_topic}
 
     # WHEN
     throw bpmn error    de1    Alles kaputt    variables=${variables}

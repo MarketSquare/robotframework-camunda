@@ -69,22 +69,24 @@ Integrationtests:
   stage: test
   parallel:
     matrix:
-      - CAMUNDA_VERSION: run-7.14.0
-      - CAMUNDA_VERSION: run-7.15.0
-      - CAMUNDA_VERSION: run-7.16.0
+      - CAMUNDA_VERSION: run-7.24.0
+      - CAMUNDA_VERSION: run-7.23.0
+      - CAMUNDA_VERSION: run-7.22.0
   services:
     - name: camunda/camunda-bpm-platform:${CAMUNDA_VERSION}
       alias: camunda
   before_script:
-    - pip install .
+    - pip install uv
+    - uv sync --group ci
+    - uv pip install .
   script:
-    - robot -L DEBUG -b console -d output -x xunit.xml -V tests/robot/config_cicd.py -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/test*.robot
+    - uv run robotcode -p dryrun -p ci robot tests/robot/**/test*.robot
   artifacts:
     expire_in: 1 week
     paths:
-      - output
+      - results
     reports:
-      junit: output/xunit.xml
+      junit: results/xunit.xml
     when: always
 
 

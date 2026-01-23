@@ -1,15 +1,15 @@
 *** Settings ***
-Library     CamundaLibrary
-Library     Collections
-Resource    ../cleanup.resource
-Suite Setup    Set Camunda Configuration    ${configuration}
-Test Setup    Delete all instances from process '${PROCESS_DEFINITION_KEY}'
+Library         CamundaLibrary
+Library         Collections
+Resource        ../cleanup.resource
+
+Suite Setup     Set Camunda Configuration    ${configuration}
+Test Setup      Delete all instances from process '${PROCESS_DEFINITION_KEY}'
 
 
 *** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
-${PROCESS_DEFINITION_KEY}    demo_for_robot
-${EXISTING_TOPIC}    process_demo_element
+${PROCESS_DEFINITION_KEY}       demo_for_robot
+${EXISTING_TOPIC}               process_demo_element
 
 
 *** Test Cases ***
@@ -20,17 +20,16 @@ Dictionary variable remains dictionary
     # WHEN
     ${return_variables}    Workload is fetched
 
-    #THEN
+    # THEN
     Should Not Be Empty    ${return_variables}    Fetching failed. Expected workload at topic '${EXISTING_TOPIC}'
 
-    #AND
+    # AND
     Should Be Equal    ${return_variables}[map][a]    ${variables}[map][a]    Dictionary value returned not as expected
     Should Be Equal    ${return_variables}[map][b]    ${variables}[map][b]    Dictionary value returned not as expected
 
-
 Dictionary variable is of type JSON in camunda
-    #GIVEN
-    ${process_instance}     Process with dictionary variable is started
+    # GIVEN
+    ${process_instance}    Process with dictionary variable is started
 
     ${variable_instance}    Get Process Instance Variable
     ...    process_instance_id=${process_instance}[id]
@@ -46,17 +45,16 @@ List variable remains list
     # WHEN
     ${return_variables}    Workload is fetched
 
-    #THEN
+    # THEN
     Should Not Be Empty    ${return_variables}    Fetching failed. Expected workload at topic '${EXISTING_TOPIC}'
 
-    #AND
+    # AND
     Should Be Equal    ${return_variables}[map][0]    ${variables}[map][0]    Dictionary value returned not as expected
     Should Be Equal    ${return_variables}[map][1]    ${variables}[map][1]    Dictionary value returned not as expected
 
-
 List variable is of type JSON in camunda
-    #GIVEN
-    ${process_instance}     Process with list variable is started
+    # GIVEN
+    ${process_instance}    Process with list variable is started
 
     ${variable_instance}    Get Process Instance Variable
     ...    process_instance_id=${process_instance}[id]
@@ -71,26 +69,26 @@ Process with dictionary variable
     ${my_dict}    Create Dictionary    a=1    b=2
     ${variables}    Create Dictionary    map=${my_dict}
     ${process_instance}    Start Process Instance    ${PROCESS_DEFINITION_KEY}    variables=${variables}
-    [Return]    ${variables}
+    RETURN    ${variables}
 
 Process with list variable
     ${my_dict}    Create list    1    2
     ${variables}    Create Dictionary    map=${my_dict}
     ${process_instance}    Start Process Instance    ${PROCESS_DEFINITION_KEY}    variables=${variables}
-    [Return]    ${variables}
+    RETURN    ${variables}
 
 Workload is fetched
     ${return_variables}    fetch workload    ${EXISTING_TOPIC}
-    [Return]    ${return_variables}
+    RETURN    ${return_variables}
 
 Process with dictionary variable is started
     ${my_dict}    Create Dictionary    a=1    b=2
     ${variables}    Create Dictionary    map=${my_dict}
     ${process_instance}    Start Process Instance    ${PROCESS_DEFINITION_KEY}    variables=${variables}
-    [Return]    ${process_instance}
+    RETURN    ${process_instance}
 
 Process with list variable is started
     ${my_dict}    Create Dictionary    a=1    b=2
     ${variables}    Create Dictionary    map=${my_dict}
     ${process_instance}    Start Process Instance    ${PROCESS_DEFINITION_KEY}    variables=${variables}
-    [Return]    ${process_instance}
+    RETURN    ${process_instance}

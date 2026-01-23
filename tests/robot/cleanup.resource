@@ -1,8 +1,6 @@
 *** Settings ***
-Library    CamundaLibrary   ${CAMUNDA_HOST}
+Library     CamundaLibrary    ${CAMUNDA_HOST}
 
-*** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
 
 *** Keywords ***
 Delete all instances from process '${process_key}'

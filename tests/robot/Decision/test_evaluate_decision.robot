@@ -1,13 +1,13 @@
 *** Settings ***
-Library    CamundaLibrary
-Library    Collections
-Suite Setup    Set Camunda Configuration    ${configuration}
+Library         CamundaLibrary
+Library         Collections
+
+Suite Setup     Set Camunda Configuration    ${configuration}
 
 
 *** Variables ***
-${CAMUNDA_HOST}        http://localhost:8080
-${DMN_KEY}             demo_decision
-${DECISIONS}           ${EMPTY}
+${DMN_KEY}      demo_decision
+${DECISIONS}    ${EMPTY}
 
 
 *** Test Cases ***
@@ -40,7 +40,7 @@ Request Decision
     ${infos}    Create Dictionary    married=${married}
     ${variables}    Create Dictionary
     ...    firstname    ${firstname}
-    ...    age     ${age}
+    ...    age    ${age}
     ...    infos    ${infos}
     ${response}    Evaluate Decision
     ...    ${DMN_KEY}
@@ -50,5 +50,5 @@ Request Decision
 Decision Will Be Correct
     Log    ${DECISIONS}
     Should Be Equal As Integers    3001001001    ${DECISIONS}[0][0][level]
-    Should Be Equal As Integers    0             ${DECISIONS}[1][0][level]
-    Should Be Equal As Integers    -1            ${DECISIONS}[2][0][level]
+    Should Be Equal As Integers    0    ${DECISIONS}[1][0][level]
+    Should Be Equal As Integers    -1    ${DECISIONS}[2][0][level]

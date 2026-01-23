@@ -1,0 +1,17 @@
+variable-files = ["tests/robot/config.py"]
+xunit = "xunit.xml"
+debug-file = "debug.log"
+log-level = "TRACE:INFO"
+
+[variables]
+CAMUNDA_HOST = "http://localhost:8080"
+
+[profiles.ci]
+variable-files = ["tests/robot/config_cicd.py"]
+log-level = "DEBUG:WARN"
+
+[profiles.ci.variables]
+CAMUNDA_HOST = "http://camunda:8080"
+
+[profiles.dryrun]
+dry-run = true

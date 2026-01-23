@@ -1,14 +1,16 @@
 *** Settings ***
-Library    CamundaLibrary
-Suite Setup    Set Camunda Configuration    ${configuration}
-Resource    ../cleanup.resource
+Library         CamundaLibrary
+Resource        ../cleanup.resource
+
+Suite Setup     Set Camunda Configuration    ${configuration}
+
 
 *** Variables ***
-${CAMUNDA_HOST}    http://localhost:8080
-${PROCESS_DEFINITION_KEY}    demo_for_robot
-${TOPIC_NAME}    process_demo_element
+${PROCESS_DEFINITION_KEY}       demo_for_robot
+${TOPIC_NAME}                   process_demo_element
 
-*** Test Case ***
+
+*** Test Cases ***
 There shall be as many tasks as started processes
     [Documentation]    https://github.com/MarketSquare/robotframework-camunda/issues/6
     [Tags]    issue-6
@@ -25,12 +27,13 @@ There shall be as many tasks as started processes
     2
     4
 
+
 *** Keywords ***
 Start Process Instancees and check amount of workloads
     [Arguments]    ${n}
     Delete all instances from process '${PROCESS_DEFINITION_KEY}'
-    FOR     ${i}    IN RANGE    0    ${n}
-        Start Process Instance     ${PROCESS_DEFINITION_KEY}
+    FOR    ${i}    IN RANGE    0    ${n}
+        Start Process Instance    ${PROCESS_DEFINITION_KEY}
     END
 
     ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}
@@ -39,10 +42,11 @@ Start Process Instancees and check amount of workloads
 Start Process Instance with business key and check for particular workload
     [Arguments]    ${n}
     Delete all instances from process '${PROCESS_DEFINITION_KEY}'
-    FOR     ${i}    IN RANGE    0    ${n}
-        ${last_process_instance}    Start Process Instance     ${PROCESS_DEFINITION_KEY}    business_key=${i}
+    FOR    ${i}    IN RANGE    0    ${n}
+        ${last_process_instance}    Start Process Instance    ${PROCESS_DEFINITION_KEY}    business_key=${i}
     END
 
-    ${amount_of_workloads}    Get amount of workloads    ${TOPIC_NAME}    process_instance_id=${last_process_instance}[id]
+    ${amount_of_workloads}    Get amount of workloads
+    ...    ${TOPIC_NAME}
+    ...    process_instance_id=${last_process_instance}[id]
     Should be equal as integers    ${amount_of_workloads}    1
-

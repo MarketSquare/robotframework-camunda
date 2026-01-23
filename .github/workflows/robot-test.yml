@@ -5,12 +5,12 @@ on: [push, pull_request]
 jobs:
   integrationtest:
     runs-on: ubuntu-latest
-    container: python:3.9
+    container: python:3.10
     strategy:
       fail-fast: false
       matrix:
         auth_enabled: ['false', 'true']      
-        camunda_version: ['run-7.20.0']
+        camunda_version: ['run-7.24.0']
     services:
       camunda:
         image: camunda/camunda-bpm-platform:${{ matrix.camunda_version }}
@@ -20,18 +20,23 @@ jobs:
           camunda.bpm.run.auth.enabled: ${{ matrix.auth_enabled }}
     steps:
     - uses: actions/checkout@v4
+    - name: Install uv
+      uses: astral-sh/setup-uv@v7
+      with:
+        activate-environment: true
     - name: Test with robot
       run: |
-        pip install .
+        uv sync --group ci
+        uv pip install .
         sleep 10
-        robot -d logs -b debug.log -x xunit.xml -L DEBUG -V tests/robot/config_cicd.py -v CAMUNDA_HOST:http://camunda:8080 tests/robot/**/*.robot
+        uv run robotcode -p ci robot tests/robot/**/*.robot
     - name: Archive production artifacts
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: robot logs-${{matrix.camunda_version}}-${{matrix.auth_enabled}}
         path: |
-          logs
+          results
     - name: Download Artifacts
       uses: actions/download-artifact@v4
       with:

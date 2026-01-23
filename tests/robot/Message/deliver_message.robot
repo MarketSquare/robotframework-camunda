@@ -131,7 +131,7 @@ Prepare testcase
 
 Get workload from topic '${topic}'
     ${workload}    Fetch Workload    ${topic}
-    [Return]    ${workload}
+    RETURN    ${workload}
 
 Last topic should have workload
     ${recent_process_instance}    Get fetch response
